@@ -22,6 +22,11 @@ namespace numeric
   public:
     typedef V vector_type;
     
+  private:
+    typedef typename vector_type::value_type value_type;
+    typedef ublas::scalar_traits<value_type> scalar_traits;
+    
+  public:
     bool empty() const
     {
       return liVectors_.empty();
@@ -49,7 +54,7 @@ namespace numeric
       {
         // Vectors most rows were eliminated, adding to storage.
         liVectors_.insert(liVectors_.end(), eliminatedV);
-        std::cout << "Adding: " << eliminatedV << " (" << v << ")\n"; // debug
+        //std::cout << "Adding: " << eliminatedV << " (" << v << ")\n"; // debug
         return true;
       }
     }
@@ -73,7 +78,7 @@ namespace numeric
       
       if (success)
       {
-        liVectors.swap(*this);
+        liVectors.swap(*this); // TODO: this method is not implemented.
         return true;
       }
       else
@@ -87,7 +92,7 @@ namespace numeric
       
       // Searching first non zero row in vector.
       size_t r = 0;
-      while (r < v.size() && ublas::scalar_traits<typename vector_type::value_type>::equals(v[r], 0))
+      while (r < v.size() && scalar_traits::equals(v[r], 0))
       {
         ++r;
       }
@@ -95,13 +100,13 @@ namespace numeric
       if (r >= v.size())
       {
         // Vector is zero.
-        BOOST_ASSERT(ublas::scalar_traits<typename vector_type::value_type>::equals(ublas::norm_inf(v), 0));
+        BOOST_ASSERT(scalar_traits::equals(ublas::norm_inf(v), 0));
         return false;
       }
       
       // Normalizing first nonzero row.
       v /= v[r];
-      BOOST_ASSERT(ublas::scalar_traits<typename vector_type::value_type>::equals(v[r], 1));
+      BOOST_ASSERT(scalar_traits::equals(v[r], 1));
       v[r] = 1;
       
       if (empty())
@@ -115,7 +120,7 @@ namespace numeric
       bool notEliminatableRowFound(false);
       for (; r < v.size(); ++r)
       {
-        if (ublas::scalar_traits<typename vector_type::value_type>::equals(v[r], 0))
+        if (scalar_traits::equals(v[r], 0))
         {
           // Row already eliminated.
           v[r] = 0;
@@ -129,7 +134,7 @@ namespace numeric
           {
             BOOST_ASSERT(liVectors_[i][r] == 1);
             v -= liVectors_[i] * v[r];
-            BOOST_ASSERT(ublas::scalar_traits<typename vector_type::value_type>::equals(v[r], 0));
+            BOOST_ASSERT(scalar_traits::equals(v[r], 0));
             v[r] = 0;
             eliminated = true;
             break;
@@ -152,8 +157,8 @@ namespace numeric
       else
       {
         // Vector is linear combination of storage vectors.
-        std::cout << v << "\n"; // debug
-        BOOST_ASSERT(ublas::scalar_traits<typename vector_type::value_type>::equals(ublas::norm_inf(v), 0));
+        //std::cout << v << "\n"; // debug
+        BOOST_ASSERT(scalar_traits::equals(ublas::norm_inf(v), 0));
         return false;
       }
     }

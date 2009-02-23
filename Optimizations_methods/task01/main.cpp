@@ -39,10 +39,12 @@ int main( int argc, char *argv[] )
   }
   
   {
+    /*
     numeric::matrix_type m(3, 3);
     std::vector<size_t> rows, cols;
     size_t nRows, nCols;
     boost::tie(nRows, nCols) = numeric::simplex::li_submatrix(m, std::back_inserter(rows), std::back_inserter(cols));
+    */
   }
 
   return 0;

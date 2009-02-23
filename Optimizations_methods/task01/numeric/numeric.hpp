@@ -29,7 +29,7 @@
 // Using boost::uBLAS algebra types.
 namespace numeric
 {
-  using namespace boost::numeric;
+  namespace ublas = boost::numeric::ublas;
 
   typedef double value_type; // TODO
   typedef ublas::vector<double> vector_type;
