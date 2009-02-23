@@ -1,0 +1,4 @@
+# Ignoring Code::Blocks stuff.
+bin/
+obj/
+*.save
