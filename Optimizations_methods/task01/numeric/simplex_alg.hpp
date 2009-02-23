@@ -11,35 +11,13 @@
 #include <vector>
 
 #include "numeric.hpp"
+#include "li_vectors.hpp"
 
 namespace numeric
 {
 namespace simplex
 {
   // TODO: Move implementation lower.
-  
-  // Find linear indepenent rows and columns using Gauss method.
-  // Returns number of founded rows and columns.
-  template< class RowsOutIterator, class ColsOutIterator >
-  inline std::pair<size_t, size_t> 
-      li_submatrix( matrix_type const &M, RowsOutIterator rowsOut, ColsOutIterator colsOut )
-  {
-    matrix_type W = apply_to_all(M, functor::abs<value_type>());
-    
-    size_t nIndependentRows(0), nIndependentCols(0);
-    
-    for (size_t r = 0; r < W.size1(); ++r)
-    {
-      // Searching for maximum element in row.
-      //value_type max(0);
-      for (size_t c = 0; c < W.size2(); ++c)
-      {
-        
-      }
-    }
-    
-    return std::make_pair(nIndependentRows, nIndependentCols);
-  }
   
   // Types of linear programming solving results.
   enum result_type
