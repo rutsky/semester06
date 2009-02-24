@@ -42,8 +42,12 @@ int main( int argc, char *argv[] )
     std::cout << "variablesSigns:\n" << variablesSigns << "\n";
     std::cout << "constraintsSigns:\n" << constraintsSigns << "\n";
 
-    std::cout << "A rows:\n";
+    std::cout << "'A' rows:\n";
     std::copy(numeric::matrix_rows_begin(A), numeric::matrix_rows_end(A), std::ostream_iterator<vector_type>(std::cout, "\n"));
+    
+    matrix_type const X(A);
+    std::cout << "Const 'A' rows:\n";
+    std::copy(numeric::matrix_rows_begin(X), numeric::matrix_rows_end(X), std::ostream_iterator<vector_type>(std::cout, "\n"));
   }
   
   {
