@@ -5,22 +5,22 @@
  * 15.02.2009
  */
 
-#ifndef LI_VECTORS_HPP
-#define LI_VECTORS_HPP
+#ifndef NUMERIC_LI_VECTORS_HPP
+#define NUMERIC_LI_VECTORS_HPP
 
 #include <vector>
 
-#include "numeric.hpp"
+#include "numeric_common.hpp"
 
 namespace numeric
 {
-  template< class V >
+  template< class VectorType >
   class linear_independent_vectors
   {
-    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V>));
-    
   public:
-    typedef V vector_type;
+    typedef VectorType vector_type;
+    
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<vector_type>));
     
   private:
     typedef typename vector_type::value_type value_type;
@@ -166,6 +166,18 @@ namespace numeric
   private:
     std::vector<vector_type> liVectors_;
   };
+  
+  template< class VectorsForwardIterator >
+  bool is_linear_independent( VectorsForwardIterator first, VectorsForwardIterator beyond )
+  {
+    BOOST_CONCEPT_ASSERT((boost::ForwardIterator<VectorsForwardIterator>));
+    
+    typedef typename VectorsForwardIterator::value_type vector_type;
+    
+    linear_independent_vectors<vector_type> liVectors;
+    
+    return liVectors.insert(first, beyond);
+  }
 } // End of namespace 'numeric'.
 
-#endif // LI_VECTORS_HPP
+#endif // NUMERIC_LI_VECTORS_HPP

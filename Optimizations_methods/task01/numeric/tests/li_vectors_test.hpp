@@ -9,6 +9,10 @@ using boost::unit_test_framework::test_case;
 
 class li_vectors_test
 {
+private:
+  typedef boost::numeric::ublas::vector<double> vector_type;
+  typedef boost::numeric::ublas::matrix<double> matrix_type;
+
 public:
   li_vectors_test()
   {
@@ -18,7 +22,7 @@ public:
   
   void test_empty()
   {
-    numeric::linear_independent_vectors<numeric::vector_type> liVectors;
+    numeric::linear_independent_vectors<vector_type> liVectors;
     
     boost::numeric::ublas::unit_vector<double> v(3);
     
@@ -30,9 +34,9 @@ public:
   
   void test_unit_vectors()
   {
-    numeric::linear_independent_vectors<numeric::vector_type> liVectors;
+    numeric::linear_independent_vectors<vector_type> liVectors;
     
-    numeric::vector_type v1(3), v2(3), v3(3);
+    vector_type v1(3), v2(3), v3(3);
     v1[0] = 1, v1[1] = 0, v1[2] = 0;
     v2[0] = 0, v2[1] = 1, v2[2] = 0;
     v3[0] = 0, v3[1] = 0, v3[2] = 1;
@@ -49,9 +53,9 @@ public:
   
   void test_nonunit_vectors()
   {
-    numeric::linear_independent_vectors<numeric::vector_type> liVectors;
+    numeric::linear_independent_vectors<vector_type> liVectors;
     
-    numeric::vector_type v1(3), v2(3), v3(3), v4(3);
+    vector_type v1(3), v2(3), v3(3), v4(3);
     v1[0] =  5, v1[1] =   0, v1[2] =  0;
     v2[0] =  0, v2[1] =   7, v2[2] =  0;
     v3[0] =  0, v3[1] =   0, v3[2] = 21;

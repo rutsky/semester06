@@ -12,22 +12,27 @@
 
 #include <boost/tuple/tuple.hpp>
 
-#include "numeric/li_vectors.hpp"
+#include "numeric/numeric.hpp"
 
 // debug
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/io.hpp>
+#include <iterator>
+#include <algorithm>
 // end of debug
 
 int main( int argc, char *argv[] )
 {
-  if (0)
+  typedef numeric::ublas::vector<double> vector_type;
+  typedef numeric::ublas::matrix<double> matrix_type;
+  
+  //if (0)
   {
     std::ifstream is("data/mine");
     
-    numeric::vector_type c, b, variablesSigns, constraintsSigns;
-    numeric::matrix_type A;
+    vector_type c, b, variablesSigns, constraintsSigns;
+    matrix_type A;
     
     is >> c >> b >> A >> variablesSigns >> constraintsSigns;
     
@@ -36,6 +41,9 @@ int main( int argc, char *argv[] )
     std::cout << "A:\n" << A << "\n";
     std::cout << "variablesSigns:\n" << variablesSigns << "\n";
     std::cout << "constraintsSigns:\n" << constraintsSigns << "\n";
+
+    std::cout << "A rows:\n";
+    std::copy(numeric::matrix_rows_begin(A), numeric::matrix_rows_end(A), std::ostream_iterator<vector_type>(std::cout, "\n"));
   }
   
   {

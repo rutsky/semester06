@@ -1,13 +1,15 @@
 # depslib dependency file v1.0
-1235262323 source:/home/bob/public/semester06/Optimizations_methods/task01/main.cpp
+1235438088 source:/home/bob/public/semester06/Optimizations_methods/task01/main.cpp
 	<iostream>
 	<fstream>
 	<vector>
 	<boost/tuple/tuple.hpp>
-	"simplex_alg.h"
+	"numeric/numeric.hpp"
 	<boost/numeric/ublas/matrix.hpp>
 	<boost/numeric/ublas/matrix_proxy.hpp>
 	<boost/numeric/ublas/io.hpp>
+	<iterator>
+	<algorithm>
 
 1234729683 /home/bob/public/semester06/Optimizations_methods/task01/common.h
 	<boost/numeric/ublas/vector.hpp>
@@ -3265,4 +3267,40 @@
 	<boost/numeric/ublas/matrix_expression.hpp>
 	<boost/numeric/ublas/detail/matrix_assign.hpp>
 	<boost/numeric/ublas/matrix.hpp>
+
+1235438241 /home/bob/public/semester06/Optimizations_methods/task01/numeric/li_vectors.hpp
+	<vector>
+	"numeric_common.hpp"
+
+1235438126 /home/bob/public/semester06/Optimizations_methods/task01/numeric/numeric.hpp
+	"numeric_common.hpp"
+	"iterator.hpp"
+	"li_vectors.hpp"
+	"simplex_alg.hpp"
+
+1235438175 /home/bob/public/semester06/Optimizations_methods/task01/numeric/simplex_alg.hpp
+	<vector>
+	"numeric_common.hpp"
+	"li_vectors.hpp"
+
+1235438025 /home/bob/public/semester06/Optimizations_methods/task01/numeric/numeric_common.hpp
+	<iostream>
+	<boost/assert.hpp>
+	<boost/concept/assert.hpp>
+	<boost/numeric/ublas/traits.hpp>
+	<boost/numeric/ublas/vector.hpp>
+	<boost/numeric/ublas/vector_proxy.hpp>
+	<boost/numeric/ublas/vector_sparse.hpp>
+	<boost/numeric/ublas/matrix.hpp>
+	<boost/numeric/ublas/matrix_proxy.hpp>
+	<boost/numeric/ublas/banded.hpp>
+	<boost/numeric/ublas/triangular.hpp>
+	<boost/numeric/ublas/symmetric.hpp>
+	<boost/numeric/ublas/hermitian.hpp>
+	<boost/numeric/ublas/matrix_sparse.hpp>
+	<boost/numeric/ublas/io.hpp>
+	<boost/numeric/ublas/detail/concepts.hpp>
+
+1235439693 /home/bob/public/semester06/Optimizations_methods/task01/numeric/iterator.hpp
+	"numeric_common.hpp"
 
