@@ -13,6 +13,7 @@
 #include "numeric_common.hpp"
 
 #include "li_vectors.hpp"
+#include "iterator.hpp"
 
 namespace numeric
 {
@@ -52,6 +53,9 @@ namespace simplex
     
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<vector_type>));
     BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<matrix_type>));
+  
+    // const_cast for debug
+    BOOST_ASSERT(is_linear_independent(matrix_rows_begin(const_cast<matrix_type &>(A)), matrix_rows_end(const_cast<matrix_type &>(A))));
     
     // TODO: Assert that:
     //   rank(A) is A.size2(),

@@ -37,8 +37,10 @@
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="main.cpp" />
+		<Unit filename="numeric/iterator.hpp" />
 		<Unit filename="numeric/li_vectors.hpp" />
 		<Unit filename="numeric/numeric.hpp" />
+		<Unit filename="numeric/numeric_common.hpp" />
 		<Unit filename="numeric/simplex_alg.hpp" />
 		<Extensions>
 			<code_completion />

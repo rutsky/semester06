@@ -18,7 +18,8 @@ namespace numeric
   class linear_independent_vectors
   {
   public:
-    typedef VectorType vector_type;
+    typedef VectorType                       vector_type;
+    typedef linear_independent_vectors       self_type;
     
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<vector_type>));
     
@@ -35,6 +36,11 @@ namespace numeric
     size_t size() const 
     {
       return liVectors_.size();
+    }
+    
+    void swap( self_type &x )
+    {
+      liVectors_.swap(x.liVectors_);
     }
     
     bool is_independent( vector_type const &v ) const
@@ -78,7 +84,7 @@ namespace numeric
       
       if (success)
       {
-        liVectors.swap(*this); // TODO: this method is not implemented.
+        liVectors.swap(*this);
         return true;
       }
       else
@@ -88,7 +94,7 @@ namespace numeric
   private:
     bool eliminateVector( vector_type &v ) const
     {
-      BOOST_ASSERT(!v.empty());
+      BOOST_ASSERT(!v.size() == 0);
       
       // Searching first non zero row in vector.
       size_t r = 0;

@@ -8,128 +8,205 @@
 #ifndef NUMERIC_ITERATOR_HPP
 #define NUMERIC_ITERATOR_HPP
 
+#include <iterator>
+
 #include "numeric_common.hpp"
 
 namespace numeric
 {
   template< class MatrixType >
   class matrix_rows_iterator
-    : public std::iterator<std::forward_iterator_tag, ublas::matrix_row<MatrixType> >
+    : public std::iterator<std::bidirectional_iterator_tag, // iterator_category
+                           ublas::matrix_row<MatrixType>,   // value_type
+                           std::ptrdiff_t,                  // difference_type
+                           ublas::matrix_row<MatrixType> *, // pointer
+                           ublas::matrix_row<MatrixType>    // reference
+                           >
   {
   public:
-    typedef MatrixType                     matrix_type;
-    typedef ublas::matrix_row<matrix_type> matrix_row_type;
+    typedef MatrixType                        matrix_type;
+    typedef matrix_rows_iterator              self_type;
     
-    typedef matrix_rows_iterator<matrix_type> self_type;
+  protected:
+    typedef ublas::matrix_row<matrix_type>    matrix_row_type;
     
     BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<matrix_type>));
-  
+    
   public:
-    matrix_rows_iterator( matrix_type &m, size_t row = 0 )
-      : m_  (&m)
-      , row_(row)
+    typedef typename self_type::reference       reference;
+    typedef typename self_type::pointer         pointer;
+    typedef typename self_type::difference_type difference_type;
+    
+  public:
+    matrix_rows_iterator()
+      : m_  (0)
+      , row_(-1)
     {}
     
     matrix_rows_iterator( self_type const &it )
       : m_  (it.m_)
       , row_(it.row_)
     {}
-    
-    matrix_row_type operator * ()
-    {
-      BOOST_ASSERT(row_ < m_->size2());
-      return ublas::row(*m_, row_);
-    }
-    
-    self_type & operator ++ ()
-    {
-      ++row_;
-      return *this;
-    }
-    
-    self_type operator ++ ( int )
-    {
-      self_type tmp(*this);
-      ++row_;
-      return tmp;
-    }
-     
-    bool operator == ( self_type const &it ) const
-    {
-      return (m_ == it.m_ && row_ == it.row_);
-    }
-     
-    bool operator != ( self_type const &it ) const
-    {
-      return !operator == (it);
-    }
-     
-  private:
-    matrix_type *m_;
-    size_t      row_;
-  };
   
-  // TODO: operator * () returns matrix_row object, not reference.
-  //BOOST_CONCEPT_ASSERT((boost::ForwardIterator< matrix_rows_iterator<ublas::matrix<double> > >));
-  
-  template< class MatrixType >
-  class matrix_rows_const_iterator
-    : public std::iterator<std::forward_iterator_tag, ublas::matrix_row<MatrixType const> const >
-  {
-  public:
-    typedef MatrixType                           matrix_type;
-    typedef ublas::matrix_row<matrix_type const> const_matrix_row_type;
-    
-    typedef matrix_rows_const_iterator<matrix_type> self_type;
-    
-    BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<matrix_type>));
-  
-  public:
-    matrix_rows_const_iterator( matrix_type const &m, size_t row = 0 )
+    explicit matrix_rows_iterator( matrix_type &m, size_t row = 0 )
       : m_  (&m)
       , row_(row)
     {}
     
-    matrix_rows_const_iterator( self_type const &it )
-      : m_  (it.m_)
-      , row_(it.row_)
-    {}
-    
-    const_matrix_row_type operator * ()
+  public:
+    matrix_type const & matrix() const
     {
-      BOOST_ASSERT(row_ < m_->size2());
+      return *m_;
+    }
+    
+    long row() const
+    {
+      return row_;
+    }
+    
+    bool valid() const
+    {
+      return (m_ != 0 && row_ >= 0 && row_ < m_->size2());
+    }
+  
+    // Iterator operations.  
+  public:
+    reference operator*() const
+    {
+      BOOST_ASSERT(valid());
       return ublas::row(*m_, row_);
     }
     
-    self_type & operator ++ ()
+    pointer operator->() const
+    {
+      return &(operator*());
+    }
+    
+    // TODO: Add checks for moving far after end or far before begin of matrix.
+    self_type & operator++()
     {
       ++row_;
       return *this;
     }
     
-    self_type operator ++ ( int )
+    self_type   operator++( int )
     {
       self_type tmp(*this);
       ++row_;
       return tmp;
     }
-     
-    bool operator == ( self_type const &it ) const
+    
+    self_type & operator--()
     {
-      return (m_ == it.m_ && row_ == it.row_);
+      --row_;
+      return *this;
     }
-     
-    bool operator != ( self_type const &it ) const
+    
+    self_type   operator--( int )
     {
-      return !operator == (it);
+      self_type tmp(*this);
+      --row_;
+      return tmp;
+    }
+    
+    self_type & operator+=( difference_type n )
+    {
+      row_ += n;
+      return *this;
+    }
+    
+    self_type   operator+ ( difference_type n ) const
+    {
+      return self_type(*this) += n;
+    }
+    
+    self_type & operator-=( difference_type n )
+    {
+      row_ -= n;
+      return *this;
+    }
+    
+    self_type   operator- ( difference_type n ) const
+    {
+      return self_type(*this) -= n;
     }
      
   private:
-    matrix_type const *m_;
-    size_t             row_;
+    matrix_type *m_;
+    size_t       row_;
   };
   
-  BOOST_CONCEPT_ASSERT((boost::ForwardIterator< matrix_rows_const_iterator<ublas::matrix<double> > >));
+  template< class MatrixType >
+  bool operator==( matrix_rows_iterator<MatrixType> const &x, 
+                   matrix_rows_iterator<MatrixType> const &y )
+  {
+    return (&x.matrix() == &y.matrix() &&
+             x.row() == y.row());
+  }
+   
+  template< class MatrixType >
+  bool operator!=( matrix_rows_iterator<MatrixType> const &x, 
+                   matrix_rows_iterator<MatrixType> const &y )
+  {
+    return !(x == y);
+  }
+
+  template< class MatrixType >
+  bool operator<( matrix_rows_iterator<MatrixType> const &x, 
+                  matrix_rows_iterator<MatrixType> const &y )
+  {
+    BOOST_ASSERT(x.valid());
+    BOOST_ASSERT(y.valid());
+    return x.row() < y.row();
+  }
+  
+  template< class MatrixType >
+  bool operator>( matrix_rows_iterator<MatrixType> const &x, 
+                  matrix_rows_iterator<MatrixType> const &y )
+  {
+    BOOST_ASSERT(x.valid());
+    BOOST_ASSERT(y.valid());
+    return x.row() > y.row();
+  }
+  
+  template< class MatrixType >
+  bool operator<=( matrix_rows_iterator<MatrixType> const &x, 
+                   matrix_rows_iterator<MatrixType> const &y )
+  {
+    BOOST_ASSERT(x.valid());
+    BOOST_ASSERT(y.valid());
+    return x.row() <= y.row();
+  }
+  
+  template< class MatrixType >
+  bool operator>=( matrix_rows_iterator<MatrixType> const &x, 
+                   matrix_rows_iterator<MatrixType> const &y )
+  {
+    BOOST_ASSERT(x.valid());
+    BOOST_ASSERT(y.valid());
+    return x.row() >= y.row();
+  }
+  
+  template< class MatrixType >
+  typename matrix_rows_iterator<MatrixType>::difference_type 
+    operator-(
+      matrix_rows_iterator<MatrixType> const &x, 
+      matrix_rows_iterator<MatrixType> const &y )
+  {
+    // TODO: Assertion with check on end() == end().
+    return y.row() - x.row();
+  }
+  
+  template< class MatrixType >
+  matrix_rows_iterator<MatrixType>
+    operator+(
+      typename matrix_rows_iterator<MatrixType>::difference_type n,
+      matrix_rows_iterator<MatrixType>                    const &x )
+  {
+    return x + n;
+  }
+
+  BOOST_CONCEPT_ASSERT((boost::BidirectionalIterator< matrix_rows_iterator<ublas::matrix<double> > >));
     
   template< class MatrixType >
   inline matrix_rows_iterator<MatrixType> matrix_rows_begin( MatrixType &m )
@@ -142,19 +219,6 @@ namespace numeric
   {
     return matrix_rows_iterator<MatrixType>(m, m.size1());
   }
-  
-  template< class MatrixType >
-  inline matrix_rows_const_iterator<MatrixType> matrix_rows_begin( MatrixType const &m )
-  {
-    return matrix_rows_const_iterator<MatrixType>(m);
-  }
-    
-  template< class MatrixType >
-  inline matrix_rows_const_iterator<MatrixType> matrix_rows_end( MatrixType const &m )
-  {
-    return matrix_rows_const_iterator<MatrixType>(m, m.size1());
-  }
-
 } // End of namespace 'numeric'.
 
 #endif // NUMERIC_ITERATOR_HPP

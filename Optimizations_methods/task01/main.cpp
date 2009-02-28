@@ -24,8 +24,9 @@
 
 int main( int argc, char *argv[] )
 {
-  typedef numeric::ublas::vector<double> vector_type;
-  typedef numeric::ublas::matrix<double> matrix_type;
+  typedef numeric::ublas::vector     <double> vector_type;
+  typedef numeric::ublas::unit_vector<double> unit_vector_type;
+  typedef numeric::ublas::matrix     <double> matrix_type;
   
   //if (0)
   {
@@ -48,6 +49,9 @@ int main( int argc, char *argv[] )
     matrix_type const X(A);
     std::cout << "Const 'A' rows:\n";
     std::copy(numeric::matrix_rows_begin(X), numeric::matrix_rows_end(X), std::ostream_iterator<vector_type>(std::cout, "\n"));
+    
+    vector_type basicV(unit_vector_type(5)), nextBasicV;
+    numeric::simplex::find_next_basic_vector(c, A, b, basicV, nextBasicV);
   }
   
   {
