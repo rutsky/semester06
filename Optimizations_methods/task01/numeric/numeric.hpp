@@ -10,7 +10,7 @@
 
 #include "numeric_common.hpp"
 
-// Including base numercal stuff (TODO: currentry it's all stuff TODO)
+// Including base numercal stuff (TODO: currently it's all stuff TODO)
 #include "iterator.hpp"
 #include "li_vectors.hpp"
 #include "simplex_alg.hpp"

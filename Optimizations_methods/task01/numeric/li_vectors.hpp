@@ -174,7 +174,7 @@ namespace numeric
   };
   
   template< class VectorsForwardIterator >
-  bool is_linear_independent( VectorsForwardIterator first, VectorsForwardIterator beyond )
+  inline bool is_linear_independent( VectorsForwardIterator first, VectorsForwardIterator beyond )
   {
     BOOST_CONCEPT_ASSERT((boost::ForwardIterator<VectorsForwardIterator>));
     

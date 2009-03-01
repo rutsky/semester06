@@ -66,7 +66,7 @@ namespace numeric
     
     bool valid() const
     {
-      return (m_ != 0 && row_ >= 0 && row_ < m_->size2());
+      return (m_ != 0 && row_ < m_->size2());
     }
   
     // Iterator operations.  
