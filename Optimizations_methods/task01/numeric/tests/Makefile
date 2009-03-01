@@ -15,7 +15,7 @@ LIBS_run_tests =
 DEBUG ?= 1
 STATIC ?= 0
 
-CC ?= g++
+CC := g++
 
 CFLAGS ?= -W -Wall -std=c++98 -pedantic
 

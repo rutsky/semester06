@@ -14,21 +14,30 @@
 
 namespace numeric
 {
-  template< class MatrixType >
-  class matrix_rows_iterator
-    : public std::iterator<std::bidirectional_iterator_tag, // iterator_category
-                           ublas::matrix_row<MatrixType>,   // value_type
-                           std::ptrdiff_t,                  // difference_type
-                           ublas::matrix_row<MatrixType> *, // pointer
-                           ublas::matrix_row<MatrixType>    // reference
+  template< class Matrix, class Row >
+  struct matrix_rows_iterator_traits
+  {
+    typedef Matrix matrix_type;
+    typedef Row    matrix_row_type;
+  };
+  
+  template< class MatrixRowsIteratorTraits, class Derived >
+  class matrix_rows_iterator_impl
+    : public std::iterator<std::bidirectional_iterator_tag,                      // iterator_category
+                           typename MatrixRowsIteratorTraits::matrix_row_type,   // value_type
+                           std::ptrdiff_t,                                       // difference_type
+                           typename MatrixRowsIteratorTraits::matrix_row_type *, // pointer
+                           typename MatrixRowsIteratorTraits::matrix_row_type    // reference
                            >
   {
   public:
-    typedef MatrixType                        matrix_type;
-    typedef matrix_rows_iterator              self_type;
+    typedef MatrixRowsIteratorTraits                          matrix_rows_iterator_traits;
+    typedef typename matrix_rows_iterator_traits::matrix_type matrix_type;
+    typedef matrix_rows_iterator_impl                         self_type;
+    typedef Derived                                           derived_type;
     
   protected:
-    typedef ublas::matrix_row<matrix_type>    matrix_row_type;
+    typedef typename matrix_rows_iterator_traits::matrix_row_type matrix_row_type;
     
     BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<matrix_type>));
     
@@ -38,17 +47,17 @@ namespace numeric
     typedef typename self_type::difference_type difference_type;
     
   public:
-    matrix_rows_iterator()
+    matrix_rows_iterator_impl()
       : m_  (0)
       , row_(-1)
     {}
     
-    matrix_rows_iterator( self_type const &it )
+    matrix_rows_iterator_impl( self_type const &it )
       : m_  (it.m_)
       , row_(it.row_)
     {}
   
-    explicit matrix_rows_iterator( matrix_type &m, size_t row = 0 )
+    explicit matrix_rows_iterator_impl( matrix_type &m, size_t row = 0 )
       : m_  (&m)
       , row_(row)
     {}
@@ -83,52 +92,52 @@ namespace numeric
     }
     
     // TODO: Add checks for moving far after end or far before begin of matrix.
-    self_type & operator++()
+    derived_type & operator++()
     {
       ++row_;
-      return *this;
+      return static_cast<derived_type &>(*this);
     }
     
-    self_type   operator++( int )
+    derived_type   operator++( int )
     {
-      self_type tmp(*this);
+      derived_type tmp(static_cast<derived_type &>(*this));
       ++row_;
       return tmp;
     }
     
-    self_type & operator--()
+    derived_type & operator--()
     {
       --row_;
-      return *this;
+      return static_cast<derived_type &>(*this);
     }
     
-    self_type   operator--( int )
+    derived_type   operator--( int )
     {
-      self_type tmp(*this);
+      derived_type tmp(static_cast<derived_type &>(*this));
       --row_;
       return tmp;
     }
     
-    self_type & operator+=( difference_type n )
+    derived_type & operator+=( difference_type n )
     {
       row_ += n;
-      return *this;
+      return static_cast<derived_type &>(*this);
     }
     
-    self_type   operator+ ( difference_type n ) const
+    derived_type   operator+ ( difference_type n ) const
     {
-      return self_type(*this) += n;
+      return static_cast<derived_type>(*this) += n;
     }
     
-    self_type & operator-=( difference_type n )
+    derived_type & operator-=( difference_type n )
     {
       row_ -= n;
-      return *this;
+      return static_cast<derived_type &>(*this);
     }
     
-    self_type   operator- ( difference_type n ) const
+    derived_type   operator- ( difference_type n ) const
     {
-      return self_type(*this) -= n;
+      return static_cast<derived_type>(*this) -= n;
     }
      
   private:
@@ -136,88 +145,234 @@ namespace numeric
     size_t       row_;
   };
   
-  template< class MatrixType >
-  bool operator==( matrix_rows_iterator<MatrixType> const &x, 
-                   matrix_rows_iterator<MatrixType> const &y )
+  template< class Matrix >
+  class matrix_rows_iterator
+    : public matrix_rows_iterator_impl<matrix_rows_iterator_traits<Matrix, ublas::matrix_row<Matrix> >,
+                                       matrix_rows_iterator<Matrix> >
+  {
+  protected:
+    typedef matrix_rows_iterator            self_type;
+    typedef typename self_type::matrix_type matrix_type;
+    typedef matrix_rows_iterator_impl<matrix_rows_iterator_traits<Matrix, ublas::matrix_row<Matrix> >,
+                                      matrix_rows_iterator<Matrix> > base_type;
+    
+  public:
+    matrix_rows_iterator()
+      : base_type()
+    {}
+    
+    matrix_rows_iterator( self_type const &it )
+      : base_type(it)
+    {}
+  
+    explicit matrix_rows_iterator( matrix_type &m, size_t row = 0 )
+      : base_type(m, row)
+    {}
+  };
+  
+  template< class Matrix >
+  class matrix_rows_const_iterator
+    : public matrix_rows_iterator_impl<matrix_rows_iterator_traits<Matrix const, ublas::matrix_row<Matrix const> const>,
+                                       matrix_rows_const_iterator<Matrix> >
+  {
+  protected:
+    typedef matrix_rows_const_iterator            self_type;
+    typedef typename self_type::matrix_type matrix_type;
+    typedef matrix_rows_iterator_impl<matrix_rows_iterator_traits<Matrix const, ublas::matrix_row<Matrix const> const>,
+                                      matrix_rows_const_iterator<Matrix> > base_type;
+    
+  public:
+    matrix_rows_const_iterator()
+      : base_type()
+    {}
+    
+    matrix_rows_const_iterator( self_type const &it )
+      : base_type(it)
+    {}
+  
+    explicit matrix_rows_const_iterator( matrix_type const &m, size_t row = 0 )
+      : base_type(m, row)
+    {}
+  };
+  
+  //
+  // Operators
+  //
+  
+  template< class Matrix >
+  bool operator==( matrix_rows_iterator<Matrix> const &x, 
+                   matrix_rows_iterator<Matrix> const &y )
   {
     return (&x.matrix() == &y.matrix() &&
              x.row() == y.row());
   }
    
-  template< class MatrixType >
-  bool operator!=( matrix_rows_iterator<MatrixType> const &x, 
-                   matrix_rows_iterator<MatrixType> const &y )
+  template< class Matrix >
+  bool operator!=( matrix_rows_iterator<Matrix> const &x, 
+                   matrix_rows_iterator<Matrix> const &y )
   {
     return !(x == y);
   }
 
-  template< class MatrixType >
-  bool operator<( matrix_rows_iterator<MatrixType> const &x, 
-                  matrix_rows_iterator<MatrixType> const &y )
+  template< class Matrix >
+  bool operator<( matrix_rows_iterator<Matrix> const &x, 
+                  matrix_rows_iterator<Matrix> const &y )
   {
     BOOST_ASSERT(x.valid());
     BOOST_ASSERT(y.valid());
     return x.row() < y.row();
   }
   
-  template< class MatrixType >
-  bool operator>( matrix_rows_iterator<MatrixType> const &x, 
-                  matrix_rows_iterator<MatrixType> const &y )
+  template< class Matrix >
+  bool operator>( matrix_rows_iterator<Matrix> const &x, 
+                  matrix_rows_iterator<Matrix> const &y )
   {
     BOOST_ASSERT(x.valid());
     BOOST_ASSERT(y.valid());
     return x.row() > y.row();
   }
   
-  template< class MatrixType >
-  bool operator<=( matrix_rows_iterator<MatrixType> const &x, 
-                   matrix_rows_iterator<MatrixType> const &y )
+  template< class Matrix >
+  bool operator<=( matrix_rows_iterator<Matrix> const &x, 
+                   matrix_rows_iterator<Matrix> const &y )
   {
     BOOST_ASSERT(x.valid());
     BOOST_ASSERT(y.valid());
     return x.row() <= y.row();
   }
   
-  template< class MatrixType >
-  bool operator>=( matrix_rows_iterator<MatrixType> const &x, 
-                   matrix_rows_iterator<MatrixType> const &y )
+  template< class Matrix >
+  bool operator>=( matrix_rows_iterator<Matrix> const &x, 
+                   matrix_rows_iterator<Matrix> const &y )
   {
     BOOST_ASSERT(x.valid());
     BOOST_ASSERT(y.valid());
     return x.row() >= y.row();
   }
   
-  template< class MatrixType >
-  typename matrix_rows_iterator<MatrixType>::difference_type 
+  template< class Matrix >
+  typename matrix_rows_iterator<Matrix>::difference_type 
     operator-(
-      matrix_rows_iterator<MatrixType> const &x, 
-      matrix_rows_iterator<MatrixType> const &y )
+      matrix_rows_iterator<Matrix> const &x, 
+      matrix_rows_iterator<Matrix> const &y )
   {
     // TODO: Assertion with check on end() == end().
     return y.row() - x.row();
   }
   
-  template< class MatrixType >
-  matrix_rows_iterator<MatrixType>
+  template< class Matrix >
+  matrix_rows_iterator<Matrix>
     operator+(
-      typename matrix_rows_iterator<MatrixType>::difference_type n,
-      matrix_rows_iterator<MatrixType>                    const &x )
+      typename matrix_rows_iterator<Matrix>::difference_type n,
+      matrix_rows_iterator<Matrix>                    const &x )
   {
     return x + n;
   }
 
   BOOST_CONCEPT_ASSERT((boost::BidirectionalIterator< matrix_rows_iterator<ublas::matrix<double> > >));
-    
-  template< class MatrixType >
-  inline matrix_rows_iterator<MatrixType> matrix_rows_begin( MatrixType &m )
+
+  //
+  // Constant interator operators.
+  //
+
+  template< class Matrix >
+  bool operator==( matrix_rows_const_iterator<Matrix> const &x, 
+                   matrix_rows_const_iterator<Matrix> const &y )
   {
-    return matrix_rows_iterator<MatrixType>(m);
+    return (&x.matrix() == &y.matrix() &&
+             x.row() == y.row());
+  }
+   
+  template< class Matrix >
+  bool operator!=( matrix_rows_const_iterator<Matrix> const &x, 
+                   matrix_rows_const_iterator<Matrix> const &y )
+  {
+    return !(x == y);
+  }
+
+  template< class Matrix >
+  bool operator<( matrix_rows_const_iterator<Matrix> const &x, 
+                  matrix_rows_const_iterator<Matrix> const &y )
+  {
+    BOOST_ASSERT(x.valid());
+    BOOST_ASSERT(y.valid());
+    return x.row() < y.row();
+  }
+  
+  template< class Matrix >
+  bool operator>( matrix_rows_const_iterator<Matrix> const &x, 
+                  matrix_rows_const_iterator<Matrix> const &y )
+  {
+    BOOST_ASSERT(x.valid());
+    BOOST_ASSERT(y.valid());
+    return x.row() > y.row();
+  }
+  
+  template< class Matrix >
+  bool operator<=( matrix_rows_const_iterator<Matrix> const &x, 
+                   matrix_rows_const_iterator<Matrix> const &y )
+  {
+    BOOST_ASSERT(x.valid());
+    BOOST_ASSERT(y.valid());
+    return x.row() <= y.row();
+  }
+  
+  template< class Matrix >
+  bool operator>=( matrix_rows_const_iterator<Matrix> const &x, 
+                   matrix_rows_const_iterator<Matrix> const &y )
+  {
+    BOOST_ASSERT(x.valid());
+    BOOST_ASSERT(y.valid());
+    return x.row() >= y.row();
+  }
+  
+  template< class Matrix >
+  typename matrix_rows_const_iterator<Matrix>::difference_type 
+    operator-(
+      matrix_rows_const_iterator<Matrix> const &x, 
+      matrix_rows_const_iterator<Matrix> const &y )
+  {
+    // TODO: Assertion with check on end() == end().
+    return y.row() - x.row();
+  }
+  
+  template< class Matrix >
+  matrix_rows_const_iterator<Matrix>
+    operator+(
+      typename matrix_rows_const_iterator<Matrix>::difference_type n,
+      matrix_rows_const_iterator<Matrix>                    const &x )
+  {
+    return x + n;
+  }
+
+  BOOST_CONCEPT_ASSERT((boost::BidirectionalIterator< matrix_rows_const_iterator<ublas::matrix<double> > >));
+
+  //
+  // Initializators.
+  // 
+    
+  template< class Matrix >
+  inline matrix_rows_iterator<Matrix> matrix_rows_begin( Matrix &m )
+  {
+    return matrix_rows_iterator<Matrix>(m);
   }
     
-  template< class MatrixType >
-  inline matrix_rows_iterator<MatrixType> matrix_rows_end( MatrixType &m )
+  template< class Matrix >
+  inline matrix_rows_iterator<Matrix> matrix_rows_end( Matrix &m )
   {
-    return matrix_rows_iterator<MatrixType>(m, m.size1());
+    return matrix_rows_iterator<Matrix>(m, m.size1());
+  }
+  
+  template< class Matrix >
+  inline matrix_rows_const_iterator<Matrix> matrix_rows_begin( Matrix const &m )
+  {
+    return matrix_rows_const_iterator<Matrix>(m);
+  }
+    
+  template< class Matrix >
+  inline matrix_rows_const_iterator<Matrix> matrix_rows_end( Matrix const &m )
+  {
+    return matrix_rows_const_iterator<Matrix>(m, m.size1());
   }
 } // End of namespace 'numeric'.
 
