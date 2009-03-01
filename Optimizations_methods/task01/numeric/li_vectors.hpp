@@ -10,6 +10,8 @@
 
 #include <vector>
 
+#include <boost/optional.hpp>
+
 #include "numeric_common.hpp"
 
 namespace numeric
@@ -48,20 +50,68 @@ namespace numeric
       return false; // TODO
     }
     
-    bool insert( vector_type const &v )
+    bool insert( vector_type const &vOriginal )
     {
-      vector_type eliminatedV(v);
-      if (!eliminateVector(eliminatedV))
+      BOOST_ASSERT(vOriginal.size() != 0);
+      //std::cout << "Eliminating: " << vOriginal << "\n"; // debug
+      
+      vector_type v = vOriginal;
+      if (eliminateVector(v))
       {
-        // Vector with vectors in storage are linear dependent.
-        return false;
+        // Searching first nonzero row in eliminated vector.
+        size_t r(0);
+        for (; r < v.size(); ++r)
+        {
+          if (!scalar_traits::equals(v[r], 0))
+          {
+            break;
+          }
+        }
+        
+        BOOST_ASSERT(r < v.size()); // because eliminateVector() returned true
+        BOOST_ASSERT(scalar_traits::equals(v[r], 1));
+        
+        if (!liVectors_.empty())
+        {
+          // Eliminating founded row in vectors in storage.
+          for (size_t i = 0; i < liVectors_.size(); ++i)
+          {
+            vector_type &w = liVectors_[i];
+            
+            if (!scalar_traits::equals(w[r], 0))
+            {
+              // Eliminating row.
+              w = w - w[r] * v;
+              BOOST_ASSERT(scalar_traits::equals(w[r], 0));
+              w[r] = 0; // rounding
+            }
+            else
+            {
+              // Row of vector in storage is already eliminated.
+            }
+          }
+          
+          // Adding normalized vector to storage.
+          liVectors_.push_back(v);
+          BOOST_ASSERT(!unitPos_[r]);
+          unitPos_[r] = liVectors_.size() - 1;
+          
+          return true;
+        }
+        else
+        {
+          // Storage is empty, adding normalized vector.
+          liVectors_.push_back(v);
+          unitPos_.resize(v.size());
+          unitPos_[r] = 0;
+          
+          return true;
+        }
       }
       else
       {
-        // Vectors most rows were eliminated, adding to storage.
-        liVectors_.insert(liVectors_.end(), eliminatedV);
-        //std::cout << "Adding: " << eliminatedV << " (" << v << ")\n"; // debug
-        return true;
+        // Vector is not linear independent with vectors in storage.
+        return false;
       }
     }
     
@@ -70,6 +120,9 @@ namespace numeric
     {
       BOOST_CONCEPT_ASSERT((boost::InputIterator<InputIterator>));
       BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<typename InputIterator::value_type>));
+      
+      typedef typename InputIterator::value_type::value_type value_type;
+      typedef typename ublas::vector<value_type> vector_type;
       
       linear_independent_vectors<vector_type> liVectors(*this);
       
@@ -92,85 +145,85 @@ namespace numeric
     }
     
   private:
+    // Returns true if nonzero row was found.
+    bool normalizeFirstNonZeroRow( vector_type &v ) const
+    {
+      // TODO: Rewrite using std::find and boost::bind.
+      for (size_t r = 0; r < v.size(); ++r)
+      {
+        if (!scalar_traits::equals(v[r], 0))
+        {
+          // Found nonzero row, normalizing it and return success code.
+          v = v / v[r];
+          BOOST_ASSERT(scalar_traits::equals(v[r], 1));
+          v[r] = 1; // rounding
+          return true;
+        }
+      }
+      
+      // Nonzero row is not found.
+      return false;
+    }
+  
+    // Returns true, if provided vector is linear independent with vectors in storage.
     bool eliminateVector( vector_type &v ) const
     {
-      BOOST_ASSERT(!v.size() == 0);
+      BOOST_ASSERT(v.size() != 0);
+      //std::cout << "Eliminating: " << v << "\n"; // debug
+      //dumpStorage(); // debug
       
-      // Searching first non zero row in vector.
-      size_t r = 0;
-      while (r < v.size() && scalar_traits::equals(v[r], 0))
+      if (!liVectors_.empty())
       {
-        ++r;
-      }
-      
-      if (r >= v.size())
-      {
-        // Vector is zero.
-        BOOST_ASSERT(scalar_traits::equals(ublas::norm_inf(v), 0));
-        return false;
-      }
-      
-      // Normalizing first nonzero row.
-      v /= v[r];
-      BOOST_ASSERT(scalar_traits::equals(v[r], 1));
-      v[r] = 1;
-      
-      if (empty())
-      {
-        // All possible vector rows eliminated, because there is no other vector to eliminate left nonzero rows.
-        return true;
-      }
-      
-      // Eliminating vectors rows.
-      BOOST_ASSERT(liVectors_[0].size() == v.size());
-      bool notEliminatableRowFound(false);
-      for (; r < v.size(); ++r)
-      {
-        if (scalar_traits::equals(v[r], 0))
-        {
-          // Row already eliminated.
-          v[r] = 0;
-          continue;
-        }
+        // Eliminating vector's rows.
+        BOOST_ASSERT(liVectors_[0].size() == v.size());
         
-        bool eliminated(false);
-        for (size_t i = 0; i < liVectors_.size(); ++i)
+        // TODO: Rewrite using std::find and boost::bind.
+        for (size_t r = 0; r < v.size(); ++r)
         {
-          if (liVectors_[i][r] != 0)
+          if (unitPos_[r])
           {
-            BOOST_ASSERT(liVectors_[i][r] == 1);
-            v -= liVectors_[i] * v[r];
+            // Eliminating row with normalized vector from storage.
+            BOOST_ASSERT(liVectors_[unitPos_[r].get()][r] == 1);
+            v = v - v[r] * liVectors_[unitPos_[r].get()];
             BOOST_ASSERT(scalar_traits::equals(v[r], 0));
-            v[r] = 0;
-            eliminated = true;
-            break;
+            v[r] = 0; // rounding
+          }
+          else
+          {
+            // Current row is zero or not normalized in storage's vectors. Skipping.
           }
         }
         
-        if (!eliminated)
-        {
-          // Found not eliminatable row in vector.
-          notEliminatableRowFound = true;
-          break;
-        }
-      }
-      
-      if (notEliminatableRowFound)
-      {
-        // Storage vectors with given vector are linear independent.
-        return true;
+        // All vector's rows that can be eliminated with vectors from storage are eliminated,
+        // so searching first nonzero row in left vector and normalizing it.
+        return normalizeFirstNonZeroRow(v);
       }
       else
       {
-        // Vector is linear combination of storage vectors.
-        //std::cout << v << "\n"; // debug
-        BOOST_ASSERT(scalar_traits::equals(ublas::norm_inf(v), 0));
-        return false;
+        // Storage don't have any vectors, so just try to normalize first nonzero row.
+        return normalizeFirstNonZeroRow(v);
+      }
+    }
+    
+    // debug
+  public:
+    void dumpStorage() const
+    {
+      for (size_t i = 0; i < liVectors_.size(); ++i)
+      {
+        std::cout << liVectors_[i];
+        if (unitPos_[i])
+          std::cout << " " << unitPos_[i].get();
+        std::cout << "\n";
       }
     }
     
   private:
-    std::vector<vector_type> liVectors_;
+    // EOD
+    
+  private:
+    std::vector<vector_type>              liVectors_;
+    std::vector<boost::optional<size_t> > unitPos_;
   };
   
   template< class VectorsForwardIterator >
@@ -178,7 +231,8 @@ namespace numeric
   {
     BOOST_CONCEPT_ASSERT((boost::ForwardIterator<VectorsForwardIterator>));
     
-    typedef typename VectorsForwardIterator::value_type vector_type;
+    typedef typename VectorsForwardIterator::value_type::value_type value_type;
+    typedef typename ublas::vector<value_type>                      vector_type;
     
     linear_independent_vectors<vector_type> liVectors;
     

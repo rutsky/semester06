@@ -172,13 +172,13 @@ namespace numeric
   
   template< class Matrix >
   class matrix_rows_const_iterator
-    : public matrix_rows_iterator_impl<matrix_rows_iterator_traits<Matrix const, ublas::matrix_row<Matrix const> const>,
+    : public matrix_rows_iterator_impl<matrix_rows_iterator_traits<Matrix const, ublas::matrix_row<Matrix const> >,
                                        matrix_rows_const_iterator<Matrix> >
   {
   protected:
     typedef matrix_rows_const_iterator            self_type;
     typedef typename self_type::matrix_type matrix_type;
-    typedef matrix_rows_iterator_impl<matrix_rows_iterator_traits<Matrix const, ublas::matrix_row<Matrix const> const>,
+    typedef matrix_rows_iterator_impl<matrix_rows_iterator_traits<Matrix const, ublas::matrix_row<Matrix const> >,
                                       matrix_rows_const_iterator<Matrix> > base_type;
     
   public:

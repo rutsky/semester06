@@ -55,7 +55,7 @@ namespace simplex
     BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<matrix_type>));
   
     // const_cast for debug
-    BOOST_ASSERT(is_linear_independent(matrix_rows_begin(const_cast<matrix_type &>(A)), matrix_rows_end(const_cast<matrix_type &>(A))));
+    BOOST_ASSERT(is_linear_independent(matrix_rows_begin(A), matrix_rows_end(A)));
     
     // TODO: Assert that:
     //   rank(A) is A.size2(),
