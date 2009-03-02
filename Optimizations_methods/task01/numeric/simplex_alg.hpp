@@ -46,20 +46,21 @@ namespace simplex
   inline result_type find_next_basic_vector( VectorType const &c, MatrixType const &A, VectorType const &b, 
                                              VectorType const &basicV, VectorType &nextBasicV )
   {
-    typedef VectorType                       vector_type;
-    typedef MatrixType                       matrix_type;
-    typedef typename vector_type::value_type value_type;
+    typedef typename VectorType::value_type  value_type;
+    typedef ublas::vector<value_type>        vector_type;
+    typedef ublas::matrix<value_type>        matrix_type;
     typedef ublas::scalar_traits<value_type> scalar_traits;
     
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<vector_type>));
     BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<matrix_type>));
+    // TODO: Assert that value types in all input is compatible.
   
-    // const_cast for debug
     BOOST_ASSERT(is_linear_independent(matrix_rows_begin(A), matrix_rows_end(A)));
     
     // TODO: Assert that:
-    //   rank(A) is A.size2(),
     //   basicV is basic vector.
+    
+    
     
     return rt_none; // debug
   }
