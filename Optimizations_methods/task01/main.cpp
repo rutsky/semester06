@@ -6,6 +6,11 @@
  * 15.02.2009
  */
 
+#ifdef USING_QT_CREATOR
+// Only for debugging in Qt Creator.
+#include </opt/qtcreator-1.0.0/share/qtcreator/gdbmacros/gdbmacros.cpp>
+#endif // USING_QT_CREATOR
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -22,7 +27,7 @@
 #include <algorithm>
 // end of debug
 
-int main( int argc, char *argv[] )
+int main()
 {
   typedef numeric::ublas::vector     <double> vector_type;
   typedef numeric::ublas::unit_vector<double> unit_vector_type;
@@ -44,11 +49,13 @@ int main( int argc, char *argv[] )
     std::cout << "constraintsSigns:\n" << constraintsSigns << "\n";
 
     std::cout << "'A' rows:\n";
-    std::copy(numeric::matrix_rows_begin(A), numeric::matrix_rows_end(A), std::ostream_iterator<vector_type>(std::cout, "\n"));
+    std::copy(numeric::matrix_rows_begin(A), numeric::matrix_rows_end(A), 
+      std::ostream_iterator<vector_type>(std::cout, "\n"));
     
     matrix_type const X(A);
     std::cout << "Const 'A' rows:\n";
-    std::copy(numeric::matrix_rows_begin(X), numeric::matrix_rows_end(X), std::ostream_iterator<vector_type>(std::cout, "\n"));
+    std::copy(numeric::matrix_rows_begin(X), numeric::matrix_rows_end(X), 
+      std::ostream_iterator<vector_type>(std::cout, "\n"));
     
     vector_type basicV(unit_vector_type(5)), nextBasicV;
     numeric::simplex::find_next_basic_vector(c, A, b, basicV, nextBasicV);
@@ -59,7 +66,9 @@ int main( int argc, char *argv[] )
     numeric::matrix_type m(3, 3);
     std::vector<size_t> rows, cols;
     size_t nRows, nCols;
-    boost::tie(nRows, nCols) = numeric::simplex::li_submatrix(m, std::back_inserter(rows), std::back_inserter(cols));
+    boost::tie(nRows, nCols) = 
+      numeric::simplex::li_submatrix(m, 
+        std::back_inserter(rows), std::back_inserter(cols));
     */
   }
 

@@ -4,3 +4,12 @@ obj/
 *.save
 *.depend
 *.layout
+# Ignoring Qt Creator stuff.
+task01.pro.user
+task01
+Makefile
+Makefile.Debug
+Makefile.Release
+qtc-gdbmacros/
+debug/
+release/
