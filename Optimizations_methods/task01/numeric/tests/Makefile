@@ -6,8 +6,7 @@
 # Define the targets.
 
 TARGET_BINS = run_tests
-MODS_run_tests = test_runner iterator_test li_vectors_test
-#MODS_run_tests = test_runner unit_test_example_04 unit_test_example_04_2
+MODS_run_tests = test_runner iterator_test li_vectors_test invert_matrix_test
 
 LIBS_run_tests = 
 
