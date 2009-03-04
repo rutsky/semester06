@@ -37,6 +37,7 @@
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="main.cpp" />
+		<Unit filename="numeric/invert_matrix.hpp" />
 		<Unit filename="numeric/iterator.hpp" />
 		<Unit filename="numeric/li_vectors.hpp" />
 		<Unit filename="numeric/numeric.hpp" />
