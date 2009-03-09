@@ -1,7 +1,7 @@
 /*
  * submatrix.hpp
  * Submatrix of selected rows and columns class implementation.
- * Based on boost::numeric::ublas::submatrix.
+ * Based on boost::numeric::ublas::matrix_range.
  * Vladimir Rutsky <altsysrq@gmail.com>
  * 05.03.2009
  */
@@ -25,11 +25,11 @@
 namespace numeric
 {
   template< class M >
-  class submatrix 
-    : public ublas::matrix_expression<submatrix<M> >
+  class matrix_submatrix 
+    : public ublas::matrix_expression<matrix_submatrix<M> >
   {
   public:
-    typedef submatrix<M> self_type;
+    typedef matrix_submatrix<M> self_type;
     
     typedef M                           matrix_type;
     typedef typename M::size_type       size_type;
@@ -37,18 +37,21 @@ namespace numeric
     typedef typename M::value_type      value_type;
     typedef typename M::const_reference const_reference;
     typedef typename boost::mpl::if_<boost::is_const<M>,
-                                      typename M::const_reference,
-                                      typename M::reference>::type    reference;
+                                     typename M::const_reference,
+                                     typename M::reference>::type reference;
     
     typedef typename boost::mpl::if_<boost::is_const<M>,
-                                      typename M::const_closure_type,
-                                      typename M::closure_type>::type matrix_closure_type;
+                                     typename M::const_closure_type,
+                                     typename M::closure_type>::type matrix_closure_type;
     typedef const self_type             const_closure_type;
     typedef self_type                   closure_type;
+    typedef typename ublas::storage_restrict_traits<typename M::storage_category, 
+                                                    ublas::dense_proxy_tag>::storage_category storage_category;
+    typedef typename M::orientation_category orientation_category;
     
   public:
     template< class RowsForwardIterator, class ColsForwardIterator >
-    submatrix( matrix_type &data, 
+    matrix_submatrix( matrix_type &data, 
                RowsForwardIterator rowsBegin, RowsForwardIterator rowsEnd,
                ColsForwardIterator colsBegin, ColsForwardIterator colsEnd )
       : data_       (data)
@@ -107,72 +110,72 @@ namespace numeric
     }
 
     // Assignment.
-    submatrix & operator = ( submatrix const &sm )
+    matrix_submatrix & operator = ( matrix_submatrix const &sm )
     {
       ublas::matrix_assign<ublas::scalar_assign>(*this, sm);
       return *this;
     }
-    submatrix & assign_temporary( submatrix &sm )
+    matrix_submatrix & assign_temporary( matrix_submatrix &sm )
     {
       return *this = sm;
     }
     template< class AE >
-    submatrix & operator = ( ublas::matrix_expression<AE> const &ae ) 
+    matrix_submatrix & operator = ( ublas::matrix_expression<AE> const &ae ) 
     {
       ublas::matrix_assign<ublas::scalar_assign>(*this, typename ublas::matrix_temporary_traits<M>::type(ae));
       return *this;
     }
     template< class AE >
-    submatrix & assign ( ublas::matrix_expression<AE> const &ae )  
+    matrix_submatrix & assign ( ublas::matrix_expression<AE> const &ae )  
     {
       ublas::matrix_assign<ublas::scalar_assign>(*this, ae);
       return *this;
     }
     template< class AE >
-    submatrix & operator += ( ublas::matrix_expression<AE> const &ae ) 
+    matrix_submatrix & operator += ( ublas::matrix_expression<AE> const &ae ) 
     {
       ublas::matrix_assign<ublas::scalar_assign>(*this, typename ublas::matrix_temporary_traits<M>::type(*this + ae));
       return *this;
     }
     template< class AE >
-    submatrix & plus_assign ( ublas::matrix_expression<AE> const &ae )
+    matrix_submatrix & plus_assign ( ublas::matrix_expression<AE> const &ae )
     {
       ublas::matrix_assign<ublas::scalar_plus_assign>(*this, ae);
       return *this;
     }
     template< class AE >
-    submatrix & operator -= ( ublas::matrix_expression<AE> const &ae )
+    matrix_submatrix & operator -= ( ublas::matrix_expression<AE> const &ae )
     {
       ublas::matrix_assign<ublas::scalar_assign>(*this, typename ublas::matrix_temporary_traits<M>::type(*this - ae));
       return *this;
     }
     template< class AE >
-    submatrix & minus_assign( ublas::matrix_expression<AE> const &ae )
+    matrix_submatrix & minus_assign( ublas::matrix_expression<AE> const &ae )
     {
       ublas::matrix_assign<ublas::scalar_minus_assign>(*this, ae);
       return *this;
     }
     template< class AT >
-    submatrix & operator *= ( AT const &at ) 
+    matrix_submatrix & operator *= ( AT const &at ) 
     {
       ublas::matrix_assign_scalar<ublas::scalar_multiplies_assign>(*this, at);
       return *this;
     }
     template< class AT >
-    submatrix & operator /= ( AT const &at )
+    matrix_submatrix & operator /= ( AT const &at )
     {
       ublas::matrix_assign_scalar<ublas::scalar_divides_assign>(*this, at);
       return *this;
     }
 
     // Closure comparison
-    bool same_closure ( submatrix const &mr ) const
+    bool same_closure ( matrix_submatrix const &mr ) const
     {
       return (*this).data_.same_closure(mr.data_);
     }
 
     // Comparison
-    bool operator == ( submatrix const &sm ) const
+    bool operator == ( matrix_submatrix const &sm ) const
     {
       return 
           (*this).data_ == (sm.data_)            &&
@@ -181,7 +184,7 @@ namespace numeric
     }
 
     // Swapping
-    void swap( submatrix sm )
+    void swap( matrix_submatrix sm )
     {
       if (this != &sm)
       {
@@ -190,7 +193,7 @@ namespace numeric
         ublas::matrix_swap<ublas::scalar_swap>(*this, sm);
       }
     }
-    friend void swap( submatrix sm1, submatrix sm2 )
+    friend void swap( matrix_submatrix sm1, matrix_submatrix sm2 )
     {
       sm1.swap(sm2);
     }
@@ -240,15 +243,15 @@ namespace numeric
     }
 
     class const_iterator1
-      : public ublas::container_const_reference<submatrix>
+      : public ublas::container_const_reference<matrix_submatrix>
       , public ublas::iterator_base_traits<std::random_access_iterator_tag>::template
                   iterator_base<const_iterator1, value_type>::type 
     {
     public:
-      typedef typename submatrix::value_type      value_type;
-      typedef typename submatrix::difference_type difference_type;
-      typedef typename submatrix::reference       reference;
-      typedef typename submatrix::size_type       size_type;
+      typedef typename matrix_submatrix::value_type      value_type;
+      typedef typename matrix_submatrix::difference_type difference_type;
+      typedef typename matrix_submatrix::reference       reference;
+      typedef typename matrix_submatrix::size_type       size_type;
       typedef const_iterator2                     dual_iterator_type;
       typedef const_reverse_iterator2             dual_reverse_iterator_type;
 
@@ -352,15 +355,15 @@ namespace numeric
     }
 
     class iterator1
-      : public ublas::container_reference<submatrix>
+      : public ublas::container_reference<matrix_submatrix>
       , public ublas::iterator_base_traits<std::random_access_iterator_tag>::template
                   iterator_base<iterator1, value_type>::type 
     {
     public:
-      typedef typename submatrix::value_type      value_type;
-      typedef typename submatrix::difference_type difference_type;
-      typedef typename submatrix::reference       reference;
-      typedef typename submatrix::size_type       size_type;
+      typedef typename matrix_submatrix::value_type      value_type;
+      typedef typename matrix_submatrix::difference_type difference_type;
+      typedef typename matrix_submatrix::reference       reference;
+      typedef typename matrix_submatrix::size_type       size_type;
       typedef iterator2                           dual_iterator_type;
       typedef reverse_iterator2                   dual_reverse_iterator_type;
 
@@ -466,15 +469,15 @@ namespace numeric
     }
 
     class const_iterator2
-      : public ublas::container_const_reference<submatrix>
+      : public ublas::container_const_reference<matrix_submatrix>
       , public ublas::iterator_base_traits<std::random_access_iterator_tag>::template
                   iterator_base<const_iterator2, value_type>::type 
     {
     public:
-      typedef typename submatrix::value_type      value_type;
-      typedef typename submatrix::difference_type difference_type;
-      typedef typename submatrix::reference       reference;
-      typedef typename submatrix::size_type       size_type;
+      typedef typename matrix_submatrix::value_type      value_type;
+      typedef typename matrix_submatrix::difference_type difference_type;
+      typedef typename matrix_submatrix::reference       reference;
+      typedef typename matrix_submatrix::size_type       size_type;
       typedef const_iterator1                     dual_iterator_type;
       typedef const_reverse_iterator1             dual_reverse_iterator_type;
 
@@ -578,15 +581,15 @@ namespace numeric
     }
 
     class iterator2
-      : public ublas::container_reference<submatrix>
+      : public ublas::container_reference<matrix_submatrix>
       , public ublas::iterator_base_traits<std::random_access_iterator_tag>::template
                   iterator_base<iterator2, value_type>::type 
     {
     public:
-      typedef typename submatrix::value_type      value_type;
-      typedef typename submatrix::difference_type difference_type;
-      typedef typename submatrix::reference       reference;
-      typedef typename submatrix::size_type       size_type;
+      typedef typename matrix_submatrix::value_type      value_type;
+      typedef typename matrix_submatrix::difference_type difference_type;
+      typedef typename matrix_submatrix::reference       reference;
+      typedef typename matrix_submatrix::size_type       size_type;
       typedef iterator1                           dual_iterator_type;
       typedef reverse_iterator1                   dual_reverse_iterator_type;
 
@@ -732,6 +735,24 @@ namespace numeric
     matrix_closure_type data_;
     std::vector<size_t> rowsIndices_, colsIndices_;
   };
+  
+  template< class MatrixType, class RowsForwardIterator, class ColsForwardIterator >
+  inline
+  matrix_submatrix<MatrixType> submatrix( MatrixType &data, 
+                                          RowsForwardIterator rowsBegin, RowsForwardIterator rowsEnd,
+                                          ColsForwardIterator colsBegin, ColsForwardIterator colsEnd )
+  {
+    return matrix_submatrix<MatrixType>(data, rowsBegin, rowsEnd, colsBegin, colsEnd);
+  }
+  
+  template< class MatrixType, class RowsForwardIterator, class ColsForwardIterator >
+  inline
+  matrix_submatrix<MatrixType const> submatrix( MatrixType const &data, 
+                                                RowsForwardIterator rowsBegin, RowsForwardIterator rowsEnd,
+                                                ColsForwardIterator colsBegin, ColsForwardIterator colsEnd )
+  {
+    return matrix_submatrix<MatrixType const>(data, rowsBegin, rowsEnd, colsBegin, colsEnd);
+  }
 } // End of namespace 'numeric'.
 
 #endif // NUMERIC_SUBMATRIX_HPP
