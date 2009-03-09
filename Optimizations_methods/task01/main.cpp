@@ -57,8 +57,8 @@ int main()
     std::copy(numeric::matrix_rows_begin(X), numeric::matrix_rows_end(X), 
       std::ostream_iterator<vector_type>(std::cout, "\n"));
     
-    vector_type basicV(unit_vector_type(5)), nextBasicV;
-    numeric::simplex::find_next_basic_vector(c, A, b, basicV, nextBasicV);
+    vector_type resultV(A.size2());
+    numeric::simplex::solve_augment(A, b, c, resultV);
   }
   
   {
