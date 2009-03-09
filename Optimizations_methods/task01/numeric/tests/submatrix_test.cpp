@@ -20,6 +20,8 @@ typedef ublas::vector<double> vector_type;
 typedef ublas::matrix<double> matrix_type;
 typedef numeric::matrix_submatrix<matrix_type> submatrix_type;
 
+BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<submatrix_type>));
+
 BOOST_AUTO_TEST_CASE( very_basic )
 {
   matrix_type m = identity_matrix_type(3);
