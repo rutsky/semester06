@@ -147,12 +147,12 @@ namespace simplex
     BOOST_ASSERT(c.size()          == N.size());
     BOOST_ASSERT(b.size()          == M.size());
     
-    vector_type newC(N.size()), newB(M.size()), newBasicV(N.size() + M.size()), newResultV(N.size() + M.size());
+    vector_type newC(N.size() + M.size()), newB(M.size()), newBasicV(N.size() + M.size()), newResultV(N.size() + M.size());
     matrix_type newA(M.size(), N.size() + M.size());
     
     // Filling new 'c'.
     ublas::project(newC, ublas::range(0, N.size())) = scalar_vector_type(N.size(), 0);
-    ublas::project(newC, ublas::range(N.size(), N.size() + M.size())) = scalar_vector_type(N.size(), 1);
+    ublas::project(newC, ublas::range(N.size(), N.size() + M.size())) = scalar_vector_type(M.size(), 1);
     
     // Filling new 'A' and new 'b'.
     for (size_t r = 0; r < M.size(); ++r)
@@ -171,6 +171,7 @@ namespace simplex
     // Filling new basic vector.
     ublas::project(newBasicV, ublas::range(0, N.size())) = scalar_vector_type(N.size(), 0);
     ublas::project(newBasicV, ublas::range(N.size(), N.size() + M.size())) = newB;
+    BOOST_ASSERT(assert_basic_vector(newA, newB, newBasicV));
     
     // Solving auxiliary problem.
     simplex_result_type const result = solve_augment_with_basic_vector(newA, newB, newC, newBasicV, newResultV);
@@ -221,6 +222,8 @@ namespace simplex
     BOOST_ASSERT(nextBasicV.size() == N.size());
     BOOST_ASSERT(c.size()          == N.size());
     BOOST_ASSERT(b.size()          == M.size());
+    
+    BOOST_ASSERT(assert_basic_vector(A, b, basicV));
         
     range_container_type Nkp, Nkz, Nk, Lk;
     
@@ -243,13 +246,14 @@ namespace simplex
       if (Nk.size() < M.size())
       {
         // Trying to apped column 'c' to 'Nk'.
-        if (std::find(Nk.begin(), Nk.end(), c) != Nk.end())
+        if (std::find(Nk.begin(), Nk.end(), c) == Nk.end())
         {
           if (basicVectorLICols.is_independent(ublas::column(A, c)))
           {
             // Appending 'c' column to 'Nk'.
             Nk.push_back(c);
             Nkz.push_back(c);
+            basicVectorLICols.insert(ublas::column(A, c));
           }
           else
           {
