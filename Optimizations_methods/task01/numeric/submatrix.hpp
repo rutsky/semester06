@@ -600,7 +600,7 @@ namespace numeric
         , c_(-1)
       {
       }
-      iterator2( self_type sm, size_type r, size_type c )
+      iterator2( self_type &sm, size_type r, size_type c )
         : ublas::container_reference<self_type>(sm)
         , r_(r)
         , c_(c) 
