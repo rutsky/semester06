@@ -29,17 +29,15 @@ namespace numeric
   inline
   bool invert_matrix( ublas::matrix<T> const &input, ublas::matrix<T> &inverse )
   {
-    using namespace boost::numeric::ublas;
-
-    typedef permutation_matrix<std::size_t> pmatrix;
+    typedef ublas::permutation_matrix<std::size_t> permutation_matrix_type;
     
     // Create a working copy of the input.
-    matrix<T> A(input);
+    ublas::matrix<T> A(input);
     // Create a permutation matrix for the LU-factorization.
-    pmatrix pm(A.size1());
+    permutation_matrix_type pm(A.size1());
 
     // Perform LU-factorization.
-    int const res = lu_factorize(A, pm);
+    int const res = ublas::lu_factorize(A, pm);
     if (res != 0)
       return false;
 
@@ -47,7 +45,7 @@ namespace numeric
     inverse.assign(ublas::identity_matrix<T>(A.size1()));
 
     // Backsubstitute to get the inverse.
-    lu_substitute(A, pm, inverse);
+    ublas::lu_substitute(A, pm, inverse);
 
     return true;
   }
