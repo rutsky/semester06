@@ -205,8 +205,8 @@ namespace numeric
   bool operator==( matrix_rows_iterator<Matrix> const &x, 
                    matrix_rows_iterator<Matrix> const &y )
   {
-    return (&x.matrix() == &y.matrix() &&
-             x.row() == y.row());
+    // TODO: Do something when matrices 'this' pointers differs.
+    return (x.row() == y.row());
   }
    
   template< class Matrix >
@@ -281,8 +281,8 @@ namespace numeric
   bool operator==( matrix_rows_const_iterator<Matrix> const &x, 
                    matrix_rows_const_iterator<Matrix> const &y )
   {
-    return (&x.matrix() == &y.matrix() &&
-             x.row() == y.row());
+    // TODO: Do something when matrices 'this' pointers differs.
+    return (x.row() == y.row());
   }
    
   template< class Matrix >
@@ -569,8 +569,8 @@ namespace numeric
   bool operator==( matrix_columns_iterator<Matrix> const &x, 
                    matrix_columns_iterator<Matrix> const &y )
   {
-    return (&x.matrix() == &y.matrix() &&
-             x.column() == y.column());
+    // TODO: Do something when matrices 'this' pointers differs.
+    return (x.column() == y.column());
   }
    
   template< class Matrix >
@@ -645,8 +645,8 @@ namespace numeric
   bool operator==( matrix_columns_const_iterator<Matrix> const &x, 
                    matrix_columns_const_iterator<Matrix> const &y )
   {
-    return (&x.matrix() == &y.matrix() &&
-             x.column() == y.column());
+    // TODO: Do something when matrices 'this' pointers differs.
+    return (x.column() == y.column());
   }
    
   template< class Matrix >
