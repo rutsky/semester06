@@ -69,6 +69,20 @@ namespace numeric
       }
     };
   } // End of namespace 'functor'.
+  
+  // Some people says, that copy_if was dropped from the STL by accident.
+  template< class SrcFwdIterator, class DstOutIterator, class Pred >
+  DstOutIterator copy_if( SrcFwdIterator first, SrcFwdIterator beyond, DstOutIterator res, Pred Pr )
+  {
+    while (first != beyond)
+    {
+      if (Pr(*first))
+        *res++ = *first;
+      ++first;
+    }
+  
+    return res;
+  }
 } // End of namespace 'numeric'.
 
 #endif // NUMERIC_NUMERIC_COMMON_HPP
