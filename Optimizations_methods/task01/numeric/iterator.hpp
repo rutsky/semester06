@@ -77,7 +77,7 @@ namespace numeric
     
     bool valid() const
     {
-      return (m_ != 0 && row_ < m_->size2());
+      return (m_ != 0 && row_ < m_->size1());
     }
   
     // Iterator operations.  
@@ -726,7 +726,7 @@ namespace numeric
   template< class Matrix >
   inline matrix_columns_iterator<Matrix> matrix_columns_end( Matrix &m )
   {
-    return matrix_columns_iterator<Matrix>(m, m.size1());
+    return matrix_columns_iterator<Matrix>(m, m.size2());
   }
   
   template< class Matrix >
@@ -738,7 +738,7 @@ namespace numeric
   template< class Matrix >
   inline matrix_columns_const_iterator<Matrix> matrix_columns_end( Matrix const &m )
   {
-    return matrix_columns_const_iterator<Matrix>(m, m.size1());
+    return matrix_columns_const_iterator<Matrix>(m, m.size2());
   }
 } // End of namespace 'numeric'.
 
