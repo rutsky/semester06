@@ -43,6 +43,7 @@ namespace numeric
     void swap( self_type &x )
     {
       liVectors_.swap(x.liVectors_);
+      unitPos_  .swap(x.unitPos_);
     }
     
     bool is_independent( vector_type const &v ) const
