@@ -25,14 +25,20 @@ namespace numeric
   // Matrix inversion routine.
   // Uses lu_factorize and lu_substitute in uBLAS to invert a matrix.
   // Note: inverse matrix argument size should match input argument size.
-  template< class T >
+  template< class M1, class M2 >
   inline
-  bool invert_matrix( ublas::matrix<T> const &input, ublas::matrix<T> &inverse )
+  bool invert_matrix( M1 const &input, M2 &inverse )
   {
-    typedef ublas::permutation_matrix<std::size_t> permutation_matrix_type;
+    BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<M1>));
+    BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<M2>));
+  
+    typedef typename M1::value_type            value_type;
+    typedef ublas::matrix<value_type>          matrix_type;
+    typedef ublas::permutation_matrix<size_t>  permutation_matrix_type;
+    typedef ublas::identity_matrix<value_type> identity_matrix_type;
     
     // Create a working copy of the input.
-    ublas::matrix<T> A(input);
+    matrix_type A = input;
     // Create a permutation matrix for the LU-factorization.
     permutation_matrix_type pm(A.size1());
 
@@ -42,7 +48,7 @@ namespace numeric
       return false;
 
     // Create identity matrix of "inverse".
-    inverse.assign(ublas::identity_matrix<T>(A.size1()));
+    inverse.assign(identity_matrix_type(A.size1()));
 
     // Backsubstitute to get the inverse.
     ublas::lu_substitute(A, pm, inverse);
