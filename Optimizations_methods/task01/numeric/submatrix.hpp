@@ -52,8 +52,8 @@ namespace numeric
   public:
     template< class RowsForwardIterator, class ColsForwardIterator >
     matrix_submatrix( matrix_type &data, 
-               RowsForwardIterator rowsBegin, RowsForwardIterator rowsEnd,
-               ColsForwardIterator colsBegin, ColsForwardIterator colsEnd )
+                      RowsForwardIterator rowsBegin, RowsForwardIterator rowsEnd,
+                      ColsForwardIterator colsBegin, ColsForwardIterator colsEnd )
       : data_       (data)
     {
       BOOST_ASSERT(rowsBegin != rowsEnd);
@@ -67,9 +67,7 @@ namespace numeric
       for (size_t r = 0; r < rowsIndices_.size(); ++r)
         BOOST_ASSERT(rowsIndices_[r] < data_.size1());
       for (size_t c = 0; c < colsIndices_.size(); ++c)
-      {
         BOOST_ASSERT(colsIndices_[c] < data_.size2());
-      }
       // end of debug
     }
     
