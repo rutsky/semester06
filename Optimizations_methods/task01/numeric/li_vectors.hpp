@@ -47,7 +47,8 @@ namespace numeric
     
     bool is_independent( vector_type const &v ) const
     {
-      return false; // TODO
+      vector_type tmp(v);
+      return eliminateVector(tmp);
     }
     
     bool insert( vector_type const &vOriginal )
@@ -219,7 +220,7 @@ namespace numeric
     }
     
   private:
-    // EOD
+    // end of debug
     
   private:
     std::vector<vector_type>              liVectors_;
