@@ -197,6 +197,7 @@ namespace numeric
     }
 
     // Iterator types
+  /*
   private:
     typedef typename M::const_iterator1 const_subiterator1_type;
     typedef typename boost::mpl::if_<boost::is_const<M>,
@@ -206,6 +207,7 @@ namespace numeric
     typedef typename boost::mpl::if_<boost::is_const<M>,
                                       typename M::const_iterator2,
                                       typename M::iterator2>::type subiterator2_type;
+  */
 
   public:
     class const_iterator1;
@@ -264,6 +266,12 @@ namespace numeric
         : ublas::container_const_reference<self_type>(sm)
         , r_(r)
         , c_(c) 
+      {
+      }
+      const_iterator1( const iterator1 &it )
+        : ublas::container_const_reference<self_type>(it())
+        , r_(it.r_) 
+        , c_(it.c_) 
       {
       }
 
@@ -492,6 +500,13 @@ namespace numeric
         , c_(c) 
       {
       }
+      const_iterator2( const iterator2 &it )
+        : ublas::container_const_reference<self_type>(it())
+        , r_(it.r_) 
+        , c_(it.c_) 
+      {
+      }
+
 
       // Arithmetic
       const_iterator2 & operator ++ () 
