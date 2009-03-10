@@ -15,4 +15,5 @@ HEADERS += numeric/simplex_alg.hpp \
     numeric/li_vectors.hpp \
     numeric/iterator.hpp \
     numeric/invert_matrix.hpp \
-    numeric/submatrix.hpp
+    numeric/submatrix.hpp \
+    numeric/subvector.hpp
