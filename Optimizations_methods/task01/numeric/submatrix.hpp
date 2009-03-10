@@ -166,13 +166,13 @@ namespace numeric
       return *this;
     }
 
-    // Closure comparison
+    // Closure comparison.
     bool same_closure ( matrix_submatrix const &mr ) const
     {
       return (*this).data_.same_closure(mr.data_);
     }
 
-    // Comparison
+    // Comparison.
     bool operator == ( matrix_submatrix const &sm ) const
     {
       return 
@@ -181,7 +181,7 @@ namespace numeric
           (*this).colsIndices_ == sm.colsIndices;
     }
 
-    // Swapping
+    // Swapping.
     void swap( matrix_submatrix sm )
     {
       if (this != &sm)
@@ -196,7 +196,7 @@ namespace numeric
       sm1.swap(sm2);
     }
 
-    // Iterator types
+    // Iterator types.
   /*
   private:
     typedef typename M::const_iterator1 const_subiterator1_type;
