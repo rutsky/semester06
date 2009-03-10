@@ -1,6 +1,6 @@
 /*
- * invert_matrix_test.cpp
- * Matrix inverting test.
+ * submatrix_test.cpp
+ * Submatrix class test.
  * Vladimir Rutsky <altsysrq@gmail.com>
  * 05.03.2009
  */
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE( iterator_construct_very_basic )
   sm.begin2();
   sm.end2();
   
-  const submatrix_type csm = sm;
+  submatrix_type const csm = sm;
   
   csm.begin1();
   csm.end1();
