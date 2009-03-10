@@ -37,6 +37,7 @@ namespace numeric
     typedef typename V::difference_type difference_type;
     typedef typename V::value_type      value_type;
     typedef typename V::const_reference const_reference;
+    typedef typename V::pointer         pointer;
     typedef typename boost::mpl::if_<boost::is_const<V>,
                                       typename V::const_reference,
                                       typename V::reference>::type reference;
