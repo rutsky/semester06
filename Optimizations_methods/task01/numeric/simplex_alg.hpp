@@ -17,6 +17,7 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/storage.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
+#include <boost/numeric/ublas/functional.hpp>
 #include <boost/bind.hpp>
 
 #include "numeric_common.hpp"
@@ -24,6 +25,8 @@
 #include "li_vectors.hpp"
 #include "iterator.hpp"
 #include "submatrix.hpp"
+#include "subvector.hpp"
+#include "invert_matrix.hpp"
 
 namespace numeric
 {
@@ -72,6 +75,10 @@ namespace simplex
     template< class MatrixType, class VectorType >
     bool assert_basic_vector( MatrixType const &A, VectorType const &b, VectorType const &x )
     {
+      // TODO: Assert that value types in all input is compatible, different types for different vectors.
+      BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<MatrixType>));
+      BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<VectorType>));
+    
       typedef typename MatrixType::value_type         value_type;
       typedef ublas::vector<value_type>               vector_type;
       typedef ublas::matrix<value_type>               matrix_type;
@@ -79,10 +86,6 @@ namespace simplex
       typedef ublas::basic_range<size_t, long>        range_type;
       typedef std::vector<size_t>                     range_container_type;
       typedef linear_independent_vectors<vector_type> li_vectors_type;
-      
-      // TODO: Assert that value types in all input is compatible.
-      BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<vector_type>));
-      BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<matrix_type>));
       
       range_type const N(0, A.size2()), M(0, A.size1());
       
@@ -122,6 +125,10 @@ namespace simplex
     find_first_basic_vector( MatrixType const &A, VectorType const &b, VectorType const &c,  
                              VectorType &basicV )
   {
+    // TODO: Assert that value types in all input is compatible, different types for different vectors.
+    BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<MatrixType>));
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<VectorType>));
+    
     typedef typename VectorType::value_type    value_type;
     typedef ublas::vector<value_type>          vector_type;
     typedef ublas::matrix<value_type>          matrix_type;
@@ -131,10 +138,6 @@ namespace simplex
     typedef ublas::identity_matrix<value_type> identity_matrix_type;
     typedef ublas::matrix_row<matrix_type>     matrix_row_type;
     
-    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<vector_type>));
-    BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<matrix_type>));
-    // TODO: Assert that value types in all input is compatible.
-
     range_type const N(0, A.size2()), M(0, A.size1());
     
     // TODO
@@ -198,6 +201,10 @@ namespace simplex
     find_next_basic_vector( MatrixType const &A, VectorType const &b, VectorType const &c, 
                             VectorType const &basicV, VectorType &nextBasicV )
   {
+    // TODO: Assert that value types in all input is compatible, different types for different vectors.
+    BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<MatrixType>));
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<VectorType>));
+    
     typedef typename MatrixType::value_type         value_type;
     typedef ublas::vector<value_type>               vector_type;
     typedef ublas::matrix<value_type>               matrix_type;
@@ -205,11 +212,8 @@ namespace simplex
     typedef ublas::basic_range<size_t, long>        range_type;
     typedef std::vector<size_t>                     range_container_type;
     typedef linear_independent_vectors<vector_type> li_vectors_type;
+    typedef ublas::identity_matrix<value_type>      identity_matrix_type;
     
-    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<vector_type>));
-    BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<matrix_type>));
-    // TODO: Assert that value types in all input is compatible.
-  
     range_type const N(0, A.size2()), M(0, A.size1());
     
     // TODO
@@ -306,10 +310,20 @@ namespace simplex
     std::cout << "Lk: ";
     std::copy(Lk.begin(), Lk.end(), std::ostream_iterator<size_t>(std::cout, " "));
     std::cout << "\n";
-    
-    //std::copy(Nkp.begin(), Nkp.end(), std::ostream_iterator<size_t>(std::cout, " "));
-    //std::cout << r << "\n";
     // end of debug
+    
+    // Calculating 'A' submatrix inverse.
+    matrix_type BNk(M.size(), M.size());
+    BOOST_VERIFY(invert_matrix(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk));
+    BOOST_ASSERT(
+      scalar_traits_type::equals(
+        ublas::matrix_norm_inf<matrix_type>::apply(ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size())),
+        0));
+    
+    // Calculating 'd' vector.
+    vector_type d(M.size());
+    d = c - ublas::prod(ublas::trans(A), vector_type(ublas::prod(ublas::trans(BNk), subvector(c, Nk.begin(), Nk.end()))));
+    BOOST_ASSERT(scalar_traits_type::equals(ublas::vector_norm_inf<matrix_type>::apply(subvector(d, Nk.begin(), Nk.end())), 0));
     
     
     
@@ -325,6 +339,10 @@ namespace simplex
     solve_augment_with_basic_vector( MatrixType const &A, VectorType const &b, VectorType const &c, 
                                      VectorType const &basicV, VectorType &resultV )
   {
+    // TODO: Assert that value types in all input is compatible, different types for different vectors.
+    BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<MatrixType>));
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<VectorType>));
+
     typedef typename MatrixType::value_type value_type;
     typedef ublas::vector<value_type>       vector_type;
     
@@ -368,6 +386,10 @@ namespace simplex
   simplex_result_type solve_augment( MatrixType const &A, VectorType const &b, VectorType const &c, 
                                      VectorType &resultV )
   {
+    // TODO: Assert that value types in all input is compatible, different types for different vectors.
+    BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<MatrixType>));
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<VectorType>));
+    
     typedef typename MatrixType::value_type         value_type;
     typedef ublas::vector<value_type>               vector_type;
     typedef ublas::matrix<value_type>               matrix_type;
@@ -376,10 +398,6 @@ namespace simplex
     typedef std::vector<size_t>                     range_container_type;
     typedef linear_independent_vectors<vector_type> li_vectors_type;
     
-    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<vector_type>));
-    BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<matrix_type>));
-    // TODO: Assert that value types in all input is compatible.
-  
     range_type const N(0, A.size2()), M(0, A.size1());
     
     // TODO
