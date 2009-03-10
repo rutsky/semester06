@@ -184,7 +184,9 @@ namespace simplex
     simplex_result_type const result = solve_augment_with_basic_vector(newA, newB, newC, newBasicV, newResultV);
     BOOST_ASSERT(result == srt_min_found); // it always has solution
     
-    if (scalar_traits_type::equals(ublas::vector_norm_inf<vector_type>::apply(ublas::project(newBasicV, ublas::range(N.size(), N.size() + M.size()))), 0))
+    std::cout << "Support problem v: " << newResultV << "\n"; // debug
+    std::cout << "mod v: " << ublas::vector_norm_inf<vector_type>::apply(ublas::project(newResultV, ublas::range(N.size(), N.size() + M.size()))) << "\n"; // debug
+    if (scalar_traits_type::equals(ublas::vector_norm_inf<vector_type>::apply(ublas::project(newResultV, ublas::range(N.size(), N.size() + M.size()))), 0))
     {
       // Found basic vector.
       basicV = ublas::project(newResultV, ublas::range(0, N.size()));
@@ -419,6 +421,7 @@ namespace simplex
       }
     }
     
+    BOOST_ASSERT(0);
     return nbrt_none; // debug
   }
   
@@ -454,6 +457,7 @@ namespace simplex
       case nbrt_min_found:
         BOOST_ASSERT(curBasicV == nextBasicV);
         resultV = curBasicV;
+        BOOST_ASSERT(assert_basic_vector(A, b, resultV));
         return srt_min_found;
         break;
         
