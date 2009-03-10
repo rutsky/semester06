@@ -19,6 +19,7 @@
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/functional.hpp>
 #include <boost/bind.hpp>
+#include <boost/optional.hpp>
 
 #include "numeric_common.hpp"
 
@@ -49,25 +50,25 @@ namespace simplex
   // Types of linear programming solving results.
   enum simplex_result_type
   {
-    srt_min_found,   // Function has minimum and it was founded.
-    srt_not_limited, // Function is not limited from below.
-    srt_none,        // Set of admissible points is empty.
+    srt_min_found = 0,                // Function has minimum and it was founded.
+    srt_not_limited,                  // Function is not limited from below.
+    srt_none,                         // Set of admissible points is empty.
   };
   
   // Types of searching first basic vector results.
   enum first_basic_vector_result_type
   {
-    fbrt_found, // Found first basic vector.
-    fbrt_none,  // Set of admissible points is empty.
+    fbrt_found = 0,                   // Found first basic vector.
+    fbrt_none,                        // Set of admissible points is empty.
   };
   
   // Types of searching next basic vector results.
   enum next_basic_vector_result_type
   {
-    nbrt_next_basic_vector_found, // Found next basic vector.
-    nbrt_min_found,               // Current basic vector is solution of problem.
-    nbrt_not_limited,             // Function is not limited from below.
-    nbrt_none,                    // Set of admissible points is empty.
+    nbrt_next_basic_vector_found = 0, // Found next basic vector.
+    nbrt_min_found,                   // Current basic vector is solution of problem.
+    nbrt_not_limited,                 // Function is not limited from below.
+    nbrt_none,                        // Set of admissible points is empty.
   };
   
   namespace
@@ -97,6 +98,8 @@ namespace simplex
       BOOST_ASSERT(is_linear_independent(matrix_rows_begin(A), matrix_rows_end(A)));
       BOOST_ASSERT(x.size() == N.size());
       BOOST_ASSERT(b.size() == M.size());
+
+      BOOST_ASSERT(std::find_if(x.begin(), x.end(), boost::bind<bool>(std::less<value_type>(), _1, 0)) == x.end());
       
       range_container_type Nkp;
       copy_if(N.begin(), N.end(), std::back_inserter(Nkp), 
@@ -113,6 +116,7 @@ namespace simplex
         value_type const result = std::inner_product(ublas::row(A, r).begin(), ublas::row(A, r).end(), x.begin(), 0);
         BOOST_ASSERT(scalar_traits_type::equals(result, b[r]));
       }
+      
       
       return true;
     }
@@ -208,9 +212,10 @@ namespace simplex
     typedef typename MatrixType::value_type         value_type;
     typedef ublas::vector<value_type>               vector_type;
     typedef ublas::matrix<value_type>               matrix_type;
+    typedef typename vector_type::size_type         size_type;
     typedef ublas::scalar_traits<value_type>        scalar_traits_type;
     typedef ublas::basic_range<size_t, long>        range_type;
-    typedef std::vector<size_t>                     range_container_type;
+    typedef std::vector<size_type>                  range_container_type;
     typedef linear_independent_vectors<vector_type> li_vectors_type;
     typedef ublas::identity_matrix<value_type>      identity_matrix_type;
     
@@ -315,17 +320,104 @@ namespace simplex
     // Calculating 'A' submatrix inverse.
     matrix_type BNk(M.size(), M.size());
     BOOST_VERIFY(invert_matrix(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk));
+    std::cout << "zero m mod: " << ublas::matrix_norm_inf<matrix_type>::apply(ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size())) << "\n"; // debug
+    std::cout << "zero m: " << ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size()) << std::endl; // debug
+    /*
+    // TODO: Precision.
     BOOST_ASSERT(
       scalar_traits_type::equals(
         ublas::matrix_norm_inf<matrix_type>::apply(ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size())),
         0));
+     */
     
     // Calculating 'd' vector.
     vector_type d(M.size());
     d = c - ublas::prod(ublas::trans(A), vector_type(ublas::prod(ublas::trans(BNk), subvector(c, Nk.begin(), Nk.end()))));
     BOOST_ASSERT(scalar_traits_type::equals(ublas::vector_norm_inf<matrix_type>::apply(subvector(d, Nk.begin(), Nk.end())), 0));
     
+    std::cout << "d: " << d << "\n"; // debug
     
+    vector_subvector<vector_type> dLk(subvector(d, Lk.begin(), Lk.end()));
+    typename vector_subvector<vector_type>::const_iterator jkIt = std::find_if(
+        dLk.begin(), dLk.end(),
+        boost::bind<bool>(std::less<value_type>(), _1, 0));
+    
+    if (jkIt == dLk.end())
+    {
+      // d[Lk] >= 0, current basic vector is optimal.
+      nextBasicV = basicV;
+      return nbrt_min_found;
+    }
+    else
+    {
+      // Searhcing next basic vector.
+      
+      size_type const jk = Lk[jkIt.index()];
+      BOOST_ASSERT(d(jk) < 0);
+      
+      vector_type u(ublas::scalar_vector<value_type>(N.size(), 0));
+      subvector(u, Nk.begin(), Nk.end()) = ublas::prod(BNk, ublas::column(A, jk));
+      u[jk] = -1;
+      
+      std::cout << "u: " << u << "\n"; // debug
+      
+      vector_subvector<vector_type> uNk(subvector(u, Nk.begin(), Nk.end()));
+      typename vector_subvector<vector_type>::const_iterator iuIt = std::find_if(
+          uNk.begin(), uNk.end(),
+          boost::bind<bool>(std::less<value_type>(), 0, _1));
+      
+      if (iuIt == uNk.end())
+      {
+        // u <= 0, goal function is not limited from below.
+        return nbrt_not_limited;
+      }
+      else
+      {
+        // Found u[iu] > 0.
+        
+        bool canCalculateNextBasicV(false);
+        
+        if (Nkp.size() == Nk.size())
+          canCalculateNextBasicV = true;
+        
+        if (!canCalculateNextBasicV)
+        {
+          vector_subvector<vector_type> uNkz(subvector(u, Nkz.begin(), Nkz.end()));
+          if (std::find_if(uNkz.begin(), uNkz.end(), boost::bind<bool>(std::less<value_type>(), 0, _1)) == uNkz.end())
+            canCalculateNextBasicV = true;
+        }
+        
+        if (canCalculateNextBasicV)
+        {
+          // Basic vector is not singular or u[Nkz] <= 0.
+          
+          boost::optional<value_type> minTeta;
+          for (size_t ri = 0; ri < Nk.size(); ++ri)
+          {
+            size_t const r = Nk[ri];
+            if (u[r] > 0 && !scalar_traits_type::equals(u[r], 0))
+            {
+              value_type const teta = basicV(r) / u(r);
+              
+              if (!minTeta || teta < minTeta.get())
+                minTeta = teta;
+            }
+          }
+          
+          // Finally constructing next basic vector.
+          BOOST_ASSERT(minTeta);
+          nextBasicV = basicV - minTeta.get() * u;
+          BOOST_ASSERT(assert_basic_vector(A, b, nextBasicV));
+          
+          return nbrt_next_basic_vector_found;
+        }
+        else
+        {
+          // Need to change basis.
+          BOOST_ASSERT(0); // FIXME
+        }
+      }
+    }
     
     return nbrt_none; // debug
   }
@@ -355,6 +447,7 @@ namespace simplex
       switch (result)
       {
       case nbrt_next_basic_vector_found:
+        BOOST_ASSERT(assert_basic_vector(A, b, nextBasicV));
         curBasicV = nextBasicV;
         break;
         
@@ -406,15 +499,16 @@ namespace simplex
     
     BOOST_ASSERT(M.size() < N.size());
     BOOST_ASSERT(is_linear_independent(matrix_rows_begin(A), matrix_rows_end(A)));
-    BOOST_ASSERT(resultV.size()    == N.size());
-    BOOST_ASSERT(c.size()          == N.size());
-    BOOST_ASSERT(b.size()          == M.size());
+    BOOST_ASSERT(resultV.size() == N.size());
+    BOOST_ASSERT(c.size()       == N.size());
+    BOOST_ASSERT(b.size()       == M.size());
 
     vector_type firstBasicV(N.size());
     first_basic_vector_result_type const result = find_first_basic_vector(A, b, c, firstBasicV);
     
     if (result == fbrt_found)
     {
+      BOOST_ASSERT(assert_basic_vector(A, b, firstBasicV));
       return solve_augment_with_basic_vector(A, b, c, firstBasicV, resultV);
     }
     else

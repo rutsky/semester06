@@ -58,7 +58,8 @@ int main()
       std::ostream_iterator<vector_type>(std::cout, "\n"));
     
     vector_type resultV(A.size2());
-    numeric::simplex::solve_augment(A, b, c, resultV);
+    numeric::simplex::simplex_result_type const result = numeric::simplex::solve_augment(A, b, c, resultV);
+    std::cout << "Solution: " << resultV << " (result=" << static_cast<int>(result) << ")\n";
   }
   
   {
