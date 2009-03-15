@@ -44,7 +44,6 @@ bool correctFWHeader( char const *inFileName, char const *outFileName )
   
     // Correcting header.
     telechips_encode_sum(&buf[0], inputSize);
-    telechips_encode_crc(&buf[0], inputSize);
   
     // Writing corrected firmware.
     ofs.write(reinterpret_cast<char *>(&buf[0]), inputSize);
