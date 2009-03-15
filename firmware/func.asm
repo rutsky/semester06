@@ -8,5 +8,7 @@
 
     use32
         STMFD   SP!, {R2-R9,LR}
+        MOV     R2, 2Eh
+        MOV     R1, 0
         MOV     R0, 0
         LDMFD   SP!, {R2-R9,PC}

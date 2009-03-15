@@ -12,12 +12,14 @@
 ;RAM:20009CFC                 ADR     R3, aOct08200720571 ; "Oct 08 2007 20:57:16"
 ;RAM:20009D00                 STR     R3, [SP]
 ;RAM:20009D04                 MOV     R3, #0xDC
-;RAM:20009D08                 MOV     R2, #0x2E
-;RAM:20009D0C                 MOV     R1, #0
-;RAM:20009D10                 MOV     R0, #0              ; <-- jump code will be inserted here
+;RAM:20009D08                 MOV     R2, #0x2E           ; <--+---
+;RAM:20009D0C                 MOV     R1, #0              ;    | jump code will be inserted here
+;RAM:20009D10                 MOV     R0, #0              ;    +---
 ;RAM:20009D14                 BL      PutString
 
 ; Position of our function is RAM:200FACB4 (one byte after firmware end, due to align).
 
     use32
-        BL      200FACB4h-20009D10h
+        STMFD   SP!, {LR}
+        BL      200FACB4h-20009D08h
+        LDMFD   SP!, {LR}
