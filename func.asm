@@ -3,9 +3,13 @@
 ; Vladimir Rutsky <altsysrq@gmail.com>
 ; 15.03.2009
 
+; Function is called instead of this commands:
+;RAM:20009D0C                 MOV     R1, #0     ; <--+
+;RAM:20009D10                 MOV     R0, #0     ;    | Code will be inserted here
+
     use32
-        STMFD   SP!, {R0-R9,LR}
-        ADD     R0, R0, R1
+        STMFD   SP!, {R2-R9,LR}
         ; Jumpl
-        BL      000facb4h
-        LDMFD   SP!, {R0-R9,PC}
+        MOV     R0, 0
+        MOV     R1, 0
+        LDMFD   SP!, {R2-R9,PC}
