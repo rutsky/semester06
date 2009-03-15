@@ -5,10 +5,10 @@
 
 # Define the targets.
 
-TARGET_BINS = test
-MODS_test = main telechips
+TARGET_BINS = fw_correct_header
+MODS_fw_correct_header = main telechips
 
-LIBS_test = m
+LIBS_fw_correct_header = m
 
 # 0 == debug off, anything else switches DEBUG on
 DEBUG ?= 1
