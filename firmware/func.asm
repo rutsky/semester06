@@ -9,7 +9,6 @@
 
     use32
         STMFD   SP!, {R2-R9,LR}
-        ; Jumpl
         MOV     R0, 0
         MOV     R1, 0
         LDMFD   SP!, {R2-R9,PC}

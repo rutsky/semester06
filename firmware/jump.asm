@@ -17,7 +17,7 @@
 ;RAM:20009D10                 MOV     R0, #0     ;    | Code will be inserted here
 ;RAM:20009D14                 BL      PutString
 
-; Position of our function is RAM:200FAC94 (one byte after firmware end, due to align).
+; Position of our function is RAM:200FACB4 (one byte after firmware end, due to align).
 
     use32
-        BL      200FAC94h-20009D0Ch
+        BL      200FACB4h-20009D0Ch
