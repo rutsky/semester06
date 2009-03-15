@@ -27,9 +27,9 @@ int main(int argc, char **argv)
   int    offset, offset1;
   USHORT regid;
 
-  if(argc == 1 || strcmp(argv[1], "--help") == 0)
-  { printf("Usage: arm_disass [input file]\n");
-    printf(" disassembles input file to 'disasm.txt'\n");
+  if(argc <= 1 || strcmp(argv[1], "--help") == 0)
+  { printf("Usage: arm_disass [input file [output file]]\n");
+    printf(" disassembles input file to output file.\n");
     exit(-1);
   }
 
@@ -39,8 +39,18 @@ int main(int argc, char **argv)
     exit(-1);
   }
 
-  out = fopen("disasm.txt", "w");
-  if(out == NULL) exit(-1);
+  if (argc >= 3)
+  {
+    out = fopen(argv[2], "w");
+    if(out == NULL) 
+    { printf("Cannot open %s", argv[2]);
+      exit(-1);
+    }
+  }
+  else
+  {
+    out = stdout;
+  }
 
   fseek(in, 0, SEEK_END);
   sz = ftell(in);
