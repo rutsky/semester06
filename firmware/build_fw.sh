@@ -50,7 +50,7 @@ inject_fw_reset_version_str()
   fwResetVersionStrTmpFile=".fwResetVersionStrTmpFile"
   fwResetVersionStrOffset=$((0x00029ff7))
 
-  printf " %04X\0" $version > $fwResetVersionStrTmpFile
+  printf " %04X" $version > $fwResetVersionStrTmpFile
   
   fwResetVersionStr=`cat $fwResetVersionStrTmpFile`
   
@@ -99,6 +99,14 @@ append_func()
   cat func.bin >> $tempFWFile
 }
 
+inject_jump()
+{
+  jumpOffset=$((0x9d10))
+
+  # Adding function code
+  inject_file jump.bin $jumpOffset
+}
+
 # Increasing version first.
 increase_version
 
@@ -114,6 +122,7 @@ inject_fw_reset_version_str
 inject_version_str
 inject_date_str
 append_func
+inject_jump
 
 # Fixing control sum.
 $FWfixToolFile $tempFWFile $tempFWFileDst
