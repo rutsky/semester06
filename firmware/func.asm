@@ -14,6 +14,7 @@
 ;RAM:20009D60                 ADR     R3, aFreeMem    ; "FREE MEM : "
 
     USE32
+    section "asd" at 0x10
 func:
         ; Saving process state.
         STMFD   SP!, {R0-R11,LR}
@@ -21,6 +22,22 @@ func:
         SUB     SP, SP, 0x184
         
         ; Body
+
+        ; Trying do PutString on place of firmware version.
+        MOV     R3, 5
+        MOV     R2, 4
+        LDR     R1, [PC, r1_store - $ - 8]
+        LDR     R0, [PC, r1_store - $ - 8]
+        STMFA   SP, {R0-R3}
+        ADR     R3, msg
+        STR     R3, [SP]
+        MOV     R3, 0xDC
+        MOV     R2, 0x42
+        MOV     R1, 0
+        MOV     R0, 0
+        BL      0x20044D28-$
+        
+loop:   B       loop
         
         ; Restoring process state.
         MOV     R3, 5
@@ -33,3 +50,4 @@ func:
 
 r1_store   DW     0x0F81F
 r0_store   DW     0x0FE5B
+msg        DB     'Hello world!',10

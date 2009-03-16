@@ -17,7 +17,7 @@ func.bin: func.asm
 	$(FASMARM) func.asm func.bin
 	$(ARM_DISASS) func.bin > func.disasm
 
-func.bin: nop.asm
+nop.bin: nop.asm
 	$(FASMARM) nop.asm nop.bin
 	$(ARM_DISASS) nop.bin > nop.disasm
 
