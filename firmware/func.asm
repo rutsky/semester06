@@ -16,12 +16,11 @@
     USE32
 func:
         ; Saving process state.
-        STMFD   SP!, {R4-R11,LR}
+        STMFD   SP!, {R0-R11,LR}
         SUB     SP, SP, 0x1C00
         SUB     SP, SP, 0x184
         
         ; Body
-        
         
         ; Restoring process state.
         MOV     R3, 5
@@ -29,8 +28,8 @@ func:
         LDR     R1, [PC, r1_store - $ - 8]
         LDR     R0, [PC, r0_store - $ - 8]
         ADD     SP, SP, 0x1C00
-        ADD     SP, SP, 0x184
+        ADD     SP, SP, 0x194
         LDMFD   SP!, {R4-R11,PC}
 
-r1_store DW     0x0F81F
-r0_store DW     0x0FE5B
+r1_store   DW     0x0F81F
+r0_store   DW     0x0FE5B

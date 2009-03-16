@@ -114,6 +114,11 @@ inject_jump()
   inject_file jump.bin $jumpOffset
 }
 
+inject_nop()
+{
+  inject_file nop.bin $1
+}
+
 # Increasing version first.
 increase_version
 
@@ -130,8 +135,10 @@ inject_version_str
 inject_date_str
 
 #append_func
-inject_func
-inject_jump
+#inject_func
+#inject_jump
+
+inject_nop $((0x9d44))
 
 # Fixing control sum.
 $FWfixToolFile $tempFWFile $tempFWFileDst

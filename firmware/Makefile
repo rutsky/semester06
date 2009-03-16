@@ -17,6 +17,10 @@ func.bin: func.asm
 	$(FASMARM) func.asm func.bin
 	$(ARM_DISASS) func.bin > func.disasm
 
+func.bin: nop.asm
+	$(FASMARM) nop.asm nop.bin
+	$(ARM_DISASS) nop.bin > nop.disasm
+
 unlock:
 	rm -rf .lock
 
@@ -25,3 +29,5 @@ clean:
 	rm -rf jump.disasm
 	rm -rf func.bin
 	rm -rf func.disasm
+	rm -rf nop.bin
+	rm -rf nop.disasm
