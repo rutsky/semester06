@@ -99,6 +99,13 @@ append_func()
   cat func.bin >> $tempFWFile
 }
 
+inject_func()
+{
+  funcOffset=$((0xfa600))
+  
+  inject_file func.bin $funcOffset
+}
+
 inject_jump()
 {
   jumpOffset=$((0x9d48))
@@ -121,7 +128,9 @@ chmod 0644 $tempFWFile
 inject_fw_reset_version_str
 inject_version_str
 inject_date_str
-append_func
+
+#append_func
+inject_func
 inject_jump
 
 # Fixing control sum.

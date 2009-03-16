@@ -31,4 +31,5 @@
 ; Position of our function is RAM:200FACB4 (one byte after firmware end, due to align).
 
     USE32
-        BL      200FACB4h-20009D48h
+        ;BL      200FACB4h-20009D48h
+        BL      0x200FA600-0x20009D48
