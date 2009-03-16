@@ -19,8 +19,8 @@
 ;RAM:20009D44                 BL      PutString
 ;RAM:20009D48                 MOV     R3, #5          ; <--+---
 ;RAM:20009D4C                 MOV     R2, #1          ;    | jump code will be inserted here
-;RAM:20009D50                 LDR     R1, =0xF81F     ;    +---
-;RAM:20009D54                 LDR     R0, =0xFE5B
+;RAM:20009D50                 LDR     R1, =0xF81F     ;    |
+;RAM:20009D54                 LDR     R0, =0xFE5B     ;    +---
 ;RAM:20009D58                 ADD     R4, SP, #0x37A8+var_37A0
 ;RAM:20009D5C                 STMIA   R4, {R0-R3}
 ;RAM:20009D60                 ADR     R3, aFreeMem    ; "FREE MEM : "
@@ -30,7 +30,5 @@
 
 ; Position of our function is RAM:200FACB4 (one byte after firmware end, due to align).
 
-    use32
-        STMFD   SP!, {LR}
+    USE32
         BL      200FACB4h-20009D48h
-        LDMFD   SP!, {LR}

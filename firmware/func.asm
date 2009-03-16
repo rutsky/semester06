@@ -13,14 +13,24 @@
 ;RAM:20009D5C                 STMIA   R4, {R0-R3}
 ;RAM:20009D60                 ADR     R3, aFreeMem    ; "FREE MEM : "
 
-    use32
+    USE32
 func:
-        STMFD   SP!, {R4-R9,LR}
+        ; Saving process state.
+        STMFD   SP!, {R4-R11,LR}
+        SUB     SP, SP, 0x1C00
+        SUB     SP, SP, 0x184
+        
+        ; Body
+        
+        
+        ; Restoring process state.
         MOV     R3, 5
         MOV     R2, 1
         LDR     R1, [PC, r1_store - $ - 8]
         LDR     R0, [PC, r0_store - $ - 8]
-        LDMFD   SP!, {R4-R9,PC}
+        ADD     SP, SP, 0x1C00
+        ADD     SP, SP, 0x184
+        LDMFD   SP!, {R4-R11,PC}
 
 r1_store DW     0x0F81F
 r0_store DW     0x0FE5B
