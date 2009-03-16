@@ -101,7 +101,7 @@ append_func()
 
 inject_jump()
 {
-  jumpOffset=$((0x9d08))
+  jumpOffset=$((0x9d48))
 
   # Adding function code
   inject_file jump.bin $jumpOffset
