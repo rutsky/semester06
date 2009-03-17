@@ -132,8 +132,11 @@ inject_version_str
 inject_date_str
 
 #append_func
-inject_func
-inject_jump
+
+#inject_func
+#inject_jump
+
+inject_file version_hook.bin $((0x9b80))
 
 #inject_nop $((0x9d44)) # Not doing PutString before jump injection.
 
