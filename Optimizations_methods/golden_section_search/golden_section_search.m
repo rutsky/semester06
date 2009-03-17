@@ -1,5 +1,5 @@
 # golden_section_search.m
-# Golden section search algorithm
+# Golden section search algorithm.
 # Vladimir Rutsky <altsysrq@gmail.com>
 # 17.03.2009
 
