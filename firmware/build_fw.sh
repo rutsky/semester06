@@ -39,10 +39,7 @@ inject_file()
   pos=$2
   echo "Injecting '"$fileName"' into position "`printf "0x%08x" $pos` #debug
   
-  dd if=$tempFWFile of=$tempFWFileDst bs=1 count=$pos status=noxfer
-  cat $fileName >> $tempFWFileDst
-  dd if=$tempFWFile bs=1 skip=$(($pos + `stat -c%s $fileName`)) status=noxfer >> $tempFWFileDst
-  mv $tempFWFileDst $tempFWFile
+  dd if=$fileName of=$tempFWFile bs=1 seek=$pos count=`stat -c%s $fileName` status=noxfer conv=notrunc
 }
 
 inject_fw_reset_version_str()
