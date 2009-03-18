@@ -16,6 +16,11 @@
 ;RAM:20009BA4                 STR     R0, [SP,#0x37A8+var_3744]
 ;RAM:20009BA8                 MOV     R0, #1
 
+; Here we have memory at least till 0x20009FDC!
+
     USE32
-        STMFD   SP!, {LR}
-        LDMFD   SP!, {PC}
+        STMFD   SP!, {R0-R11,LR}
+        
+        
+        
+        LDMFD   SP!, {R0-R11,PC}
