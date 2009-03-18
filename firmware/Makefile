@@ -6,7 +6,7 @@
 FASMARM=fasmarm
 ARM_DISASS=../arm_disass/arm_disass
 
-all: jump.bin func.bin nop.bin version_hook.bin
+all: jump.bin func.bin nop.bin version_hook.bin fw_version_inj.bin
 	./build_fw.sh
 
 jump.bin: jump.asm
@@ -25,6 +25,9 @@ version_hook.bin: version_hook.asm
 	$(FASMARM) version_hook.asm version_hook.bin
 	$(ARM_DISASS) version_hook.bin > version_hook.disasm
 
+fw_version_inj.bin: fw_version_inj.asm
+	$(FASMARM) fw_version_inj.asm fw_version_inj.bin
+	$(ARM_DISASS) fw_version_inj.bin > fw_version_inj.disasm
 
 unlock:
 	rm -rf .lock
@@ -38,3 +41,5 @@ clean:
 	rm -rf nop.disasm
 	rm -rf version_hook.bin
 	rm -rf version_hook.disasm
+	rm -rf fw_version_inj.bin
+	rm -rf fw_version_inj.disasm

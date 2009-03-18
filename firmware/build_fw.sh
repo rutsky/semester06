@@ -12,7 +12,7 @@ origFWFile="FW_UB890_1.15.rom"
 baseVersionStr="1.15" # 4 bytes
 tempFWFile=".fw_tmp"
 tempFWFileDst=".fw_tmp2"
-versionFile="fw_version"
+versionFile=".fw_version"
 buildLockFile=".lock"
 
 outputFWFile="FW_UB890.rom"
@@ -136,7 +136,8 @@ inject_date_str
 #inject_func
 #inject_jump
 
-inject_file version_hook.bin $((0x9b80))
+#inject_file version_hook.bin $((0x9b80))
+inject_file fw_version_inj.bin $((0x9cac))
 
 #inject_nop $((0x9d44)) # Not doing PutString before jump injection.
 
