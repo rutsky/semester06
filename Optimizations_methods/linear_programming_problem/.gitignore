@@ -2,11 +2,11 @@
 bin/
 obj/
 *.save
-*.depend
-*.layout
+lp_problem.depend
+lp_problem.layout
 # Ignoring Qt Creator stuff.
-simplex_algorithm.pro.user
-simplex_algorithm
+lp_problem.pro.user
+lp_problem
 Makefile
 Makefile.Debug
 Makefile.Release
