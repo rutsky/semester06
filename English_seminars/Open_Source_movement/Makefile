@@ -3,7 +3,7 @@
 # Vladimir Rutsky <altsysrq@gmail.com>
 # 22.03.2009
 
-SOURCE  = Rutsky_FSF_and_OSS_movements_help_sheet
+SOURCE  = Rutsky_FSF_and_OSS_movements_Help_Sheet
 TEX2PDF = pdflatex
 
 all: $(SOURCE).pdf
