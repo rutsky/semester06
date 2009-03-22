@@ -13,8 +13,7 @@
 % Encoding support.
 \usepackage[utf8x]{inputenc}
 \usepackage{url}
-% Using English here ;)
-%\usepackage[russian]{babel}
+\usepackage[russian,english]{babel}
 
 % From K.V.Voroncov Latex in samples, 2005.
 \textheight=24cm   % Text height.
@@ -29,6 +28,9 @@
 % For defining headers.
 \usepackage{fancyhdr}
 
+% For transcriptions.
+\usepackage{tipa}
+
 % Numerating sections with Roman numerals.
 \renewcommand \thesection{\Roman{section}}
 
@@ -37,6 +39,8 @@
 % TODO
 \newcommand{\bee}{\begin{enumerate}\setlength{\itemsep}{-0.7mm}}
 \newcommand{\ene}{\end{enumerate}}
+\newcommand{\bit}{\begin{itemize}\setlength{\itemsep}{-0.7mm}}
+\newcommand{\eit}{\end{itemize}}
 
 \begin{document}
 
@@ -45,10 +49,7 @@
 \pagestyle{fancy}
 \lhead{V.\,V.~Rutsky, 3057/2}
 \rhead{\today}
-
-% Title
-%\title{Free Software and Open Source movements}
-%\maketitle
+\cfoot{}
 
 \begin{center}
 {\LARGE \bfseries Free Software and Open Source movements}
@@ -61,7 +62,6 @@
   \item Richard~M.~Stallman and his idea of Free Software.
   \item Free Software Foundation (1985).
   \item Free Software freedoms:
-  %\begin{enumerate}
   \bee
     \item[Freedom 0:] The freedom to run the program, for any purpose.
     \item[Freedom 1:] The freedom to study how the program works, and adapt it to 
@@ -130,5 +130,18 @@ sacrifices.
   \item Open Source is a quality guarantee.
   \item It is possible to gain money and work for freedom.
 \ene
+
+\section*{Sources}
+  \bit
+    \item \url{http://www.fsf.org/}~--- Free Software Foundation
+    \item \url{http://www.opensource.org/}~--- Open Source Initiative
+    \item \url{http://en.wikipedia.org/wiki/Portal:Free_software}~--- Wikipedia Free Software Portal
+  \eit
+  
+\section*{Vocabulary}
+  \begin{tabular}{rll}
+    proprietary & \textipa{[pr@'prai@t(@)ri]} & \Russianсобственнический \\
+    license     & \textipa{['lais(@)ns]}      & \Russianлицензия \\
+  \end{tabular}
 
 \end{document}
