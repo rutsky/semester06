@@ -1,12 +1,12 @@
 /*
- * combination.h
+ * combination.hpp
  * Working with combinations.
  * Vladimir Rutsky <altsysrq@gmail.com>
  * 16.04.2008
  */
 
-#ifndef COMBINATION_H
-#define COMBINATION_H
+#ifndef COMBINATION_HPP
+#define COMBINATION_HPP
 
 #include <cassert>
 
@@ -127,4 +127,4 @@ namespace comb
   }
 } // End of 'comb' namespace
 
-#endif // COMBINATION_H
+#endif // COMBINATION_HPP
