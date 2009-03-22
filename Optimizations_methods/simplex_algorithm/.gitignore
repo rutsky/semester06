@@ -5,8 +5,8 @@ obj/
 *.depend
 *.layout
 # Ignoring Qt Creator stuff.
-task01.pro.user
-task01
+simplex_algorithm.pro.user
+simplex_algorithm
 Makefile
 Makefile.Debug
 Makefile.Release
