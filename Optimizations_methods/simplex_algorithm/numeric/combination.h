@@ -33,6 +33,16 @@ namespace comb
     return numerator / denumerator;
   }
   
+  // Generates first combination in lexigraphicall order.
+  template< class ScalarType, class OutIter > 
+  OutIter first_combination( OutIter out, ScalarType k )
+  {
+    for (size_t i = 0; i < k; ++i)
+      *out++ = i;
+    
+    return out;
+  }
+  
   // Tries to generate next lexigraphically greater combination.
   // Indexes are unique k numbers from 0 to n - 1.
   // Rough asymptotic: O(n).
