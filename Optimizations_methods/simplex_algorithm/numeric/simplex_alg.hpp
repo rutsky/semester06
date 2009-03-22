@@ -11,6 +11,7 @@
 #include <iterator>
 #include <algorithm>
 #include <numeric>
+#include <functional>
 #include <vector>
 
 #include <boost/numeric/ublas/matrix.hpp>
@@ -28,6 +29,7 @@
 #include "submatrix.hpp"
 #include "subvector.hpp"
 #include "invert_matrix.hpp"
+#include "combination.hpp"
 
 namespace numeric
 {
@@ -46,6 +48,7 @@ public:
 namespace simplex
 {
   // TODO: Move implementation lower.
+  // TODO: Code is "a little" overgeneralized.
   
   // Types of linear programming solving results.
   enum simplex_result_type
@@ -116,7 +119,6 @@ namespace simplex
         value_type const result = std::inner_product(ublas::row(A, r).begin(), ublas::row(A, r).end(), x.begin(), 0);
         BOOST_ASSERT(scalar_traits_type::equals(result, b[r]));
       }
-      
       
       return true;
     }
@@ -243,186 +245,172 @@ namespace simplex
         boost::bind<bool>(std::logical_not<bool>(), boost::bind<bool>(&scalar_traits_type::equals, 0.0, boost::bind<value_type>(basicV, _1))));
     BOOST_ASSERT(Nkp.size() > 0);
     BOOST_ASSERT(Nkp.size() <= M.size());
-    
-    // Filling 'Nkz' and 'Nk'.
-    Nk.assign(Nkp.begin(), Nkp.end());
-    
-    li_vectors_type basicVectorLICols;
-    BOOST_VERIFY(basicVectorLICols.insert(matrix_columns_begin(submatrix(A, M.begin(), M.end(), Nkp.begin(), Nkp.end())),
-                                          matrix_columns_end  (submatrix(A, M.begin(), M.end(), Nkp.begin(), Nkp.end()))));
-    
-    // Filling 'Nk' with linear independent columns of 'A' to square size.
-    for (size_t c = 0; c < N.size(); ++c)
+    BOOST_ASSERT(std::adjacent_find(Nkp.begin(), Nkp.end(), std::greater<size_type>()) == Nkp.end());
+    BOOST_ASSERT(is_linear_independent(matrix_columns_begin(submatrix(A, M.begin(), M.end(), Nkp.begin(), Nkp.end())),
+                                       matrix_columns_end  (submatrix(A, M.begin(), M.end(), Nkp.begin(), Nkp.end()))));
+
+    // Iterating through basises till find suitable (Nk).
+    bool foundBasis(false);
+    combination::first_combination<size_type>(std::back_inserter(Nk), M.size());
+    do 
     {
-      if (Nk.size() < M.size())
+      BOOST_ASSERT(std::adjacent_find(Nk.begin(), Nk.end(), std::greater<size_type>()) == Nk.end());
+      BOOST_ASSERT(Nk.size() == M.size());
+      if (std::includes(Nk.begin(), Nk.end(), Nkp.begin(), Nkp.end()))
       {
-        // Trying to apped column 'c' to 'Nk'.
-        if (std::find(Nk.begin(), Nk.end(), c) == Nk.end())
+        bool const isLI = is_linear_independent(
+            matrix_columns_begin(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end())),
+            matrix_columns_end  (submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end())));
+
+        if (isLI)
         {
-          if (basicVectorLICols.is_independent(ublas::column(A, c)))
+          // Basis was found.
+          foundBasis = true;
+          
+          // Filling 'Nkz'.
+          std::set_difference(Nk.begin(), Nk.end(), Nkp.begin(), Nkp.end(), std::back_inserter(Nkz));
+          BOOST_ASSERT(std::adjacent_find(Nkz.begin(), Nkz.end(), std::greater<size_type>()) == Nkz.end());
+          
+          // Filling 'Lk'
+          std::set_difference(N.begin(), N.end(), Nk.begin(), Nk.end(), std::back_inserter(Lk));
+          
+          BOOST_ASSERT(Nk.size() == M.size());
+          BOOST_ASSERT(Nkz.size() + Nkp.size() == M.size());
+          BOOST_ASSERT(Lk.size() == N.size() - M.size());
+          
+          // debug
+          std::cout << "N: ";
+          std::copy(N.begin(), N.end(), std::ostream_iterator<size_t>(std::cout, " "));
+          std::cout << "\n";
+          
+          std::cout << "M: ";
+          std::copy(M.begin(), M.end(), std::ostream_iterator<size_t>(std::cout, " "));
+          std::cout << "\n";
+      
+          std::cout << "Nkp: ";
+          std::copy(Nkp.begin(), Nkp.end(), std::ostream_iterator<size_t>(std::cout, " "));
+          std::cout << "\n";
+      
+          std::cout << "Nkz: ";
+          std::copy(Nkz.begin(), Nkz.end(), std::ostream_iterator<size_t>(std::cout, " "));
+          std::cout << "\n";
+      
+          std::cout << "Nk: ";
+          std::copy(Nk.begin(), Nk.end(), std::ostream_iterator<size_t>(std::cout, " "));
+          std::cout << "\n";
+      
+          std::cout << "Lk: ";
+          std::copy(Lk.begin(), Lk.end(), std::ostream_iterator<size_t>(std::cout, " "));
+          std::cout << "\n";
+          // end of debug
+
+          // Calculating 'A' submatrix inverse.
+          matrix_type BNk(M.size(), M.size());
+          BOOST_VERIFY(invert_matrix(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk));
+          std::cout << "zero m mod: " << ublas::matrix_norm_inf<matrix_type>::apply(ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size())) << "\n"; // debug
+          std::cout << "zero m: " << ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size()) << std::endl; // debug
+          /*
+          // TODO: Precision.
+          BOOST_ASSERT(
+            scalar_traits_type::equals(
+              ublas::matrix_norm_inf<matrix_type>::apply(ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size())),
+              0));
+           */
+          
+          // Calculating 'd' vector.
+          vector_type d(M.size());
+          d = c - ublas::prod(ublas::trans(A), vector_type(ublas::prod(ublas::trans(BNk), subvector(c, Nk.begin(), Nk.end()))));
+          BOOST_ASSERT(scalar_traits_type::equals(ublas::vector_norm_inf<matrix_type>::apply(subvector(d, Nk.begin(), Nk.end())), 0));
+          
+          std::cout << "d: " << d << "\n"; // debug
+          
+          vector_subvector<vector_type> dLk(subvector(d, Lk.begin(), Lk.end()));
+          typename vector_subvector<vector_type>::const_iterator jkIt = std::find_if(
+              dLk.begin(), dLk.end(),
+              boost::bind<bool>(std::less<value_type>(), _1, 0));
+          
+          if (jkIt == dLk.end())
           {
-            // Appending 'c' column to 'Nk'.
-            Nk.push_back(c);
-            Nkz.push_back(c);
-            basicVectorLICols.insert(ublas::column(A, c));
+            // d[Lk] >= 0, current basic vector is optimal.
+            nextBasicV = basicV;
+            return nbrt_min_found;
           }
           else
           {
-            // Column 'c' is not linear independent with columns in 'Nk'.
-          }
-        }
-        else
-        {
-          // Column 'c' is already in 'Nk'.
-        }
-      }
-      else
-      {
-        // Filled 'Nk'.
-        BOOST_ASSERT(Nk.size() == M.size());
-        break;
-      }
-    }
-    
-    std::sort(Nk.begin(), Nk.end());
-
-    // Filling 'Lk'
-    std::set_difference(N.begin(), N.end(), Nk.begin(), Nk.end(), std::back_inserter(Lk));
-    
-    BOOST_ASSERT(Nk.size() == M.size());
-    BOOST_ASSERT(Nkz.size() + Nkp.size() == M.size());
-    BOOST_ASSERT(Lk.size() == N.size() - M.size());
-    
-    // debug
-    std::cout << "N: ";
-    std::copy(N.begin(), N.end(), std::ostream_iterator<size_t>(std::cout, " "));
-    std::cout << "\n";
-    
-    std::cout << "M: ";
-    std::copy(M.begin(), M.end(), std::ostream_iterator<size_t>(std::cout, " "));
-    std::cout << "\n";
-
-    std::cout << "Nkp: ";
-    std::copy(Nkp.begin(), Nkp.end(), std::ostream_iterator<size_t>(std::cout, " "));
-    std::cout << "\n";
-
-    std::cout << "Nkz: ";
-    std::copy(Nkz.begin(), Nkz.end(), std::ostream_iterator<size_t>(std::cout, " "));
-    std::cout << "\n";
-
-    std::cout << "Nk: ";
-    std::copy(Nk.begin(), Nk.end(), std::ostream_iterator<size_t>(std::cout, " "));
-    std::cout << "\n";
-
-    std::cout << "Lk: ";
-    std::copy(Lk.begin(), Lk.end(), std::ostream_iterator<size_t>(std::cout, " "));
-    std::cout << "\n";
-    // end of debug
-    
-    // Calculating 'A' submatrix inverse.
-    matrix_type BNk(M.size(), M.size());
-    BOOST_VERIFY(invert_matrix(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk));
-    std::cout << "zero m mod: " << ublas::matrix_norm_inf<matrix_type>::apply(ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size())) << "\n"; // debug
-    std::cout << "zero m: " << ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size()) << std::endl; // debug
-    /*
-    // TODO: Precision.
-    BOOST_ASSERT(
-      scalar_traits_type::equals(
-        ublas::matrix_norm_inf<matrix_type>::apply(ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size())),
-        0));
-     */
-    
-    // Calculating 'd' vector.
-    vector_type d(M.size());
-    d = c - ublas::prod(ublas::trans(A), vector_type(ublas::prod(ublas::trans(BNk), subvector(c, Nk.begin(), Nk.end()))));
-    BOOST_ASSERT(scalar_traits_type::equals(ublas::vector_norm_inf<matrix_type>::apply(subvector(d, Nk.begin(), Nk.end())), 0));
-    
-    std::cout << "d: " << d << "\n"; // debug
-    
-    vector_subvector<vector_type> dLk(subvector(d, Lk.begin(), Lk.end()));
-    typename vector_subvector<vector_type>::const_iterator jkIt = std::find_if(
-        dLk.begin(), dLk.end(),
-        boost::bind<bool>(std::less<value_type>(), _1, 0));
-    
-    if (jkIt == dLk.end())
-    {
-      // d[Lk] >= 0, current basic vector is optimal.
-      nextBasicV = basicV;
-      return nbrt_min_found;
-    }
-    else
-    {
-      // Searhcing next basic vector.
-      
-      size_type const jk = Lk[jkIt.index()];
-      BOOST_ASSERT(d(jk) < 0);
-      
-      vector_type u(ublas::scalar_vector<value_type>(N.size(), 0));
-      subvector(u, Nk.begin(), Nk.end()) = ublas::prod(BNk, ublas::column(A, jk));
-      u[jk] = -1;
-      
-      std::cout << "u: " << u << "\n"; // debug
-      
-      vector_subvector<vector_type> uNk(subvector(u, Nk.begin(), Nk.end()));
-      typename vector_subvector<vector_type>::const_iterator iuIt = std::find_if(
-          uNk.begin(), uNk.end(),
-          boost::bind<bool>(std::less<value_type>(), 0, _1));
-      
-      if (iuIt == uNk.end())
-      {
-        // u <= 0, goal function is not limited from below.
-        return nbrt_not_limited;
-      }
-      else
-      {
-        // Found u[iu] > 0.
-        
-        bool canCalculateNextBasicV(false);
-        
-        if (Nkp.size() == Nk.size())
-          canCalculateNextBasicV = true;
-        
-        if (!canCalculateNextBasicV)
-        {
-          vector_subvector<vector_type> uNkz(subvector(u, Nkz.begin(), Nkz.end()));
-          if (std::find_if(uNkz.begin(), uNkz.end(), boost::bind<bool>(std::less<value_type>(), 0, _1)) == uNkz.end())
-            canCalculateNextBasicV = true;
-        }
-        
-        if (canCalculateNextBasicV)
-        {
-          // Basic vector is not singular or u[Nkz] <= 0.
-          
-          boost::optional<value_type> minTeta;
-          for (size_t ri = 0; ri < Nk.size(); ++ri)
-          {
-            size_t const r = Nk[ri];
-            if (u[r] > 0 && !scalar_traits_type::equals(u[r], 0))
+            // Searhcing next basic vector.
+            
+            size_type const jk = Lk[jkIt.index()];
+            BOOST_ASSERT(d(jk) < 0);
+            
+            vector_type u(ublas::scalar_vector<value_type>(N.size(), 0));
+            subvector(u, Nk.begin(), Nk.end()) = ublas::prod(BNk, ublas::column(A, jk));
+            u[jk] = -1;
+            
+            std::cout << "u: " << u << "\n"; // debug
+            
+            vector_subvector<vector_type> uNk(subvector(u, Nk.begin(), Nk.end()));
+            typename vector_subvector<vector_type>::const_iterator iuIt = std::find_if(
+                uNk.begin(), uNk.end(),
+                boost::bind<bool>(std::less<value_type>(), 0, _1));
+            
+            if (iuIt == uNk.end())
             {
-              value_type const teta = basicV(r) / u(r);
+              // u <= 0, goal function is not limited from below.
+              return nbrt_not_limited;
+            }
+            else
+            {
+              // Found u[iu] > 0.
               
-              if (!minTeta || teta < minTeta.get())
-                minTeta = teta;
+              bool canCalculateNextBasicV(false);
+              
+              if (Nkp.size() == Nk.size())
+                canCalculateNextBasicV = true;
+              
+              if (!canCalculateNextBasicV)
+              {
+                vector_subvector<vector_type> uNkz(subvector(u, Nkz.begin(), Nkz.end()));
+                if (std::find_if(uNkz.begin(), uNkz.end(), boost::bind<bool>(std::less<value_type>(), 0, _1)) == uNkz.end())
+                  canCalculateNextBasicV = true;
+              }
+              
+              if (canCalculateNextBasicV)
+              {
+                // Basic vector is not singular or u[Nkz] <= 0.
+                
+                boost::optional<value_type> minTeta;
+                for (size_t ri = 0; ri < Nk.size(); ++ri)
+                {
+                  size_t const r = Nk[ri];
+                  if (u[r] > 0 && !scalar_traits_type::equals(u[r], 0))
+                  {
+                    value_type const teta = basicV(r) / u(r);
+                    
+                    if (!minTeta || teta < minTeta.get())
+                      minTeta = teta;
+                  }
+                }
+                
+                // Finally constructing next basic vector.
+                BOOST_ASSERT(minTeta);
+                nextBasicV = basicV - minTeta.get() * u;
+                BOOST_ASSERT(assert_basic_vector(A, b, nextBasicV));
+                
+                return nbrt_next_basic_vector_found;
+              }
+              else
+              {
+                // Continuing and changing basis.
+              }
             }
           }
-          
-          // Finally constructing next basic vector.
-          BOOST_ASSERT(minTeta);
-          nextBasicV = basicV - minTeta.get() * u;
-          BOOST_ASSERT(assert_basic_vector(A, b, nextBasicV));
-          
-          return nbrt_next_basic_vector_found;
         }
-        else
-        {
-          // Need to change basis.
-          BOOST_ASSERT(0); // FIXME
-        }
-      }
-    }
+      }      
+    } while (combination::next_combination(Nk.begin(), N.size(), M.size()));
     
+    // Impossible: basis not found.
     BOOST_ASSERT(0);
-    return nbrt_none; // debug
+    return nbrt_none;
   }
   
   // Solves linear programming problem described in augment form:

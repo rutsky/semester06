@@ -13,7 +13,7 @@
 // "Discrete Analysis", Joseph V. Romanovsky, 3rd edition, Saint-Petersburg 2004.
 // 2.5 "Allocations and combinations".
 
-namespace comb
+namespace combination
 {
   // Returns number of k-combinations from a set of n elements.
   // Rough asymptotic: O(k).
@@ -53,10 +53,10 @@ namespace comb
     assert(n > 0 && k > 0 && k <= n);
     
     ScalarType i = k - 1;
-    while (i >= 0 && indexes[i] >= n - k + i)
+    while (i > 0 && indexes[i] >= n - k + i)
       --i;
     
-    if (i < 0)
+    if (indexes[i] >= n - k + i)
       return false; // TODO: Should fill indexes with first combination like std::next_permutation does.
     
     ++indexes[i];
@@ -125,6 +125,6 @@ namespace comb
       }
     }
   }
-} // End of 'comb' namespace
+} // End of 'combination' namespace
 
 #endif // COMBINATION_HPP

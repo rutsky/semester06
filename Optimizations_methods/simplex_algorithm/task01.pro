@@ -5,7 +5,8 @@ QT -= gui
 TARGET = task01
 CONFIG += console
 CONFIG -= app_bundle
-#QMAKE_CXXFLAGS += -std=c++98 -Wall -W -pedantic
+
+# QMAKE_CXXFLAGS += -std=c++98 -Wall -W -pedantic
 INCLUDEPATH += /usr/src/boost_1_38_0
 DEFINES += USING_QT_CREATOR
 TEMPLATE = app
@@ -17,4 +18,5 @@ HEADERS += numeric/simplex_alg.hpp \
     numeric/iterator.hpp \
     numeric/invert_matrix.hpp \
     numeric/submatrix.hpp \
-    numeric/subvector.hpp
+    numeric/subvector.hpp \
+    numeric/combination.hpp
