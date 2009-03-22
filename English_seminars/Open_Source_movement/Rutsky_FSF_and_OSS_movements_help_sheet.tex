@@ -3,7 +3,7 @@
 % Vladimir Rutsky <altsysrq@gmail.com>
 % 22.03.2009
 
-\documentclass[10pt,a4paper]{article}
+\documentclass[10pt,a4paper]{proc}
 
 % Spaces after commas.
 \frenchspacing
@@ -32,6 +32,12 @@
 % Numerating sections with Roman numerals.
 \renewcommand \thesection{\Roman{section}}
 
+% Smaller interval.
+\renewcommand{\baselinestretch}{0.7}
+% TODO
+\newcommand{\bee}{\begin{enumerate}\setlength{\itemsep}{-0.7mm}}
+\newcommand{\ene}{\end{enumerate}}
+
 \begin{document}
 
 % Header.
@@ -51,11 +57,12 @@
 % Content
 \section{Free Software movement}
 
-\begin{enumerate}
+\bee
   \item Richard~M.~Stallman and his idea of Free Software.
   \item Free Software Foundation (1985).
   \item Free Software freedoms:
-  \begin{enumerate}
+  %\begin{enumerate}
+  \bee
     \item[Freedom 0:] The freedom to run the program, for any purpose.
     \item[Freedom 1:] The freedom to study how the program works, and adapt it to 
 your needs.
@@ -67,12 +74,12 @@ whole community benefits.
   \end{enumerate}
   \item GNU Operation System.
   \item Free Software licenses.
-\end{enumerate}
+\ene
 
 \section{Open Source movement}
-\begin{enumerate}
+\bee
   \item Open Source Definition:
-  \begin{enumerate}
+  \bee
     \item[1.] Free redistribution.
     \item[2.] Source code.
     \item[3.] Derived works.
@@ -83,61 +90,45 @@ whole community benefits.
     \item[8.] License must not be specific to a product.
     \item[9.] License must not restrict other software.
     \item[10.] License must be technology-neutral.
-  \end{enumerate}
+  \ene
   \item Open Source is a powerful and reliable software.
-  \item Difference between Free Software and Open Source.
-  \item Free Software is better than Open Source.
-\end{enumerate}
+  \item Free Software and Open Source are different.
+\ene
 
 \section{Licenses}
-\begin{enumerate}
+\bee
   \item Copyleft vs. permissive licenses vs. public domain.
   \item GPL-like: GNU Lesser GPL, GNU Affero GPL, GNU Free Documentation License.
   \item BSD-like: BSD, MIT, Boost Software License, Apache License.
   \item CreativeCommons. CC-BY/SA/ND/NC.
-\end{enumerate}
+\ene
 
 \section{Free Software, Open Source and profit}
-\begin{enumerate}
-  \item "Free" is not about price!
+\bee
+  \item ``Free'' is not about price!
   \item Selling program binary is mostly unprofitable if you are not Big Monopolist Corporation.
   \item Open Source busyness models:
-  \begin{enumerate}
+  \bee
     \item Redistribution and support. Red Hat Linux.
     \item Double licensing. Trolltech Qt, Berkeley DB.
     \item Implementing program/servers solutions. Zend Corporation.
-  \end{enumerate}
-\end{enumerate}
+  \ene
+\ene
 
 \section{Stories of success}
-\begin{enumerate}
-  \item End user examples.
-  \begin{enumerate}
-    \item Operating systems: *BSD, GNU/Linux, ReactOS...
-    \item Servers: LAMP (Linux, Apache, MySQL, PHP)...
-    \item Desktop: FireFox, OpenOffice...
-    \item Web: Wikimedia...
-    \item Science tools: BLAS, Octave, GNU R...
-    \item Languages compilers/interpreters: GCC, Python...
-    \item A lot of developer tools: version control systems, build systems, tracking systems.
-  \end{enumerate}
-  \item Corporation examples.
-  \begin{enumerate}
-    \item Cygnus Solutions. "Cygnus, Your GNU Support".
-    \item Canonical Ltd.
-    \item Red Hat.
-    \item Mozilla Corporation.
-    \item Qt Software.
-    \item Sun Microsystems.
-  \end{enumerate}
-\end{enumerate}
+\bee
+  \item End user examples: operating systems, servers, supercomputers, desktop, web, science tools, 
+a lot of developer tools\dots
+  \item Corporation examples: Cygnus Solutions, Canonical~Ltd. Red~Hat, Mozilla Corporation, Qt~Software, 
+Sun~Microsystems\dots
+\ene
 
 \section{Conclusion}
-\begin{enumerate}
+\bee
   \item Free Software is a way to make world better and may require some 
 sacrifices.
   \item Open Source is a quality guarantee.
   \item It is possible to gain money and work for freedom.
-\end{enumerate}
+\ene
 
 \end{document}
