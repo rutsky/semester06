@@ -2,7 +2,7 @@
 # Project created by QtCreator 2009-03-05T01:06:15
 # -------------------------------------------------
 QT -= gui
-TARGET = simplex_algorithm
+TARGET = lp_problem
 CONFIG += console
 CONFIG -= app_bundle
 
