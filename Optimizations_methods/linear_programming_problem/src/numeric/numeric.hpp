@@ -14,5 +14,6 @@
 #include "iterator.hpp"
 #include "li_vectors.hpp"
 #include "simplex_alg.hpp"
+#include "io.hpp"
 
 #endif // NUMERIC_NUMERIC_HPP
