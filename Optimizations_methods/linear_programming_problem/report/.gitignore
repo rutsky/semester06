@@ -1,5 +1,4 @@
-# Latex stuff.
+# LaTeX stuff.
 *.aux
 *.log
 *.dvi
-
