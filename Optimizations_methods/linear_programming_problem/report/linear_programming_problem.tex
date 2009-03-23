@@ -1,0 +1,97 @@
+\documentclass[10pt,a4paper,titlepage]{article}
+
+% Spaces after commas.
+\frenchspacing
+% Minimal carrying number of characters,
+\righthyphenmin=2
+
+% Encoding support.
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+
+% At least for \leqslant.
+\usepackage{amssymb}
+
+% From K.V.Voroncov Latex in samples, 2005.
+\textheight=24cm   % Text height.
+\textwidth=16cm    % Text width
+\oddsidemargin=0pt % Left side indention.
+\topmargin=-1.5cm  % Top side indention.
+\parindent=24pt    % Paragraph indent.
+\parskip=0pt       % Distance between paragraphs.
+\tolerance=2000
+%\flushbottom       % Page height aligning.
+
+% Algorithms stuff.
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\newcommand{\INPUT}{\textbf{Вход:~}}
+\newcommand{\OUTPUT}{\textbf{Выход:~}}
+\floatname{algorithm}{Алгоритм}
+\renewcommand{\algorithmicrepeat}{\textbf{do}}
+\renewcommand{\algorithmicuntil}{\textbf{while}}
+
+% Drawing figures.
+\usepackage{subfig}
+
+% Drawing graphs.
+\usepackage{tikz}
+\usetikzlibrary{trees,positioning,arrows}
+
+% Transpose symbol in math mode.
+\newcommand\T{^\mathrm{\textsf{\tiny{T}}}}
+
+
+\title{Решение задачи линейного программирования}
+\author{Владимир Руцкий, 3057/2}
+%\date{}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+% Content.
+\section{Постановка задачи}
+Целью данной работы является изучение нескольких методов решения \textit{задачи линейного программирования}, 
+которая без ограничения общности может быть представлена в \textit{канонической форме}:
+$$ \min c\T x, \quad \forall x \in S $$
+$$ S = \{ \, x\ |\ a_i\T x - b^{(i)} = 0, \quad i = \overline{1,\!M}, x \geqslant 0 \, \},$$
+где $c\T x$~--- целевая функция, а множество $S$~--- множество допустимых точек.
+
+Результатом решения задачи линейного программирования в представленной форме является один из следующих выводов:
+\begin{enumerate}
+  \item Множество допустимых точек непусто и найдётся точка $x_* \in S$ такая, что $c\T x_* \leqslant c\T x, \quad \forall x \in S$. 
+Такая точка $x_*$ называется \textit{оптимальной}.
+  \item Множество допустимых точек непусто и функция $c\T x$ неограничена снизу при $x \in S$.
+  \item Множество допустимых точек пусто: $S \ne \varnothing$.
+\end{enumerate}
+
+Каноническую задачу линейного программирования можно представить в матричной форме:
+$$ \min c\T[N] \, x[N], \quad x[N] \in S $$
+$$ S = \{ \, x[N]\ |\ A[M,N] \, x[N] = b[M], \quad x[N] \geqslant 0 \, \}.$$
+
+Я решаю задачу для следующих данных:
+$$A[M,N] = \left( \input{matrix_A} \right), \quad
+b[M] = \left( \input{vector_b} \right)$$
+$$c\T[N] = \left( \input{vector_c} \right)$$
+
+\section{Исследование применимости метода}
+
+\subsection{Симплекс метод}
+Симплекс метод применим для любой задачи линейного программирования представленной в указанной выше матричной форме,
+а значит и применим в данном случае.
+
+\subsection{Метод перебора крайних точек множества допустимых точек}
+\subsection{Генетический алгоритм}
+
+\section{Описание алгоритма}
+\section{Код программы}
+\section{Результаты решения}
+\section{Возможные дополнительные исследования}
+\section{Обоснование достоверности полученного результата}
+
+\end{document}
