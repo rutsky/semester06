@@ -19,4 +19,5 @@ HEADERS += numeric/simplex_alg.hpp \
     numeric/invert_matrix.hpp \
     numeric/submatrix.hpp \
     numeric/subvector.hpp \
-    numeric/combination.hpp
+    numeric/combination.hpp \
+    numeric/io.hpp
