@@ -8,8 +8,8 @@
  * 05.03.2009
  */
 
-#ifndef INVERT_MATRIX_HPP
-#define INVERT_MATRIX_HPP
+#ifndef NUMERIC_INVERT_MATRIX_HPP
+#define NUMERIC_INVERT_MATRIX_HPP
 
 #include "numeric_common.hpp"
 
@@ -57,4 +57,4 @@ namespace numeric
   }
 } // End of namespace 'numeric'.
 
-#endif // INVERT_MATRIX_HPP
+#endif // NUMERIC_INVERT_MATRIX_HPP
