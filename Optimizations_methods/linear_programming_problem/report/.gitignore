@@ -1,0 +1,5 @@
+# Latex stuff.
+*.aux
+*.log
+*.dvi
+
