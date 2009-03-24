@@ -4,7 +4,7 @@
 # 22.03.2009
 
 SOURCE  = golden_section_search
-DEPENDENCY =
+DEPENDENCY = function.tex segment.tex 
 TEX2PDF = pdflatex
 
 all: $(SOURCE).pdf
