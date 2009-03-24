@@ -20,25 +20,26 @@ function plotFunction( func, a, b, step )
   plot(x, y, "-");
 endfunction
 
-function goldenSectionSearch( func, a, b, precision )
+function retval = goldenSectionSearch( func, a, b, precision )
   assert(a <= b);
   
-  figure();
-  hold on;
+  #figure(); # drawing graphic
+  #hold on; # drawing graphic
   
   # Plotting function.
-  plotFunction(func, a, b, 1e-3);
+  #plotFunction(func, a, b, 1e-3); # drawing graphic
   
   # Searching minimum with golden section search (with visualization).
   phi = (5^0.5 + 1) / 2;
+  alpha = 1 / phi;
   
   originalRange = [a, b];
   
-  assert(abs(phi) > 1e-10);
-  x1 = b - (b - a) / phi;
-  x2 = a + (b - a) / phi;
+  x1 = a + (1 - alpha) * (b - a);
+  x2 = a + (    alpha) * (b - a);
   y1 = func(x1);
   y2 = func(x2);
+  i = 0;
   while (abs(b - a) >= precision)
     assert(a < x1);
     assert(x1 < x2);
@@ -50,24 +51,26 @@ function goldenSectionSearch( func, a, b, precision )
     #yMax = max([func(x1), func(x2)]);
     x = [a,    x1,   x2,   b   ];
     y = [yMax, yMax, yMax, yMax];
-    plot(x, y, "+k");
+    #plot(x, y, "+k"); # drawing graphic
     
     if (y1 <= y2)
       b  = x2;
       x2 = x1;
-      x1 = b - (b - a) / phi;
+      x1 = a + (1 - alpha) * (b - a);
       y2 = y1;
       y1 = func(x1);
     else
       a  = x1;
       x1 = x2;
-      x2 = a + (b - a) / phi;
+      x2 = a + alpha * (b - a);
       y1 = y2;
       y2 = func(x2);
     endif
 
     newDist = b - a;
     assert(oldDist > newDist);
+    
+    i++;
   endwhile
   
   if (y1 <= y2)
@@ -79,13 +82,21 @@ function goldenSectionSearch( func, a, b, precision )
   resStr = sprintf("Minimum at x=%9.7f, with precision of %5.2e", res, precision)
   title(resStr);
   
-  drawnow();
+  #drawnow(); # drawing graphic
+  
+  retval = [res, i];
 endfunction
 
 # Iterating through precisions.
 precs = 10 .^ precPows;
 for prec = precs
-  goldenSectionSearch(func, range(1), range(2), prec)
+  retval = goldenSectionSearch(func, range(1), range(2), prec)
+  
+  # TODO: output to a file.
+  #filename = "../output/result.tex";
+  #fid = fopen(filename, "w");
+  #fputs (fid, "Free Software is needed for Free Science");
+  #fclose(fid);
 endfor
 
-input("Press enter to quit.");
+#input("Press enter to quit."); # drawing graphic 
