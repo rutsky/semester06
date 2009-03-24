@@ -15,6 +15,7 @@ $(SOURCE).pdf: $(SOURCE).tex $(DEPENDENCY)
 clean:
 	rm -f *~
 	rm -f *.aux
+	rm -f *.dvi
 	rm -f $(SOURCE).log
 
 distclean: clean
