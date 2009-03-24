@@ -1,0 +1,7 @@
+# Created by Octave 3.0.1, Tue Mar 24 05:19:27 2009 MSK <bob@bob>
+# name: func
+# type: inline function
+# nargs: 1
+x
+0
+sin(1./x)
