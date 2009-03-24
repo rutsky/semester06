@@ -45,6 +45,9 @@
 \usepackage{tikz}
 \usetikzlibrary{trees,positioning,arrows}
 
+% For listings.
+\usepackage{listings}
+
 % Transpose symbol in math mode.
 \newcommand\T{^\mathrm{\textsf{\tiny{T}}}}
 
@@ -64,7 +67,7 @@
 $$ \min f(x), \quad x \in [a, b], $$
 используя \textit{метод золотого сечения}.
 
-Дана конкретная функция $\input{function},$ и задан отрезок $\input{segment}.$
+Дана конкретная функция $\input{data/function},$ и задан отрезок $\input{data/segment}.$
 
 \section{Исследование применимости метода}
 Алгоритмы поиска минимума одномерной функции $f(x)$ на отрезке $[a, b]$, 
@@ -150,6 +153,12 @@ $$
 Для простоты эта оптимизация не приводится в алгоритме.
 
 \section{Код программы}
+\lstset{language=Octave, caption=Код программы решения задачи поиска минимума унимодальной функции,%
+label=main-source-code, basicstyle=\footnotesize,%
+numbers=left, numberstyle=\footnotesize, numbersep=5pt, frame=single, breaklines=true, breakatwhitespace=false,%
+inputencoding=utf8x}
+\lstinputlisting{data/golden_section_search.m}
+
 \section{Результаты решения}
 \section{Возможные дополнительные исследования}
 \section{Обоснование достоверности полученного результата}

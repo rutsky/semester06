@@ -1,0 +1,1 @@
+../../src/golden_section_search.m
