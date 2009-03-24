@@ -1,0 +1,74 @@
+% golden_section_search.tex
+% Report on using golden section search algorithm for finding one dimensional special type function minimum.
+% Vladimir Rutsky <altsysrq@gmail.com>
+% 24.03.2009
+
+\documentclass[10pt,a4paper,titlepage]{article}
+
+% Spaces after commas.
+\frenchspacing
+% Minimal carrying number of characters,
+\righthyphenmin=2
+
+% Encoding support.
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+
+% At least for \leqslant.
+\usepackage{amssymb}
+
+% From K.V.Voroncov Latex in samples, 2005.
+\textheight=24cm   % Text height.
+\textwidth=16cm    % Text width
+\oddsidemargin=0pt % Left side indention.
+\topmargin=-1.5cm  % Top side indention.
+\parindent=24pt    % Paragraph indent.
+\parskip=0pt       % Distance between paragraphs.
+\tolerance=2000
+%\flushbottom       % Page height aligning.
+
+% Algorithms stuff.
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\newcommand{\INPUT}{\textbf{Вход:~}}
+\newcommand{\OUTPUT}{\textbf{Выход:~}}
+\floatname{algorithm}{Алгоритм}
+\renewcommand{\algorithmicrepeat}{\textbf{do}}
+\renewcommand{\algorithmicuntil}{\textbf{while}}
+
+% Drawing figures.
+\usepackage{subfig}
+
+% Drawing graphs.
+\usepackage{tikz}
+\usetikzlibrary{trees,positioning,arrows}
+
+% Transpose symbol in math mode.
+\newcommand\T{^\mathrm{\textsf{\tiny{T}}}}
+
+
+\title{Одномерная минимизация функции}
+\author{Владимир Руцкий, 3057/2}
+%\date{}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+% Content.
+\section{Постановка задачи}
+Требуется найти минимум одномерной функции $f(x)$ на заданном отрезке $[a, b]$:
+$$ \min f(x), \quad x \in [a, b]. $$
+
+\section{Исследование применимости метода}
+\section{Описание алгоритма}
+\section{Код программы}
+\section{Результаты решения}
+\section{Возможные дополнительные исследования}
+\section{Обоснование достоверности полученного результата}
+
+\end{document}
