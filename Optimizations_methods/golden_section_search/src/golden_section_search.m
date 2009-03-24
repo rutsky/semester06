@@ -8,8 +8,8 @@ precPows = [-3:-1:-6];
 #func = inline("sin(1./x)");
 #range = [0.15, 0.6];
 
-load function.mat
-load range.mat
+load data/function.mat
+load data/segment.mat
 
 function plotFunction( func, a, b, step )
   assert(a <= b);
