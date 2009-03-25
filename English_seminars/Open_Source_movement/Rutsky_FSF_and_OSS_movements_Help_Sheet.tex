@@ -3,7 +3,7 @@
 % Vladimir Rutsky <altsysrq@gmail.com>
 % 22.03.2009
 
-\documentclass[10pt,a4paper]{proc}
+\documentclass[10pt,a4paper]{article}
 
 % Spaces after commas.
 \frenchspacing
@@ -31,48 +31,55 @@
 % For transcriptions.
 \usepackage{tipa}
 
+% For multicolumns support.
+\usepackage{multicol}
+
 % Numerating sections with Roman numerals.
 \renewcommand \thesection{\Roman{section}}
 
 % Smaller interval.
-\renewcommand{\baselinestretch}{0.7}
+\renewcommand{\baselinestretch}{0.8}
 % TODO
-\newcommand{\bee}{\begin{enumerate}\setlength{\itemsep}{-0.7mm}}
+\newcommand{\bee}{\begin{enumerate}\setlength{\itemsep}{-0.6mm}}
 \newcommand{\ene}{\end{enumerate}}
-\newcommand{\bit}{\begin{itemize}\setlength{\itemsep}{-0.7mm}}
+\newcommand{\bit}{\begin{itemize}\setlength{\itemsep}{-0.6mm}}
 \newcommand{\eit}{\end{itemize}}
+
+\title{Free Software and Open Source movements \\ Help Sheet}
+\author{Rutsky\,V., 3057/2}
 
 \begin{document}
 
+% Title.
+\maketitle
+\thispagestyle{empty}
+
 % Header.
-\pagestyle{empty}
-\pagestyle{fancy}
-\lhead{Rutsky~V.\,V., 3057/2}
-\chead{Help Sheet}
-\rhead{\today}
-\cfoot{}
+%\pagestyle{empty}
+%\pagestyle{fancy}
+%lhead{Rutsky~V.\,V., 3057/2}
+%\chead{Help Sheet}
+%\rhead{\today}
+%\cfoot{}
 
-\begin{center}
-{\LARGE \bfseries Free Software and Open Source movements}
-\end{center}
+%\begin{center}
+%{\LARGE \bfseries Free Software and Open Source movements}
+%\end{center}
 
-% Content
+% Content.
+\begin{multicols}{2}
+
 \section{Free Software movement}
 
 \bee
-  \item Richard~M.~Stallman and his idea of Free Software.
-  \item Free Software Foundation (1985).
-  \item Free Software freedoms:
+  \item R.M.~Stallman and his idea of Free Software.
+  \item Free Software Foundation, Free Software freedoms:
   \bee
-    \item[Freedom 0:] The freedom to run the program, for any purpose.
-    \item[Freedom 1:] The freedom to study how the program works, and adapt it to 
-your needs.
-    \item[Freedom 2:] The freedom to redistribute copies so you can help your 
-neighbor.
-    \item[Freedom 3:] The freedom to improve the program, and release your 
-improvements (and modified versions in general) to the public, so that the 
-whole community benefits.
-  \end{enumerate}
+    \item[0.] To run the program, for any purpose.
+    \item[1.] To study how the program works, and modify it.
+    \item[2.] To redistribute copies.
+    \item[3.] To redistribute modified copies.
+  \ene
   \item GNU Operation System.
   \item Free Software licenses.
 \ene
@@ -81,7 +88,7 @@ whole community benefits.
 \bee
   \item Open Source Definition:
   \bee
-    % TODO: made normal counter.
+    % TODO: do normal counter.
     \item[1.] Free redistribution.
     \item[2.] Source code.
     \item[3.] Derived works.
@@ -94,35 +101,33 @@ whole community benefits.
     \item[10.] License must be technology-neutral.
   \ene
   \item Open Source is a powerful and reliable software.
-  \item Free Software and Open Source are different.
+  \item Free Software and Open Source are different!
 \ene
 
 \section{Licenses}
 \bee
   \item Copyleft vs. permissive licenses vs. public domain.
-  \item GPL-like: GNU Lesser GPL, GNU Affero GPL, GNU Free Documentation License.
-  \item BSD-like: BSD, MIT, Boost Software License, Apache License.
-  \item CreativeCommons. CC-BY/SA/ND/NC.
+  \item GPL-like.
+  \item BSD-like.
+  \item CreativeCommons..
 \ene
 
 \section{Free Software, Open Source and profit}
 \bee
   \item ``Free'' is not about price!
   \item Selling program binary is mostly unprofitable if you are not Big Monopolist Corporation.
-  \item Open Source busyness models:
+  \item Open Source business models:
   \bee
-    \item Redistribution and support. Red Hat Linux.
-    \item Double licensing. Trolltech~Qt, Berkeley~DB.
-    \item Implementing program/servers solutions. Zend Corporation.
+    \item Redistribution and support.
+    \item Double licensing.
+    \item Implementing programs/servers solutions.
   \ene
 \ene
 
 \section{Stories of success}
 \bee
-  \item End user examples: operating systems, servers, supercomputers, desktop, web, science tools, 
-a lot of developer tools\dots
-  \item Corporation examples: Cygnus Solutions, Canonical~Ltd. Red~Hat, Mozilla Corporation, Qt~Software, 
-Sun~Microsystems\dots
+  \item End user examples.
+  \item Corporation examples.
 \ene
 
 \section{Conclusion}
@@ -130,8 +135,10 @@ Sun~Microsystems\dots
   \item Free Software is a way to make world better and may require some 
 sacrifices.
   \item Open Source is a quality guarantee.
-  \item It is possible to gain money and work for freedom.
+  \item It is possible to gain money and work for our freedom!
 \ene
+
+\end{multicols}
 
 \section*{Sources}
   \bit
@@ -139,12 +146,13 @@ sacrifices.
     \item \url{http://www.opensource.org/}~--- Open Source Initiative
     \item \url{http://en.wikipedia.org/wiki/Portal:Free_software}~--- Wikipedia Free Software Portal
   \eit
-  
+
 \section*{Vocabulary}
   \begin{tabular}{rll}
-    proprietary & \textipa{[pr@'prai@t(@)ri]}  & \Russian собственнический \\
-    license     & \textipa{['lais(@)ns]}       & \Russian лицензия \\
-    ethical     & \textipa{['eTik@l]} & \Russian этичный \\
+    \textbf{proprietary} software & \textipa{[pr@'prai@t(@)ri]}  & \Russian проприетарное (частное) ПО \\
+    \textbf{license}              & \textipa{['lais(@)ns]}       & \Russian лицензия \\
+    field of \textbf{endeavor}    & \textipa{[in'dev@]}          & \Russian область применения \\
+    \textbf{ethical}              & \textipa{['eTik@l]}          & \Russian этичный \\
     %reliable % TODO
   \end{tabular}
 
