@@ -1,0 +1,129 @@
+% Rutsky_FSF_and_OSS_movements_Help_Sheet.tex
+% Help Sheet on Free Software and Open Source movements for English seminars.
+% Vladimir Rutsky <altsysrq@gmail.com>
+% 26.03.2009
+
+\documentclass[landscape,a5paper]{article}
+
+% Spaces after commas.
+\frenchspacing
+% Minimal carrying number of characters,
+\righthyphenmin=2
+
+% Encoding support.
+\usepackage[utf8x]{inputenc}
+\usepackage{url}
+\usepackage[russian,english]{babel}
+
+% From K.V.Voroncov Latex in samples, 2005.
+\textheight=25cm   % Text height.
+\textwidth=16cm    % Text width
+\oddsidemargin=0pt % Left side indention.
+\topmargin=-1.5cm  % Top side indention.
+\parindent=24pt    % Paragraph indent.
+\parskip=0pt       % Distance between paragraphs.
+\tolerance=2000
+\flushbottom       % Page height aligning.
+
+% For defining headers.
+\usepackage{fancyhdr}
+
+% For transcriptions.
+\usepackage{tipa}
+
+% For multicolumns support.
+\usepackage{multicol}
+
+% Numerating sections with Roman numerals.
+\renewcommand \thesection{\Roman{section}}
+
+% Smaller interval.
+\renewcommand{\baselinestretch}{0.60}
+% TODO
+\newcommand{\bee}{\begin{enumerate}\setlength{\itemsep}{-0.65mm}}
+\newcommand{\ene}{\end{enumerate}}
+\newcommand{\bit}{\begin{itemize}\setlength{\itemsep}{-0.65mm}}
+\newcommand{\eit}{\end{itemize}}
+
+%\title{Free Software and Open Source movements \\ Help Sheet}
+%\title{Free Software and Open Source movements}
+%\author{Rutsky\,V., 3057/2}
+%\date{}
+
+\begin{document}
+
+% Title.
+%\maketitle
+%\thispagestyle{empty}
+
+% Header.
+\pagestyle{empty}
+%\pagestyle{fancy}
+%\renewcommand{\headrulewidth}{0pt}
+%\rhead{Rutsky\,V., 3057/2 \qquad \today}
+%\chead{Help Sheet}
+%\cfoot{}
+%\fancypagestyle{plain}
+
+\begin{flushright}
+  Rutsky\,V., 3057/2 \qquad \today
+\end{flushright}
+
+\begin{center}
+{\LARGE \bfseries Free Software and Open Source movements}
+\end{center}
+
+% Content.
+\section*{Sources}
+%{\Large \bfseries Sources}
+  \bit
+    \item \url{http://www.fsf.org/}~--- Free Software Foundation
+    \item \url{http://www.opensource.org/}~--- Open Source Initiative
+    \item \url{http://en.wikipedia.org/wiki/Portal:Free_software}~--- Wikipedia Free Software Portal
+  \eit
+
+\begin{center}
+{\Large \bfseries Contents}
+\end{center}
+
+\begin{center}
+\begin{minipage}[center]{10cm}
+{\bfseries 
+Introduction
+\begin{enumerate}
+  %\renewcommand{\labelenumi}{\Roman{enumi}}
+
+  \item {Free Software movement}
+  \item {Open Source movement}
+  \item {Licenses}
+  \item {Free Software, Open Source and profit}
+  \item {Stories of success}
+\end{enumerate}
+Conclusion
+}
+
+\end{minipage}
+\end{center}
+
+\begin{center}
+{\Large \bfseries Vocabulary}
+\end{center}
+
+\begin{tabular}{lll}
+  \textbf{attribution}           & \textipa{[,\ae{}tri'bju:S@n]}        & \Russian установление авторства \\
+  \textbf{collaboration}         & \textipa{[k@,l\ae{}b@'reiS@n]}       & \Russian совместная работа \\
+  \textbf{copyright}             & \textipa{['kOpirait]}                & \Russian авторское право \\
+  \textbf{derivative}            & \textipa{[di'riv@tiv]}               & \Russian производная \\
+  \textbf{ethical}               & \textipa{['eTik@l]}                  & \Russian этичный \\
+  \textbf{field of endeavor}     & \textipa{[fi:ld Ov in'dev@]}         & \Russian область применения \\
+  \textbf{intellectual property} & \textipa{[,inti'lektju@l 'prOp@ti]}  & \Russian интеллектуальная собственность \\
+  \textbf{legal right}           & \textipa{['li:g@l rait]}             & \Russian юридическое право \\
+  \textbf{patent}                & \textipa{['peit@nt]}                 & \Russian патент \\
+  \textbf{permissive license}    & \textipa{[p@'misiv 'lais(@)ns]}      & \Russian либеральная лицензия \\
+  \textbf{proprietary software}  & \textipa{[pr@'prai@t(@)ri 'sOftwE@]} & \Russian проприетарное (частное) программное обеспечение \\
+  \textbf{public domain}         & \textipa{['pAblik d@'mein]}          & \Russian общественное достояние \\
+  \textbf{reliability}           & \textipa{[ri,lai@'biliti]}           & \Russian надёжность \\
+  \textbf{trade mark}            & \textipa{[treid ma:k]}               & \Russian товарный знак \\
+\end{tabular}
+
+\end{document}
