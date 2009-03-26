@@ -3,7 +3,7 @@
 % Vladimir Rutsky <altsysrq@gmail.com>
 % 26.03.2009
 
-\documentclass[landscape,a5paper]{article}
+\documentclass[10pt,a4paper]{article}
 
 % Spaces after commas.
 \frenchspacing
@@ -16,7 +16,7 @@
 \usepackage[russian,english]{babel}
 
 % From K.V.Voroncov Latex in samples, 2005.
-\textheight=25cm   % Text height.
+\textheight=24cm   % Text height.
 \textwidth=16cm    % Text width
 \oddsidemargin=0pt % Left side indention.
 \topmargin=-1.5cm  % Top side indention.
@@ -25,24 +25,28 @@
 \tolerance=2000
 \flushbottom       % Page height aligning.
 
+% TODO: Cleanup unused stuff.
+
 % For defining headers.
-\usepackage{fancyhdr}
+%\usepackage{fancyhdr}
 
 % For transcriptions.
 \usepackage{tipa}
 
 % For multicolumns support.
-\usepackage{multicol}
+%\usepackage{multicol}
 
 % Numerating sections with Roman numerals.
-\renewcommand \thesection{\Roman{section}}
+%\renewcommand \thesection{\Roman{section}}
 
 % Smaller interval.
-\renewcommand{\baselinestretch}{0.60}
+%\renewcommand{\baselinestretch}{0.60}
 % TODO
-\newcommand{\bee}{\begin{enumerate}\setlength{\itemsep}{-0.65mm}}
+%\newcommand{\bee}{\begin{enumerate}\setlength{\itemsep}{-0.65mm}}
+\newcommand{\bee}{\begin{enumerate}}
 \newcommand{\ene}{\end{enumerate}}
-\newcommand{\bit}{\begin{itemize}\setlength{\itemsep}{-0.65mm}}
+%\newcommand{\bit}{\begin{itemize}\setlength{\itemsep}{-0.65mm}}
+\newcommand{\bit}{\begin{itemize}}
 \newcommand{\eit}{\end{itemize}}
 
 %\title{Free Software and Open Source movements \\ Help Sheet}
@@ -120,7 +124,7 @@ Conclusion
   \textbf{legal right}           & \textipa{['li:g@l rait]}             & \Russian юридическое право \\
   \textbf{patent}                & \textipa{['peit@nt]}                 & \Russian патент \\
   \textbf{permissive license}    & \textipa{[p@'misiv 'lais(@)ns]}      & \Russian либеральная лицензия \\
-  \textbf{proprietary software}  & \textipa{[pr@'prai@t(@)ri 'sOftwE@]} & \Russian проприетарное (частное) программное обеспечение \\
+  \textbf{proprietary software}  & \textipa{[pr@'prai@t(@)ri 'sOftwE@]} & \Russian проприетарное (частное) ПО \\
   \textbf{public domain}         & \textipa{['pAblik d@'mein]}          & \Russian общественное достояние \\
   \textbf{reliability}           & \textipa{[ri,lai@'biliti]}           & \Russian надёжность \\
   \textbf{trade mark}            & \textipa{[treid ma:k]}               & \Russian товарный знак \\
