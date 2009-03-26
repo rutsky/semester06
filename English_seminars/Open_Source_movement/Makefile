@@ -12,9 +12,10 @@ $(SOURCE).pdf: $(SOURCE).tex
 	$(TEX2PDF) $(SOURCE).tex
 
 clean:
+	rm -f *~
 	rm -f $(SOURCE).aux
+	rm -f $(SOURCE).dvi
 	rm -f $(SOURCE).log
 
 distclean: clean
 	rm -f $(SOURCE).pdf
-
