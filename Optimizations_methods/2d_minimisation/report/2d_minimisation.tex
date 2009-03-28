@@ -1,0 +1,89 @@
+% 2d_minimisation.tex
+% Report on 2d minimisations algorithms (gradient descent and genetic algorithm).
+% Vladimir Rutsky <altsysrq@gmail.com>
+% 28.03.2009
+
+\documentclass[10pt,a4paper,titlepage]{article}
+
+% Spaces after commas.
+\frenchspacing
+% Minimal carrying number of characters,
+\righthyphenmin=2
+
+% Encoding support.
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+
+\usepackage{amsmath, amsthm, amssymb}
+
+% From K.V.Voroncov Latex in samples, 2005.
+\textheight=24cm   % Text height.
+\textwidth=16cm    % Text width
+\oddsidemargin=0pt % Left side indention.
+\topmargin=-1.5cm  % Top side indention.
+\parindent=24pt    % Paragraph indent.
+\parskip=0pt       % Distance between paragraphs.
+\tolerance=2000
+%\flushbottom       % Page height aligning.
+
+% Algorithms stuff.
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\newcommand{\INPUT}{\textbf{Вход:~}}
+\newcommand{\OUTPUT}{\textbf{Выход:~}}
+\floatname{algorithm}{Алгоритм}
+\renewcommand{\algorithmicrepeat}{\textbf{do}}
+\renewcommand{\algorithmicuntil}{\textbf{while}}
+
+% Drawing figures.
+\usepackage{subfig}
+
+% Drawing graphs.
+\usepackage{tikz}
+\usetikzlibrary{trees,positioning,arrows}
+
+% For listings.
+\usepackage{listings}
+
+% Transpose symbol in math mode.
+\newcommand\T{^\mathrm{\textsf{\tiny{T}}}}
+% Real number space.
+\newcommand\RR{\mathbb{R}}
+
+% Source code listings.
+\renewcommand{\lstlistingname}{Исходный код}
+
+
+\title{Решение задачи многомерной минимизации}
+\author{Владимир Руцкий, 3057/2}
+%\date{}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+% Content.
+\section{Постановка задачи}
+Требуется найти с наперёд заданной точностью минимум многомерной функции $f(x)$ в некоторой области:
+$$ \min f(x), \quad x \in \RR^n, $$
+используя \textit{метод градиентного спуска} и \textit{генетический алгоритм}.
+
+Дана конкретная функция $\input{data/function},$ заданная на $\RR^2$.
+
+\section{Исследование применимости метода}
+
+\section{Описание алгоритма}
+
+\section{Код программы}
+
+\section{Результаты решения}
+
+\section{Возможные дополнительные исследования}
+
+\section{Обоснование достоверности полученного результата}
+
+\end{document}
