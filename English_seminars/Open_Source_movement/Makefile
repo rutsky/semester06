@@ -13,9 +13,9 @@ $(SOURCE).pdf: $(SOURCE).tex
 
 clean:
 	rm -f *~
-	rm -f $(SOURCE).aux
-	rm -f $(SOURCE).dvi
-	rm -f $(SOURCE).log
+	rm -f *.aux
+	rm -f *.dvi
+	rm -f *.log
 
 distclean: clean
-	rm -f $(SOURCE).pdf
+	rm -f *.pdf
