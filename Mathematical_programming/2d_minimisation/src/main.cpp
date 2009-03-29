@@ -17,11 +17,14 @@
 
 #include "numeric/numeric.hpp"
 
+#include "data/function.hpp"
+
 int main()
 {
   typedef numeric::ublas::vector     <double> vector_type;
   typedef numeric::ublas::unit_vector<double> unit_vector_type;
   typedef numeric::ublas::matrix     <double> matrix_type;
+  
   
   
   return 0;
