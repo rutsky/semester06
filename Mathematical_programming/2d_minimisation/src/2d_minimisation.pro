@@ -7,7 +7,8 @@ CONFIG += console
 CONFIG -= app_bundle
 
 # QMAKE_CXXFLAGS += -std=c++98 -Wall -W -pedantic
-INCLUDEPATH += /usr/src/boost_1_38_0 $(MY_NUMERIC_ROOT)
+INCLUDEPATH += /usr/src/boost_1_38_0 \
+    $(MY_NUMERIC_ROOT)
 DEFINES += USING_QT_CREATOR
 TEMPLATE = app
 SOURCES += main.cpp
