@@ -15,7 +15,6 @@
 					<Add option="-Wall" />
 					<Add option="-g" />
 					<Add option="-std=c++98" />
-					<Add directory="/usr/src/boost_1_38_0" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -35,14 +34,10 @@
 		</Build>
 		<Compiler>
 			<Add option="-fexceptions" />
+			<Add directory="/usr/src/boost_1_38_0" />
+			<Add directory="$(MY_NUMERIC_ROOT)" />
 		</Compiler>
 		<Unit filename="main.cpp" />
-		<Unit filename="numeric/invert_matrix.hpp" />
-		<Unit filename="numeric/iterator.hpp" />
-		<Unit filename="numeric/li_vectors.hpp" />
-		<Unit filename="numeric/numeric.hpp" />
-		<Unit filename="numeric/numeric_common.hpp" />
-		<Unit filename="numeric/simplex_alg.hpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
