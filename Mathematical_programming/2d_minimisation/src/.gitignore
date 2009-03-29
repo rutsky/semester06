@@ -1,0 +1,9 @@
+# Ignoring Qt Creator stuff.
+2d_minimisation.pro.user
+2d_minimisation
+Makefile
+Makefile.Debug
+Makefile.Release
+qtc-gdbmacros/
+debug/
+release/
