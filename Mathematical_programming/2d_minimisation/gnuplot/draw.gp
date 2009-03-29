@@ -9,15 +9,16 @@ set terminal x11
 set auto
 
 set surface
+# set multiplot
 
-#set sample 31; set isosamples 30
+set sample 31; set isosamples 30
 
 set pal color
 set pal maxcolors 0
 set grid layerdefault
 
 set hidden3d
-set pm3d at s
+#set pm3d at s
 set view 50,220
 
 set xlabel "x"
@@ -29,6 +30,10 @@ set ticslevel 0
 unset clabel
 set contour
 
+set style data lines
+
 load "function.gp"
+
+#unset multiplot
 
 pause -1
