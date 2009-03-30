@@ -15,5 +15,6 @@
 #include "li_vectors.hpp"
 #include "simplex_alg.hpp"
 #include "io.hpp"
+#include "gradient_descent.hpp"
 
 #endif // NUMERIC_NUMERIC_HPP

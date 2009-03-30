@@ -68,6 +68,24 @@ namespace numeric
     
     ostr << "\\end{array}\n";
   }
+  
+  template< class OutStream, class Vector >
+  void output_vector_coordinates( OutStream &ostr, Vector v, 
+                                  char const *delimiter = " ", 
+                                  char const *end = "\n" )
+  {
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<Vector>));
+    BOOST_ASSERT(v.size() > 0);
+    
+    ostr << v(0);
+    for (size_t r = 1; r < v.size(); ++r)
+    {
+      ostr << delimiter;
+      ostr << v(r);
+    }
+    
+    ostr << end;
+  }
 } // End of namespace 'numeric'.
 
 #endif // NUMERIC_IO_HPP

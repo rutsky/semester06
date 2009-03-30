@@ -1,2 +1,8 @@
 # Ignoring Qt Creator stuff.
 numeric.pro.user
+Makefile
+Makefile.Debug
+Makefile.Release
+qtc-gdbmacros/
+debug/
+release/
