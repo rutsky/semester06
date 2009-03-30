@@ -1,6 +1,6 @@
 /*
  * gradient_descent.hpp
- * Searching funciton minimum with gradient descent algorithm.
+ * Searching multidimensional function minimum with gradient descent algorithm.
  * Vladimir Rutsky <altsysrq@gmail.com>
  * 29.03.2009
  */
@@ -13,6 +13,10 @@
 #include <boost/assert.hpp>
 #include <boost/concept/assert.hpp>
 #include <boost/concept_check.hpp>
+#include <boost/bind.hpp>
+
+#include "golden_section_search.hpp"
+#include "lerp.hpp"
 
 namespace numeric
 {
@@ -28,7 +32,7 @@ namespace gradient_descent
               typename V::value_type step,
               OStream &ostr /* debug for Gnuplot */ )
   {
-    // TODO: Now we assume that vector's coordinates and function values are same scalal types.
+    // TODO: Now we assume that vector's coordinates and function values are same scalar types.
     // TODO: Assert on correctness of `ostr'.
     
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V>));
@@ -49,9 +53,15 @@ namespace gradient_descent
     while (true)
     {
       // Searching next point in direction opposite to gradient.
-      vector_type const dir = -functionGrad(x);
+      vector_type const grad = functionGrad(x);
       
+      /*
       
+      vector_type const &s0 = x;
+      vector_type const &s1 = s0 + dir;
+      
+      golden_section::find_min(boost::bind(function, boost::bind(Lerp<scalar_type, vector_type>(0, 1))));
+      */
     }
     
     return x;

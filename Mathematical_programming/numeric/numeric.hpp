@@ -16,5 +16,6 @@
 #include "simplex_alg.hpp"
 #include "io.hpp"
 #include "gradient_descent.hpp"
+#include "golden_section_search.hpp"
 
 #endif // NUMERIC_NUMERIC_HPP

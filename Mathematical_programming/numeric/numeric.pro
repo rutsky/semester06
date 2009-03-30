@@ -8,4 +8,6 @@ HEADERS = combination.hpp \
     simplex_alg.hpp \
     submatrix.hpp \
     subvector.hpp \
-    gradient_descent.hpp
+    gradient_descent.hpp \
+    golden_section_search.hpp \
+    lerp.hpp
