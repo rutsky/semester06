@@ -83,6 +83,9 @@ namespace numeric
   
     return res;
   }
+  
+  template< typename T, int size >
+  size_t array_size( T (&)[size] ) { return size; };
 } // End of namespace 'numeric'.
 
 #endif // NUMERIC_NUMERIC_COMMON_HPP

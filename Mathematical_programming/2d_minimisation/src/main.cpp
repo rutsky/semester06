@@ -38,16 +38,16 @@ int main()
     typedef scalar_type (*function_type     )( vector_type const & );
     typedef vector_type (*function_grad_type)( vector_type const & );
     
-    function_type      const f         = &function::function<vector_type>;
-    function_grad_type const df        = &function::functionGrad<vector_type>;
-    scalar_type        const precision = function::precision;
-    scalar_type        const step      = function::step;
+    function_type      const f                 = &function::function<vector_type>;
+    function_grad_type const df                = &function::functionGrad<vector_type>;
+    scalar_type        const preferedPrecision = function::preferedPrecision;
+    scalar_type        const step              = function::step;
     
     std::vector<vector_type> points;
     
     vector_type const xMin = numeric::gradient_descent::find_min
                                <function_type, function_grad_type, vector_type>(
-                                  f, df, startPoint, precision, step, std::back_inserter(points));
+                                  f, df, startPoint, preferedPrecision, step, std::back_inserter(points));
     
     {
       // Saving passed spots.
@@ -77,11 +77,39 @@ int main()
       
       *ofs << "set cntrparam levels discrete ";
       
-      std::cout << f(*points.begin()) << std::endl; // debug
+      //std::cout << f(*points.begin()) << std::endl; // debug
       
       std::transform(++points.begin(), points.end(), std::ostream_iterator<double>(*ofs, ","), f);
       *ofs << f(*points.begin());
       *ofs << std::endl;
+    }
+    
+    {
+      // Generating report data.
+      
+      // Saving passed spots function values (for contours).
+      char const *dataFileName = "../output/gd_result.tex";
+      boost::scoped_ptr<std::ofstream> ofs(new std::ofstream(dataFileName));
+      if (ofs->fail())
+      {
+        std::cerr << "Failed to open data file '" << dataFileName << "'.\n";
+        return 1;
+      }
+      
+      for (size_t p = 0; p < numeric::array_size(function::precisions); ++p)
+      {
+        scalar_type const precision = function::precisions[p];
+        
+        std::vector<vector_type> points;
+        vector_type const xMin = numeric::gradient_descent::find_min
+                                   <function_type, function_grad_type, vector_type>(
+                                      f, df, startPoint, precision, step, std::back_inserter(points));
+        
+        // TODO: Formatting.
+        *ofs << precision << " & " << points.size() << " & $(";
+        numeric::output_vector_coordinates(*ofs, xMin, ", ", "");
+        *ofs << ")$ & " << f(xMin) << " \\\\\n";
+      }
     }
   }
   
