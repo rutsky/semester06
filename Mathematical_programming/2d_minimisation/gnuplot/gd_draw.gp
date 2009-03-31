@@ -9,7 +9,6 @@ set terminal x11
 set auto
 
 #set surface
-# set multiplot
 
 #set pal color
 #set pal maxcolors 0
@@ -30,8 +29,5 @@ set ticslevel 0
 
 #set style data lines
 
-load "function.gp"
-
-#unset multiplot
-
+load "gd_function.gp"
 pause -1

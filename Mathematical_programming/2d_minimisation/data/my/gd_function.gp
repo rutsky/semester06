@@ -16,14 +16,14 @@ set hidden3d
 
 set contour
 #unset clabel
-load 'contours.dat'
+load 'gd_contours.gp'
 
 #show palette palette 5#5n6#6
 
 f(x, y) = x**3 + 2 * y + 4 * (2 + x**2 + y**2)**0.5
 splot f(x, y) title 'x**3 + 2 * y + 4 * (2 + x**2 + y**2)**0.5', \
-  'points.dat' using 1:2:(f($1, $2) + 1) notitle linewidth 3 linecolor rgb "#0000FF" with lines, \
-  'points.dat' using 1:2:(f($1, $2) - 1) notitle linewidth 3 linecolor rgb "#0000FF" with lines
+  'gd_points.dat' using 1:2:(f($1, $2) + 1) notitle linewidth 3 linecolor rgb "#0000FF" with lines, \
+  'gd_points.dat' using 1:2:(f($1, $2) - 1) notitle linewidth 3 linecolor rgb "#0000FF" with lines
 
 #pause -1
 
@@ -39,6 +39,6 @@ splot f(x, y) title 'x**3 + 2 * y + 4 * (2 + x**2 + y**2)**0.5', \
 #set grid
 #set contour
 #unset clabel
-#load 'contours.dat'
+#load 'gd_contours.dat'
 
-#splot 'points.dat' using 1:2:(f($1, $2)) notitle linewidth 3 linecolor rgb "#0000FF" with lines
+#splot 'gd_points.dat' using 1:2:(f($1, $2)) notitle linewidth 3 linecolor rgb "#0000FF" with lines

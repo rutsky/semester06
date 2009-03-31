@@ -40,7 +40,6 @@ int main()
   scalar_type        const preferedPrecision = function::preferedPrecision;
   scalar_type        const step              = function::step;
 
-  if (0)
   {
     //
     // Gradient descent algorithm.
@@ -58,7 +57,7 @@ int main()
     
     {
       // Saving passed spots.
-      char const *dataFileName = "../output/points.dat";
+      char const *dataFileName = "../output/gd_points.dat";
       boost::scoped_ptr<std::ofstream> ofs(new std::ofstream(dataFileName));
       if (ofs->fail())
       {
@@ -74,7 +73,7 @@ int main()
     if (points.begin() != points.end())
     {
       // Saving passed spots function values (for contours).
-      char const *dataFileName = "../output/contours.dat";
+      char const *dataFileName = "../output/gd_contours.gp";
       boost::scoped_ptr<std::ofstream> ofs(new std::ofstream(dataFileName));
       if (ofs->fail())
       {
@@ -132,7 +131,8 @@ int main()
     size_t const nIndividuals = function::nIndividuals;
     double const liveRate     = function::liveRate;
     
-    typedef std::vector<std::vector<vector_type> > points_vecs_vec_type;
+    typedef std::vector<vector_type>     points_vec_type;
+    typedef std::vector<points_vec_type> points_vecs_vec_type;
     points_vecs_vec_type selectedPointsVecs, notSelectedPointsVec;
     
     typedef numeric::genetic::ParallelepipedonUniformGenerator<vector_type> generator_type;
@@ -143,42 +143,43 @@ int main()
         generator_type(loGen, hiGen), crossover_type(), f, nIndividuals, liveRate, preferedPrecision,
         std::back_inserter(selectedPointsVecs), std::back_inserter(notSelectedPointsVec));
     
-    /*
     {
-      // Saving passed spots.
-      char const *dataFileName = "../output/points.dat";
-      boost::scoped_ptr<std::ofstream> ofs(new std::ofstream(dataFileName));
-      if (ofs->fail())
+      // Saving generations.
+      for (size_t i = 0; i < selectedPointsVecs.size(); ++i)
       {
-        std::cerr << "Failed to open data file '" << dataFileName << "'.\n";
-        return 1;
+        // Selected.
+        {
+          std::string const dataFileName = (boost::format("../output/gen_populations/gen_selected_points_%1$03d.dat") % i).str();
+          boost::scoped_ptr<std::ofstream> ofs(new std::ofstream(dataFileName.c_str()));
+          if (ofs->fail())
+          {
+            std::cerr << "Failed to open data file '" << dataFileName << "'.\n";
+            return 1;
+          }
+          
+          points_vec_type const &vec = selectedPointsVecs[i];
+          
+          for (size_t j = 0; j < vec.size(); ++j)
+            numeric::output_vector_coordinates(*ofs, vec[j], ",");
+        }
+        
+        // Not selected.
+        {
+          std::string const dataFileName = (boost::format("../output/gen_populations/gen_not_selected_points_%1$03d.dat") % i).str();
+          boost::scoped_ptr<std::ofstream> ofs(new std::ofstream(dataFileName.c_str()));
+          if (ofs->fail())
+          {
+            std::cerr << "Failed to open data file '" << dataFileName << "'.\n";
+            return 1;
+          }
+          
+          points_vec_type const &vec = notSelectedPointsVec[i];
+          
+          for (size_t j = 0; j < vec.size(); ++j)
+            numeric::output_vector_coordinates(*ofs, vec[j], ",");
+        }
       }
-      
-      std::for_each(points.begin(), points.end(), 
-                    boost::bind<void>(&numeric::output_vector_coordinates<std::ofstream, vector_type>, 
-                                      boost::ref(*ofs), _1, " ", "\n"));
     }
-    */
-    
-    /*
-    if (points.begin() != points.end())
-    {
-      // Saving passed spots function values (for contours).
-      char const *dataFileName = "../output/contours.dat";
-      boost::scoped_ptr<std::ofstream> ofs(new std::ofstream(dataFileName));
-      if (ofs->fail())
-      {
-        std::cerr << "Failed to open data file '" << dataFileName << "'.\n";
-        return 1;
-      }
-      
-      *ofs << "set cntrparam levels discrete ";
-      
-      std::transform(++points.begin(), points.end(), std::ostream_iterator<double>(*ofs, ","), f);
-      *ofs << f(*points.begin());
-      *ofs << std::endl;
-    }
-    */
     
     {
       // Generating report data.
