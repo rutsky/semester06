@@ -15,9 +15,11 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include <iomanip>
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/bind.hpp>
+#include <boost/format.hpp>
 
 #include "numeric/numeric.hpp"
 
@@ -106,9 +108,9 @@ int main()
                                       f, df, startPoint, precision, step, std::back_inserter(points));
         
         // TODO: Formatting.
-        *ofs << precision << " & " << points.size() << " & $(";
+        *ofs << boost::format("%1$1.0e") % precision << " & " << points.size() << " & (";
         numeric::output_vector_coordinates(*ofs, xMin, ", ", "");
-        *ofs << ")$ & " << f(xMin) << " \\\\\n";
+        *ofs << ") & " << boost::format("%1$15.8f") % f(xMin) << " \\\\\n";
       }
     }
   }

@@ -81,7 +81,7 @@ namespace numeric
     for (size_t r = 1; r < v.size(); ++r)
     {
       ostr << delimiter;
-      ostr << v(r);
+      ostr << boost::format("%1$15.8f") % v(r);
     }
     
     ostr << end;

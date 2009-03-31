@@ -79,8 +79,9 @@ $$ \min f(x), \quad x \in \RR^n, $$
 \label{GradientDescentMethodConditions}
 \textit{Метод градиентного спуска} основывается на том, что для гладкой выпуклой функции градиент функции в точке направлен
 в сторону увеличения функции.
-Используя этот факт можно построить итерационный процесс в котором каждая следующая точка выбирается на луче противоположном
-градиенту в текущей точке:
+Используя этот факт можно построить итерационный процесс. 
+Выберем начальное приближение минимума, далее построим последовательность точек,
+в которой каждая следующая точка выбирается на луче противоположном градиенту в текущей точке:
 $$ x_{k+1} = x_k - \lambda_k \nabla f(x_k). $$
 Шаг на который двигается текущая точка за одну итерацию равен $\lambda_k$ и может задаваться различными способами, например:
 \begin{enumerate}
@@ -92,9 +93,15 @@ $$ x_{k+1} = x_k - \lambda_k \nabla f(x_k). $$
     направленным против градиента.
 \end{enumerate}
 
+Для того, чтобы к функции можно было применить указанный выше итерационный процесс, необходимо, 
+чтобы функция была гладкой: $f \in C^{1,1}$.
+
 %FIXME: Условие сходимости.
 
-%FIXME: Критерий остановки.
+Критерием остановки итерационного является событие, когда следующая точка находится от предыдущей 
+на расстоянии меньше либо равном $\varepsilon$:
+$$ || x_{k+1} - x_k || < \varepsilon. $$
+% TODO: Критерий остановки по малой величине градиента.
 
 Исходная функция в исследуемой области % FIXME!
 удовлетворяет необходимым для сходимости метода градиентного спуска условиям, указанным в \ref{GradientDescentMethodConditions}.
@@ -109,35 +116,61 @@ $$ x_{k+1} = x_k - \lambda_k \nabla f(x_k). $$
 В используемой реализации алгоритма $\lambda_k$ выбирается таким согласно последнему методу, указанному в \ref{GradientDescentMethodConditions}:
 $$
   \lambda_k \in (\,0, q\,)\!: 
-    \quad f(x_k - \lambda_k \nabla f(x_k)) = \min\limits_{0 < \lambda < q} f(x_k - \lambda \nabla f(x_k)). 
+    \quad f(x_k - \lambda_k \nabla f(x_k)) = \min\limits_{0 < \lambda < q} f(x_k - \lambda \nabla f(x_k)),
 $$
+значение $\lambda_k$ ищется методом золотого сечения.
+
+%FIXME: Алгоритм.
 
 \subsection{Генетический алгоритм}
 %FIXME:
 
 \section{Код программы}
 \subsection{Метод градиентного спуска}
-%FIXME:
+\lstset{language=C++, caption=Градиентный спуск,%
+label=gd-source-code, basicstyle=\footnotesize,%
+numbers=left, numberstyle=\footnotesize, numbersep=5pt, frame=single, breaklines=true, breakatwhitespace=false,%
+inputencoding=utf8x}
+\lstinputlisting{data/gradient_descent.hpp}
 
 \subsection{Генетический алгоритм}
 %FIXME:
 
 \section{Результаты решения}
 \subsection{Метод градиентного спуска}
-%FIXME:
+Результаты решения приведены в таблице \ref{gd-result-table}. 
+
+%TODO: spaces!
+Начальной точкой была выбрана точка \input{data/gd_start_point.tex}, 
+шаг для поиска минимума методом золотого сечения был равен \input{data/gd_step.tex}.
+
+\begin{table}[H]
+\caption{Результаты работы алгоритма градиентного спуска}
+\label{gd-result-table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+Точность & Количеcтво шагов & $x$ & $f(x)$ \\
+\hline
+%TODO: Formatting.
+\input{data/gd_result.tex}
+\hline
+\end{tabular}
+\end{center}
+\end{table}
 
 \subsection{Генетический алгоритм}
 %FIXME:
 
-\section{Возможные дополнительные исследования}
-\subsection{Метод градиентного спуска}
+%\section{Возможные дополнительные исследования}
+%\subsection{Метод градиентного спуска}
 %FIXME:
 
-\subsection{Генетический алгоритм}
+%\subsection{Генетический алгоритм}
 %FIXME:
 
 \section{Обоснование достоверности полученного результата}
-\subsection{Метод градиентного спуска}
+%\subsection{Метод градиентного спуска}
 %FIXME:
 
 \subsection{Генетический алгоритм}

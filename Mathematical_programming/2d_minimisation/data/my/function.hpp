@@ -18,14 +18,11 @@ namespace function
   namespace ublas = boost::numeric::ublas;
 
   const double preferedPrecision = 1e-4;
-  const double precisions[] = { 1e-3, 1e-4, 1e-5, 1e-6, 1e-7 };
+  const double precisions[] = { 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8 };
   const double step      = 0.5;
   
-  //const double startX    = 10;
-  //const double startY    = 10;
-  
-  const double startX    = 1;
-  const double startY    = 1;
+  const double startX    = 2.5;
+  const double startY    = 2.5;
 
   // Warning! Functions are not inline! :(
   
