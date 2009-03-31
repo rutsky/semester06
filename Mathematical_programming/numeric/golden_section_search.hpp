@@ -19,7 +19,7 @@ namespace numeric
 namespace golden_section
 {
   // TODO: Output passed points for rendering in Gnuplot.
-  template< class Func, class Scalar, class OStream >
+  template< class Func, class Scalar >
   inline
   Scalar find_min( Func function, 
                    Scalar const lo, Scalar const hi, Scalar const precision, 
@@ -40,8 +40,8 @@ namespace golden_section
     scalar_type a = lo, b = hi;
     scalar_type x1 = a + (1 - alpha) * (b - a);
     scalar_type x2 = a + (    alpha) * (b - a);
-    scalar_type y1 = func(x1);
-    scalar_type y2 = func(x2);
+    scalar_type y1 = function(x1);
+    scalar_type y2 = function(x2);
 
     // Searching minimum with golden section search.
     size_t counter = 0;
@@ -59,7 +59,7 @@ namespace golden_section
         x2 = x1;
         x1 = a + (1 - alpha) * (b - a);
         y2 = y1;
-        y1 = func(x1);
+        y1 = function(x1);
       }
       else
       {
@@ -67,7 +67,7 @@ namespace golden_section
         x1 = x2;
         x2 = a + alpha * (b - a);
         y1 = y2;
-        y2 = func(x2);
+        y2 = function(x2);
       }
       
       // debug

@@ -17,6 +17,12 @@ namespace function
 {
   namespace ublas = boost::numeric::ublas;
 
+  const double precision = 1e-3;
+  const double step      = 1;
+  
+  const double startX    = 10;
+  const double startY    = 10;
+
   // Warning! Functions are not inline! :(
   
   // Function value.

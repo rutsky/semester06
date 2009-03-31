@@ -20,6 +20,7 @@ set auto
 
 set xlabel "x"
 set ylabel "y"
+set zlabel "f(x,y)"
 
 set border 4095
 set ticslevel 0

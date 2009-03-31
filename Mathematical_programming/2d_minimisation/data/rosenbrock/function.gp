@@ -24,5 +24,6 @@ unset clabel
 #unset hidden3d
 #unset surf
 
-f(x,y) = (1 - x)**2 + 100 * (y - x**2)**2
-splot f(x, y) with pm3d title '(1 - x)**2 + 100 * (y - x**2)**2', 'points.dat' using 1:2:(f($1, $2)) notitle lw 3 lc rgb "#0000FF" with lines
+f(x, y) = (1 - x)**2 + 100 * (y - x**2)**2
+splot f(x, y) with pm3d title '(1 - x)**2 + 100 * (y - x**2)**2', \
+  'points.dat' using 1:2:(f($1, $2)) notitle lw 3 lc rgb "#0000FF" with lines

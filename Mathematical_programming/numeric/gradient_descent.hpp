@@ -14,6 +14,7 @@
 #include <boost/concept/assert.hpp>
 #include <boost/concept_check.hpp>
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 
 #include "golden_section_search.hpp"
 #include "lerp.hpp"
@@ -22,23 +23,23 @@ namespace numeric
 {
 namespace gradient_descent
 {
-  // Outputting passed points for rendering in Gnuplot.
-  template< class Func, class FuncGrad, class V, class OStream >
+  template< class Func, class FuncGrad, class V, class PointsOut >
   inline
   ublas::vector<typename V::value_type> 
     find_min( Func function, FuncGrad functionGrad, 
               V const &startPoint,
               typename V::value_type precision,
               typename V::value_type step,
-              OStream &ostr /* debug for Gnuplot */ )
+              PointsOut pointsOut )
   {
     // TODO: Now we assume that vector's coordinates and function values are same scalar types.
     // TODO: Assert on correctness of `ostr'.
     
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V>));
 
-    typedef typename V::value_type     scalar_type;
-    typedef ublas::vector<scalar_type> vector_type;
+    typedef typename V::value_type            scalar_type;
+    typedef ublas::vector<scalar_type>        vector_type;
+    typedef ublas::scalar_traits<scalar_type> scalar_traits_type;
     
     BOOST_CONCEPT_ASSERT((boost::UnaryFunction<Func,     scalar_type, vector_type>));
     BOOST_CONCEPT_ASSERT((boost::UnaryFunction<FuncGrad, vector_type, vector_type>));
@@ -48,20 +49,42 @@ namespace gradient_descent
     // Setting current point to start point.
     vector_type x = startPoint;
     
-    output_vector_coordinates(ostr, x, " ", "\n"); // debug for Gnuplot
+    *pointsOut++ = x;
     
     while (true)
     {
       // Searching next point in direction opposite to gradient.
       vector_type const grad = functionGrad(x);
       
-      /*
+      scalar_type const gradNorm = ublas::norm_2(grad);
+      if (scalar_traits_type::equals(gradNorm, 0))
+      {
+        // Function gradient is almost zero, found minimum.
+        return x;
+      }
+      
+      vector_type const dir = -grad / gradNorm;
+      BOOST_ASSERT(scalar_traits_type::equals(ublas::norm_2(dir), 1));
       
       vector_type const &s0 = x;
-      vector_type const &s1 = s0 + dir;
+      vector_type const &s1 = s0 + dir * step;
       
-      golden_section::find_min(boost::bind(function, boost::bind(Lerp<scalar_type, vector_type>(0, 1))));
-      */
+      typedef boost::function<scalar_type ( scalar_type )> function_bind_type;
+      function_bind_type functionBind = 
+          boost::bind<scalar_type>(function, boost::bind<vector_type>(Lerp<scalar_type, vector_type>(0.0, 1.0, s0, s1), _1));
+      scalar_type const section = golden_section::find_min<function_bind_type, scalar_type>(functionBind, 0.0, 1.0, precision);
+      BOOST_ASSERT(0 <= section && section <= 1);
+      
+      vector_type const nextX = s0 + dir * step * section;
+      if (ublas::norm_2(x - nextX) < precision)
+      {
+        // Next point is equal to current (with precision), seems found minimum.
+        return x;
+      }
+
+      // Moving to next point.
+      x = nextX;
+      *pointsOut++ = x;
     }
     
     return x;
