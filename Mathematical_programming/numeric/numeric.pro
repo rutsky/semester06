@@ -10,4 +10,5 @@ HEADERS = combination.hpp \
     subvector.hpp \
     gradient_descent.hpp \
     golden_section_search.hpp \
-    lerp.hpp
+    lerp.hpp \
+    genetic.hpp

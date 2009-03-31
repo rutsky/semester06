@@ -17,5 +17,6 @@
 #include "io.hpp"
 #include "gradient_descent.hpp"
 #include "golden_section_search.hpp"
+#include "genetic.hpp"
 
 #endif // NUMERIC_NUMERIC_HPP

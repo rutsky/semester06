@@ -17,12 +17,21 @@ namespace function
 {
   namespace ublas = boost::numeric::ublas;
 
-  const double preferedPrecision = 1e-4;
-  const double precisions[] = { 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8 };
-  const double step      = 0.5;
+  double const preferedPrecision = 1e-4;
+  double const precisions[] = { 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8 };
+  double const step      = 0.5;
   
-  const double startX    = 2.5;
-  const double startY    = 2.5;
+  // Gradient descent algorithm specific.
+  double const startX    = 2.5;
+  double const startY    = 2.5;
+
+  // Genetic algorithm specific.
+  double const loGenX       = -0.9;
+  double const loGenY       = -3;
+  double const hiGenX       = 3;
+  double const hiGenY       = 3;
+  size_t const nIndividuals = 10;
+  double const liveRate     = 0.5;
 
   // Warning! Functions are not inline! :(
   
