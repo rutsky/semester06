@@ -51,6 +51,7 @@ namespace gradient_descent
     
     *pointsOut++ = x;
     
+    size_t iteration = 0;
     while (true)
     {
       // Searching next point in direction opposite to gradient.
@@ -66,14 +67,22 @@ namespace gradient_descent
       vector_type const dir = -grad / gradNorm;
       BOOST_ASSERT(scalar_traits_type::equals(ublas::norm_2(dir), 1));
       
-      vector_type const &s0 = x;
-      vector_type const &s1 = s0 + dir * step;
+      vector_type const s0 = x;
+      vector_type const s1 = s0 + dir * step;
       
       typedef boost::function<scalar_type ( scalar_type )> function_bind_type;
       function_bind_type functionBind = 
           boost::bind<scalar_type>(function, boost::bind<vector_type>(Lerp<scalar_type, vector_type>(0.0, 1.0, s0, s1), _1));
       scalar_type const section = golden_section::find_min<function_bind_type, scalar_type>(functionBind, 0.0, 1.0, precision);
       BOOST_ASSERT(0 <= section && section <= 1);
+      
+      std::cout << "x="; // debug
+      output_vector_coordinates(std::cout, x); // debug
+      std::cout << "f(x0) = " << function(s0 + dir * step * 0) << std::endl; // debug
+      std::cout << "f(x)  = " << function(s0 + dir * step * section) << std::endl; // debug
+      std::cout << "f(x1) = " << function(s0 + dir * step * 1) << std::endl; // debug
+      
+      std::cout << "section=" << section << std::endl; // debug
       
       vector_type const nextX = s0 + dir * step * section;
       if (ublas::norm_2(x - nextX) < precision)
@@ -85,6 +94,13 @@ namespace gradient_descent
       // Moving to next point.
       x = nextX;
       *pointsOut++ = x;
+      
+      ++iteration;
+      
+      // debug
+      if (iteration > 100)
+        break;
+      // end of debug
     }
     
     return x;

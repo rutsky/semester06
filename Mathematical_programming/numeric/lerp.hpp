@@ -25,20 +25,28 @@ namespace numeric
   class Lerp
   {
   public:
+    // Linear interpolation:
+    //   x = y0 + (x - x0) * (y1 - y0) / (x1 - x0) 
+    
+    // TODO: Optimize.
+    
     Lerp( S const &x0, S const &x1, T const &y0, T const &y1 )
-      : y0_(y0)
+      : x0_(x0)
+      , x1_(x1)
+      , y0_(y0)
+      , y1_(y1)
     {
       BOOST_ASSERT(x0 != x1); // TODO: Do it with precision.
-      dy_ = (y1 - y0) / (x1 - x0);
     }
     
     T operator()( S const &x )
     {
-      return y0_ + x * dy_;
+      return y0_ + (x - x0_) * (y1_ - y0_) / (x1_ - x0_);
     }
     
   private:
-    T y0_, dy_;
+    S const x0_, x1_;
+    T const y0_, y1_;
   };
   
   template< class S, class T >

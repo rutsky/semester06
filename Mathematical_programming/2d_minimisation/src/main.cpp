@@ -77,6 +77,8 @@ int main()
       
       *ofs << "set cntrparam levels discrete ";
       
+      std::cout << f(*points.begin()) << std::endl; // debug
+      
       std::transform(++points.begin(), points.end(), std::ostream_iterator<double>(*ofs, ","), f);
       *ofs << f(*points.begin());
       *ofs << std::endl;

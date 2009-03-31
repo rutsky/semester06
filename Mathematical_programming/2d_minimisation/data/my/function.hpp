@@ -17,11 +17,14 @@ namespace function
 {
   namespace ublas = boost::numeric::ublas;
 
-  const double precision = 1e-3;
-  const double step      = 1;
+  const double precision = 1e-4;
+  const double step      = 0.5;
   
-  const double startX    = 10;
-  const double startY    = 10;
+  //const double startX    = 10;
+  //const double startY    = 10;
+  
+  const double startX    = 1;
+  const double startY    = 1;
 
   // Warning! Functions are not inline! :(
   
@@ -60,7 +63,7 @@ namespace function
     
     vector_type grad(2);
     grad(0) = 3. * x1 * x1 + 2. / sqrt(2 + x1 * x1 + x2 * x2) * 2 * x1;
-    grad(1) = 2. + 2. / sqrt(2 + x1 * x1 + x2 * x2) * 2 * x2;
+    grad(1) = 2.           + 2. / sqrt(2 + x1 * x1 + x2 * x2) * 2 * x2;
     return grad;
   }
 } // End of namespace 'function'
