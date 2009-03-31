@@ -97,10 +97,47 @@ namespace genetic
     mutable base_generator_type rndGenerator_;
   };
   
-  // TODO: Mutations.
+  template< class Scalar >
+  struct ParallelepipedonMutation
+  {
+    typedef Scalar scalar_type;
+    
+    template< class OffsetFwdIt >
+    ParallelepipedonMutation( OffsetFwdIt first, OffsetFwdIt beyond )
+      : rndGenerator_(30u)
+    {
+      deviations_.assign(first, beyond);
+    }
+    
+    template< class V >
+    V operator()( V const &x ) const
+    {
+      BOOST_ASSERT(deviations_.size() == x.size());
+      
+      V result(deviations_.size());
+      
+      // TODO: Optimize.
+      for (size_t r = 0; r < deviations_.size(); ++r)
+      {
+        boost::uniform_real<> uni_dist(0.0, 1.0);
+        boost::variate_generator<base_generator_type &, boost::uniform_real<> > uni(rndGenerator_, uni_dist);
+  
+        double const lambda = uni();
+        
+        result(r) = x(r) + deviations_[r] * lambda;
+      }
+      
+      return result;
+    }
+    
+  private:
+    std::vector<scalar_type>    deviations_;
+    mutable base_generator_type rndGenerator_;
+  };
+  
   // TODO: Documentation.
-  template< class Generator, class Crossover, class V, class Func, class FuncScalar, class PointsVecsOut >
-  V vectorSpaceGeneticSearch( Generator generator, Crossover crossover, Func fitness,
+  template< class Generator, class Crossover, class Mutation, class V, class Func, class FuncScalar, class PointsVecsOut >
+  V vectorSpaceGeneticSearch( Generator generator, Crossover crossover, Mutation mutation, Func fitness,
                               size_t nIndividuals, double liveRate, typename V::value_type precision,
                               PointsVecsOut selectedPointsVecsOut, PointsVecsOut notSelectedPointsVecsOut )
   {
@@ -187,7 +224,7 @@ namespace genetic
                   std::back_inserter(nextPopulation));
         BOOST_ASSERT(nextPopulation.size() == nSelected);
         
-        // Crossover.
+        // Crossover and mutation.
         for (size_t i = nSelected; i < nIndividuals; ++i)
         {
           // TODO: Optimize.
@@ -199,12 +236,15 @@ namespace genetic
           BOOST_ASSERT(xIdx < population.size());
           BOOST_ASSERT(yIdx < population.size());
 
+          // Crossover.
           vector_type const x = population[xIdx], y = population[yIdx];
           vector_type const child = crossover(x, y);
-          nextPopulation.push_back(child);
+          
+          // Mutation.
+          vector_type const mutant = mutation(child);
+          
+          nextPopulation.push_back(mutant);
         }
-        
-        // TODO: Mutations.
       }
       
       // Replacing old population.
@@ -212,11 +252,12 @@ namespace genetic
       
       // debug, TODO
       ++iterations;
-      if (iterations > 100)
+      if (iterations >= 1000)
       {
         std::cerr << "Too much iterations!\n";
         break;
       }
+      // end of debug
     }
     
     return population[0];

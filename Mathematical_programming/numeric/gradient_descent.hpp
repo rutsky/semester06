@@ -51,7 +51,7 @@ namespace gradient_descent
     
     *pointsOut++ = x;
     
-    size_t iteration = 0;
+    size_t iterations = 0;
     while (true)
     {
       // Searching next point in direction opposite to gradient.
@@ -98,10 +98,10 @@ namespace gradient_descent
       x = nextX;
       *pointsOut++ = x;
       
-      ++iteration;
+      ++iterations;
       
       // debug
-      if (iteration > 100)
+      if (iterations >= 100)
       {
         std::cerr << "Too many iterations!\n";
         break;

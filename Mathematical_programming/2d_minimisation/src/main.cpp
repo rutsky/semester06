@@ -128,6 +128,10 @@ int main()
     hiGen(0) = function::hiGenX;
     hiGen(1) = function::hiGenY;
     
+    vector_type mutations(2);
+    mutations(0) = function::mutationX;
+    mutations(1) = function::mutationY;
+    
     size_t const nIndividuals = function::nIndividuals;
     double const liveRate     = function::liveRate;
     
@@ -137,10 +141,12 @@ int main()
     
     typedef numeric::genetic::ParallelepipedonUniformGenerator<vector_type> generator_type;
     typedef numeric::genetic::LCCrossOver                                   crossover_type;
+    typedef numeric::genetic::ParallelepipedonMutation<scalar_type>         mutation_type;
     
     vector_type const xMin = numeric::genetic::vectorSpaceGeneticSearch
-      <generator_type, crossover_type, vector_type, function_type, scalar_type>(
-        generator_type(loGen, hiGen), crossover_type(), f, nIndividuals, liveRate, preferedPrecision,
+      <generator_type, crossover_type, mutation_type, vector_type, function_type, scalar_type>(
+        generator_type(loGen, hiGen), crossover_type(), mutation_type(mutations.begin(), mutations.end()), f, 
+        nIndividuals, liveRate, preferedPrecision,
         std::back_inserter(selectedPointsVecs), std::back_inserter(notSelectedPointsVec));
     
     {
@@ -200,8 +206,9 @@ int main()
         points_vecs_vec_type selectedPointsVecs, notSelectedPointsVec;
         
         vector_type const xMin = numeric::genetic::vectorSpaceGeneticSearch
-          <generator_type, crossover_type, vector_type, function_type, scalar_type>(
-            generator_type(loGen, hiGen), crossover_type(), f, nIndividuals, liveRate, precision,
+          <generator_type, crossover_type, mutation_type, vector_type, function_type, scalar_type>(
+            generator_type(loGen, hiGen), crossover_type(), mutation_type(mutations.begin(), mutations.end()), f, 
+            nIndividuals, liveRate, precision,
             std::back_inserter(selectedPointsVecs), std::back_inserter(notSelectedPointsVec));
         
         *ofs << boost::format("%1$1.0e") % precision << " & " << selectedPointsVecs.size() << " & (";

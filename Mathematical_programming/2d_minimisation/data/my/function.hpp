@@ -31,7 +31,9 @@ namespace function
   double const hiGenX       = 3;
   double const hiGenY       = 3;
   size_t const nIndividuals = 10;
-  double const liveRate     = 0.5;
+  double const liveRate     = 0.8;
+  double const mutationX    = 0.3;
+  double const mutationY    = 0.3;
 
   // Warning! Functions are not inline! :(
   
