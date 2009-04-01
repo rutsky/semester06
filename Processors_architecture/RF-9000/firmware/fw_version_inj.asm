@@ -137,6 +137,7 @@ loading_error:
         MOV     R2, 0x2E
         MOV     R1, 0
         MOV     R0, 0
+        ; TODO: Use MOV LR, PC; LDR PC, [PC, ...]
         BL      $ + ((RealDrawTextCenterFuncAddr - RealStartAddr) - ($ - start))
         
         ; Freeing memory on stack.
