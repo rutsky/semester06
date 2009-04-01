@@ -79,7 +79,7 @@ start:
         SUB     SP, SP, BlockSize + StackAdditionalSpace
         
         ; Setting file name to load from.
-        MOV     R0, file_name ; FIXME!
+        ADD     R0, PC, file_name - $ - 8
         MOV     R6, R0                                 ; storing pointer to file name string in R6
         
         ; Setting buffer pointer
@@ -158,7 +158,7 @@ boot_ldr_end:
         LDMFD   SP!, {R0-R11,LR}
         B $ + ((RealEndAddr - RealStartAddr) - ($ - start))
 
-file_name        DB     'MBOOTLDR.BIN',32
+file_name        DB     'MBOOTLDR.BIN',0
 print_text_smth1 DW     0x0F81F
 print_text_smth0 DW     0x0FE5B
-error_str        DB     'Failed to load code.',32
+error_str        DB     'Failed to load code.',0

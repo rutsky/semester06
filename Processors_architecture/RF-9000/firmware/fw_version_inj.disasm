@@ -1,6 +1,6 @@
      0:	e92d4fff	stmdb	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, lr}
      4:	e24dde41	sub 	sp,	sp,	0x410
-     8:	e3a0008c	mov 	r0, 0x8c
+     8:	e28f007c	add 	r0,	pc,	0x7c
      c:	e1a06000	mov 	r6, r0
     10:	e28d1008	add 	r1,	sp,	0x8
     14:	e1a07001	mov 	r7, r1
@@ -36,11 +36,11 @@
     8c:	4f4f424d	swimi
     90:	52444c54	subpl 	r4,	r4,	0x5400
     94:	4e49422e	cdpmi	2, 4, cr4, cr9, cr14, {1}
-    98:	00f81f20
+    98:	00f81f00
     9c:	00fe5b00
     a0:	69614600	stmvsdb	r1!, {r9, sl, lr}^
     a4:	2064656c	rsbcs 	r6,	r4,	ip ror #10
     a8:	6c206f74	copvs
     ac:	2064616f	rsbcs 	r6,	r4,	pc ror #2
     b0:	65646f63	strvsb	r6, [r4, -0xf63]!
-    b4:	6564202e	strvsb	r2, [r4, -0x2e]!
+    b4:	6564002e	strvsb	r0, [r4, -0x2e]!
