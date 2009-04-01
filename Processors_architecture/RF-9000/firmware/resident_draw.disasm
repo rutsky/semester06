@@ -2,17 +2,17 @@
      4:	e24dd020	sub 	sp,	sp,	0x20
      8:	e3a03005	mov 	r3, 0x5
      c:	e3a02004	mov 	r2, 0x4
-    10:	e59f10a8	ldr 	r1, [pc, 0xa8] <- 0xf81f
-    14:	e59f00a8	ldr 	r0, [pc, 0xa8] <- 0xfe5b
+    10:	e59f10ac	ldr 	r1, [pc, 0xac] <- 0xf81f
+    14:	e59f00ac	ldr 	r0, [pc, 0xac] <- 0xfe5b
     18:	e98d000f	stmib	sp, {r0, r1, r2, r3}
-    1c:	e28f30a4	add 	r3,	pc,	0xa4
+    1c:	e28f30a8	add 	r3,	pc,	0xa8
     20:	e58d3000	str 	r3, [sp]
     24:	e3a030dc	mov 	r3, 0xdc
     28:	e3a0202e	mov 	r2, 0x2e
     2c:	e3a01000	mov 	r1, 0x0
     30:	e3a00000	mov 	r0, 0x0
     34:	e1a0e00f	mov 	lr, pc
-    38:	e59ff078	ldr 	pc, [pc, 0x78] <- 0x200237a0
+    38:	e59ff080	ldr 	pc, [pc, 0x80] <- 0x20044d28
     3c:	e59f5070	ldr 	r5, [pc, 0x70] <- 0x200fea64
     40:	e5956000	ldr 	r6, [r5]
     44:	e5907004	ldr 	r7, [r0, 0x4]
@@ -46,9 +46,10 @@
     b4:	200fea64
     b8:	200237a0
     bc:	20090d64
-    c0:	0000f81f
-    c4:	0000fe5b
-    c8:	6c6c6548	copvs
-    cc:	0000216f
-    d0:	74736554	ldrvcb	error 'write back' set
-    d4:	00000000
+    c0:	20044d28
+    c4:	0000f81f
+    c8:	0000fe5b
+    cc:	6c6c6548	copvs
+    d0:	0000216f
+    d4:	74736554	ldrvcb	error 'write back' set
+    d8:	00000000

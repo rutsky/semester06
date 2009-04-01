@@ -30,7 +30,7 @@ resident_start:
         MOV     R0, 0
         
         MOV     LR, PC
-        LDR     PC, [PC, RealCheckYesNoKeysFunc_addr - $ - 8]
+        LDR     PC, [PC, RealDrawTextCenterFunc_addr - $ - 8]
 
         ; Loading frame buffer information
         LDR     R5, [PC, frame_buffer_descr_real_addr - $ - 8]
@@ -98,6 +98,7 @@ resident_end:
 frame_buffer_descr_real_addr DW     RealFrameBufferVarAddr
 RealCheckYesNoKeysFunc_addr  DW     RealCheckYesNoKeysFunc
 RealOSSleepFunc_addr         DW     RealOSSleepFunc
+RealDrawTextCenterFunc_addr  DW     RealDrawTextCenterFunc
 
 ; TODO: May be in other order.
 foreground_color             DW     0x0F81F
