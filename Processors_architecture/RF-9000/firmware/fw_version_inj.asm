@@ -145,9 +145,14 @@ loading_error:
         ; This kind of calling works:
         ;BL      print_test
         
+        ; Not working:
+        ;MOV     LR, PC
+        ;LDR     PC, [PC, -8 + (RealPrintTestFunc_addr - $)]
+        
         ; Trying this:
+        LDR     R9, [PC, -8 + (RealPrintTestFunc_addr - $)]
         MOV     LR, PC
-        LDR     PC, [PC, -8 + (RealPrintTestFunc_addr - $)]
+        MOV     PC, R9
         
         ; Freeing memory on stack.
         ADD     SP, SP, MemOnStack
