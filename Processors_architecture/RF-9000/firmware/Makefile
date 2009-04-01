@@ -6,7 +6,7 @@
 FASMARM=fasmarm
 ARM_DISASS=../arm_disass/arm_disass
 
-all: jump.bin func.bin nop.bin version_hook.bin fw_version_inj.bin
+all: jump.bin func.bin nop.bin version_hook.bin fw_version_inj.bin resident_return.bin resident_draw.bin resident_text.bin
 
 firmware: all
 	./build_fw.sh
@@ -41,6 +41,10 @@ resident_draw.bin: resident_draw.asm
 	$(FASMARM) resident_draw.asm resident_draw.bin
 	$(ARM_DISASS) resident_draw.bin > resident_draw.disasm
 
+resident_text.bin: resident_text.asm
+	$(FASMARM) resident_text.asm resident_text.bin
+	$(ARM_DISASS) resident_text.bin > resident_text.disasm
+
 unlock:
 	rm -rf .lock
 
@@ -59,3 +63,5 @@ clean:
 	rm -rf resident_return.disasm
 	rm -rf resident_draw.bin
 	rm -rf resident_draw.disasm
+	rm -rf resident_text.bin
+	rm -rf resident_text.disasm
