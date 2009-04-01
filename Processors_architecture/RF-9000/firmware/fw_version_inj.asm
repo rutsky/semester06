@@ -138,9 +138,11 @@ loading_error:
         MOV     R1, 0
         MOV     R0, 0
         ;BL      $ + ((RealDrawTextCenterFuncAddr - RealStartAddr) - ($ - start)) ; TODO: Remove this line.
-        LDR     R9, [PC, -8 + (RealDrawTextCenterFunc_addr - $)]
+        ;LDR     R9, [PC, -8 + (RealDrawTextCenterFunc_addr - $)]
         ;MOV     LR, PC
         ;MOV     PC, R9
+        
+        BL      print_test
         
         ; Freeing memory on stack.
         ADD     SP, SP, MemOnStack
@@ -152,18 +154,37 @@ boot_ldr_end:
         
 ;loop:   B       loop ; Checking that this code is actually runs
         NOP
-        NOP
-        NOP
-        NOP
-        NOP
         
         ; Restoring process state.
         LDMFD   SP!, {R0-R11,LR}
         B       $ + ((RealEndAddr - RealStartAddr) - ($ - start ))
+        
+        ; Drawing test string function
+print_test:
+        STMFD   SP!, {R0-R11,LR}
+        PrintTestMemOnStack = 0x20
+        SUB     SP, SP, PrintTestMemOnStack
+        
+        MOV     R3, 5
+        MOV     R2, 4
+        LDR     R1, [PC, -8 + (print_text_smth1 - $)]
+        LDR     R0, [PC, -8 + (print_text_smth0 - $)]
+        STMFA   SP, {R0-R3}                                       ; this requires memory on stack
+        ADD     R3, PC, -8 + (test_str - $)
+        STR     R3, [SP]
+        MOV     R3, 0xDC
+        MOV     R2, 0x42
+        MOV     R1, 0
+        MOV     R0, 0
+        BL      $ + ((RealDrawTextCenterFuncAddr - RealStartAddr) - ($ - start))
+        
+        ADD     SP, SP, PrintTestMemOnStack
+        LDMFD   SP!, {R0-R11,PC}
 
                         ; aligning:  123 123 123 123 123
 file_name                   DB     'MBOOTLDR.BIN',0,0,0,0
 print_text_smth1            DW     0x0F81F ; TODO: rename it
 print_text_smth0            DW     0x0FE5B
 error_str                   DB     'Failed to load code.',0,0,0,0
+test_str                    DB     'Test!',0,0,0
 RealDrawTextCenterFunc_addr DW     RealDrawTextCenterFuncAddr
