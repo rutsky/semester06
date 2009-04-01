@@ -9,10 +9,28 @@
     RealFrameBufferVarAddr = 0x200FEA64
     RealCheckYesNoKeysFunc = 0x200237A0
     RealOSSleepFunc        = 0x20090D64
+    RealDrawTextCenterFunc = 0x20044D28
 
 resident_start:
         STMFD   SP!, {R0-R11,LR}
+        MemOnStack = 0x20
+        SUB     SP, SP, MemOnStack
         
+        ; Drawing `Hello' string.
+        MOV     R3, 5
+        MOV     R2, 4
+        LDR     R1, [PC, foreground_color - $ - 8]
+        LDR     R0, [PC, background_color - $ - 8]
+        STMFA   SP, {R0-R3}                                       ; this requires memory on stack
+        ADD     R3, PC, hello_string - $ - 8
+        STR     R3, [SP]
+        MOV     R3, 0xDC
+        MOV     R2, 0x2E
+        MOV     R1, 0
+        MOV     R0, 0
+        
+        MOV     LR, PC
+        LDR     PC, [PC, RealCheckYesNoKeysFunc_addr - $ - 8]
 
         ; Loading frame buffer information
         LDR     R5, [PC, frame_buffer_descr_real_addr - $ - 8]
@@ -75,7 +93,14 @@ loop_column:
         B      loop
         
 resident_end:
+        ADD     SP, SP, MemOnStack
         LDMFD   SP!, {R0-R11,PC}
 frame_buffer_descr_real_addr DW     RealFrameBufferVarAddr
 RealCheckYesNoKeysFunc_addr  DW     RealCheckYesNoKeysFunc
 RealOSSleepFunc_addr         DW     RealOSSleepFunc
+
+; TODO: May be in other order.
+foreground_color             DW     0x0F81F
+background_color             DW     0x0FE5B
+hello_string                 DB     'Hello!',0,0
+test_string                  DB     'Test',0,0,0,0

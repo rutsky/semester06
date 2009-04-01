@@ -122,7 +122,7 @@ loading_error:
         ;RAM:20009D14                 BL      DrawTextCenterFunc
         
         ; Allocating memory at stack.
-        MemOnStack = 32
+        MemOnStack = 0x20
         SUB     SP, SP, MemOnStack
         
         ; Calling `DrawTextCenterFunc'.

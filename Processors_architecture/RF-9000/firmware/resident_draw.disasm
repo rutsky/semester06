@@ -1,33 +1,54 @@
      0:	e92d4fff	stmdb	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, lr}
-     4:	e59f506c	ldr 	r5, [pc, 0x6c] <- 0x200fea64
-     8:	e5956000	ldr 	r6, [r5]
-     c:	e5907004	ldr 	r7, [r0, 0x4]
-    10:	e2855008	add 	r5,	r5,	0x8
-    14:	e1a03005	mov 	r3, r5
-    18:	e3a00000	mov 	r0, 0x0
-    1c:	e3a01000	mov 	r1, 0x0
-    20:	e0040690	mul 	r4, r0, r6
-    24:	e0844001	add 	r4,	r4,	r1
-    28:	e1c340b0	strh	r4, [r3, 0x0]
-    2c:	e2833002	add 	r3,	r3,	0x2
-    30:	e2811001	add 	r1,	r1,	0x1
-    34:	e1510006	cmp 	r1,	r6
-    38:	bafffff8	blt	0x20
-    3c:	e2800001	add 	r0,	r0,	0x1
-    40:	e1500007	cmp 	r0,	r7
-    44:	bafffff4	blt	0x1c
-    48:	e92d00ff	stmdb	sp!, {r0, r1, r2, r3, r4, r5, r6, r7}
-    4c:	e1a0e00f	mov 	lr, pc
-    50:	e59ff024	ldr 	pc, [pc, 0x24] <- 0x200237a0
-    54:	e1a09000	mov 	r9, r0
-    58:	e3a00001	mov 	r0, 0x1
-    5c:	e1a0e00f	mov 	lr, pc
-    60:	e59ff018	ldr 	pc, [pc, 0x18] <- 0x20090d64
-    64:	e8bd00ff	ldmia	sp!, {r0, r1, r2, r3, r4, r5, r6, r7}
-    68:	e3590000	cmp 	r9,	0x0
-    6c:	1a000000	bne	0x74
-    70:	eaffffe7	b	0x14
-    74:	e8bd8fff	ldmia	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, pc}
-    78:	200fea64
-    7c:	200237a0
-    80:	20090d64
+     4:	e24dd020	sub 	sp,	sp,	0x20
+     8:	e3a03005	mov 	r3, 0x5
+     c:	e3a02004	mov 	r2, 0x4
+    10:	e59f10a8	ldr 	r1, [pc, 0xa8] <- 0xf81f
+    14:	e59f00a8	ldr 	r0, [pc, 0xa8] <- 0xfe5b
+    18:	e98d000f	stmib	sp, {r0, r1, r2, r3}
+    1c:	e28f30a4	add 	r3,	pc,	0xa4
+    20:	e58d3000	str 	r3, [sp]
+    24:	e3a030dc	mov 	r3, 0xdc
+    28:	e3a0202e	mov 	r2, 0x2e
+    2c:	e3a01000	mov 	r1, 0x0
+    30:	e3a00000	mov 	r0, 0x0
+    34:	e1a0e00f	mov 	lr, pc
+    38:	e59ff078	ldr 	pc, [pc, 0x78] <- 0x200237a0
+    3c:	e59f5070	ldr 	r5, [pc, 0x70] <- 0x200fea64
+    40:	e5956000	ldr 	r6, [r5]
+    44:	e5907004	ldr 	r7, [r0, 0x4]
+    48:	e2855008	add 	r5,	r5,	0x8
+    4c:	e1a03005	mov 	r3, r5
+    50:	e3a00000	mov 	r0, 0x0
+    54:	e3a01000	mov 	r1, 0x0
+    58:	e0040690	mul 	r4, r0, r6
+    5c:	e0844001	add 	r4,	r4,	r1
+    60:	e1c340b0	strh	r4, [r3, 0x0]
+    64:	e2833002	add 	r3,	r3,	0x2
+    68:	e2811001	add 	r1,	r1,	0x1
+    6c:	e1510006	cmp 	r1,	r6
+    70:	bafffff8	blt	0x58
+    74:	e2800001	add 	r0,	r0,	0x1
+    78:	e1500007	cmp 	r0,	r7
+    7c:	bafffff4	blt	0x54
+    80:	e92d00ff	stmdb	sp!, {r0, r1, r2, r3, r4, r5, r6, r7}
+    84:	e1a0e00f	mov 	lr, pc
+    88:	e59ff028	ldr 	pc, [pc, 0x28] <- 0x200237a0
+    8c:	e1a09000	mov 	r9, r0
+    90:	e3a00001	mov 	r0, 0x1
+    94:	e1a0e00f	mov 	lr, pc
+    98:	e59ff01c	ldr 	pc, [pc, 0x1c] <- 0x20090d64
+    9c:	e8bd00ff	ldmia	sp!, {r0, r1, r2, r3, r4, r5, r6, r7}
+    a0:	e3590000	cmp 	r9,	0x0
+    a4:	1a000000	bne	0xac
+    a8:	eaffffe7	b	0x4c
+    ac:	e28dd020	add 	sp,	sp,	0x20
+    b0:	e8bd8fff	ldmia	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, pc}
+    b4:	200fea64
+    b8:	200237a0
+    bc:	20090d64
+    c0:	0000f81f
+    c4:	0000fe5b
+    c8:	6c6c6548	copvs
+    cc:	0000216f
+    d0:	74736554	ldrvcb	error 'write back' set
+    d4:	00000000
