@@ -35,6 +35,10 @@ resident_return.bin: resident_return.asm
 	$(FASMARM) resident_return.asm resident_return.bin
 	$(ARM_DISASS) resident_return.bin > resident_return.disasm
 
+resident_draw.bin: resident_draw.asm
+	$(FASMARM) resident_draw.asm resident_draw.bin
+	$(ARM_DISASS) resident_draw.bin > resident_draw.disasm
+
 unlock:
 	rm -rf .lock
 
@@ -49,3 +53,7 @@ clean:
 	rm -rf version_hook.disasm
 	rm -rf fw_version_inj.bin
 	rm -rf fw_version_inj.disasm
+	rm -rf resident_return.bin
+	rm -rf resident_return.disasm
+	rm -rf resident_draw.bin
+	rm -rf resident_draw.disasm

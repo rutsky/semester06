@@ -14,10 +14,10 @@
     34:	e24dd020	sub 	sp,	sp,	0x20
     38:	e3a03005	mov 	r3, 0x5
     3c:	e3a02004	mov 	r2, 0x4
-    40:	e59f1051	ldr 	r1, [pc, 0x51] <- 0xf81f
-    44:	e59f0051	ldr 	r0, [pc, 0x51] <- 0xfe5b
+    40:	e59f1054	ldr 	r1, [pc, 0x54] <- 0xf81f
+    44:	e59f0054	ldr 	r0, [pc, 0x54] <- 0xfe5b
     48:	e98d000f	stmib	sp, {r0, r1, r2, r3}
-    4c:	e28f304d	add 	r3,	pc,	0x4d
+    4c:	e28f3050	add 	r3,	pc,	0x50
     50:	e58d3000	str 	r3, [sp]
     54:	e3a030dc	mov 	r3, 0xdc
     58:	e3a0202e	mov 	r2, 0x2e
@@ -36,11 +36,12 @@
     8c:	4f4f424d	swimi
     90:	52444c54	subpl 	r4,	r4,	0x5400
     94:	4e49422e	cdpmi	2, 4, cr4, cr9, cr14, {1}
-    98:	00f81f00
-    9c:	00fe5b00
-    a0:	69614600	stmvsdb	r1!, {r9, sl, lr}^
-    a4:	2064656c	rsbcs 	r6,	r4,	ip ror #10
-    a8:	6c206f74	copvs
-    ac:	2064616f	rsbcs 	r6,	r4,	pc ror #2
-    b0:	65646f63	strvsb	r6, [r4, -0xf63]!
-    b4:	6564002e	strvsb	r0, [r4, -0x2e]!
+    98:	00000000
+    9c:	0000f81f
+    a0:	0000fe5b
+    a4:	6c696146	copvs
+    a8:	74206465	strvc	error 'write back' set
+    ac:	6f6c206f	swivs
+    b0:	63206461	teqvs 	??????????????
+    b4:	2e65646f	cdpcs	4, 6, cr6, cr5, cr15, {3}
+    b8:	2e000000	cdpcs	0, 0, cr0, cr0, cr0, {0}

@@ -90,7 +90,7 @@ start:
         MOV     R2, BlockSize
         
         ; Loading block from file using firmware function.
-        BL $ + ((RealLoadConfigFuncAddr - RealStartAddr) - ($ - start))
+        BL      $ + ((RealLoadConfigFuncAddr - RealStartAddr) - ($ - start))
         
         ; Checking is file loaded correctly.
         CMP     R0, 0
@@ -137,7 +137,7 @@ loading_error:
         MOV     R2, 0x2E
         MOV     R1, 0
         MOV     R0, 0
-        BL $ + ((RealDrawTextCenterFuncAddr - RealStartAddr) - ($ - start))
+        BL      $ + ((RealDrawTextCenterFuncAddr - RealStartAddr) - ($ - start))
         
         ; Freeing memory on stack.
         ADD     SP, SP, MemOnStack
@@ -158,7 +158,7 @@ boot_ldr_end:
         LDMFD   SP!, {R0-R11,LR}
         B $ + ((RealEndAddr - RealStartAddr) - ($ - start))
 
-file_name        DB     'MBOOTLDR.BIN',0
+file_name        DB     'MBOOTLDR.BIN',0,0,0,0
 print_text_smth1 DW     0x0F81F
 print_text_smth0 DW     0x0FE5B
-error_str        DB     'Failed to load code.',0
+error_str        DB     'Failed to load code.',0,0,0

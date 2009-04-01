@@ -1,0 +1,21 @@
+     0:	e92d4fff	stmdb	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, lr}
+     4:	e59f5044	ldr 	r5, [pc, 0x44] <- 0x200fea64
+     8:	e5956000	ldr 	r6, [r5]
+     c:	e5907004	ldr 	r7, [r0, 0x4]
+    10:	e2855008	add 	r5,	r5,	0x8
+    14:	e3a00000	mov 	r0, 0x0
+    18:	e3a01000	mov 	r1, 0x0
+    1c:	e1a03005	mov 	r3, r5
+    20:	e0040690	mul 	r4, r0, r6
+    24:	e0844001	add 	r4,	r4,	r1
+    28:	e1c340b0	strh	r4, [r3, 0x0]
+    2c:	e2833002	add 	r3,	r3,	0x2
+    30:	e2811001	add 	r1,	r1,	0x1
+    34:	e1510006	cmp 	r1,	r6
+    38:	bafffff8	blt	0x20
+    3c:	e2800001	add 	r0,	r0,	0x1
+    40:	e1500007	cmp 	r0,	r7
+    44:	bafffff3	blt	0x18
+    48:	eafffff1	b	0x14
+    4c:	e8bd8fff	ldmia	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, pc}
+    50:	200fea64
