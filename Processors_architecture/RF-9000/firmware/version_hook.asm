@@ -1,4 +1,4 @@
-; jump.asm
+; version_hook.asm
 ; Jump command for entering test function.
 ; Vladimir Rutsky <altsysrq@gmail.com>
 ; 15.03.2009

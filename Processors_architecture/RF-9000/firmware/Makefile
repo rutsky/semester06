@@ -9,6 +9,8 @@ ARM_DISASS=../arm_disass/arm_disass
 all: jump.bin func.bin nop.bin version_hook.bin fw_version_inj.bin
 	./build_fw.sh
 
+# TODO: Organize list of assembler items.
+
 jump.bin: jump.asm
 	$(FASMARM) jump.asm jump.bin
 	$(ARM_DISASS) jump.bin > jump.disasm
@@ -28,6 +30,10 @@ version_hook.bin: version_hook.asm
 fw_version_inj.bin: fw_version_inj.asm
 	$(FASMARM) fw_version_inj.asm fw_version_inj.bin
 	$(ARM_DISASS) fw_version_inj.bin > fw_version_inj.disasm
+
+resident_return.bin: resident_return.asm
+	$(FASMARM) resident_return.asm resident_return.bin
+	$(ARM_DISASS) resident_return.bin > resident_return.disasm
 
 unlock:
 	rm -rf .lock
