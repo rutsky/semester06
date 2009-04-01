@@ -8,6 +8,8 @@
 #ifndef NUMERIC_IO_HPP
 #define NUMERIC_IO_HPP
 
+#include <boost/format.hpp>
+
 #include "numeric_common.hpp"
 
 namespace numeric
