@@ -63,7 +63,7 @@
     ; Sample on this function can be found in code below.
     RealDrawTextCenterFuncAddr = 0x20044D28
     
-start:
+start: ; TODO: Rename.
         ; Saving process state.
         STMFD   SP!, {R0-R11,LR}
         
@@ -142,7 +142,12 @@ loading_error:
         ;MOV     LR, PC
         ;MOV     PC, R9
         
-        BL      print_test
+        ; This kind of calling works:
+        ;BL      print_test
+        
+        ; Trying this:
+        MOV     LR, PC
+        LDR     PC, [PC, -8 + (RealPrintTestFunc_addr - $)]
         
         ; Freeing memory on stack.
         ADD     SP, SP, MemOnStack
@@ -159,7 +164,7 @@ boot_ldr_end:
         LDMFD   SP!, {R0-R11,LR}
         B       $ + ((RealEndAddr - RealStartAddr) - ($ - start ))
         
-        ; Drawing test string function
+        ; Drawing test string function.
 print_test:
         STMFD   SP!, {R0-R11,LR}
         PrintTestMemOnStack = 0x20
@@ -183,8 +188,9 @@ print_test:
 
                         ; aligning:  123 123 123 123 123
 file_name                   DB     'MBOOTLDR.BIN',0,0,0,0
-print_text_smth1            DW     0x0F81F ; TODO: rename it
+print_text_smth1            DW     0x0F81F ; TODO: Rename it.
 print_text_smth0            DW     0x0FE5B
 error_str                   DB     'Failed to load code.',0,0,0,0
 test_str                    DB     'Test!',0,0,0
 RealDrawTextCenterFunc_addr DW     RealDrawTextCenterFuncAddr
+RealPrintTestFunc_addr      DW     RealStartAddr + (print_test - start)
