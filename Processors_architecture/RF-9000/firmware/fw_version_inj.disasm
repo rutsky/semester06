@@ -1,6 +1,6 @@
      0:	e92d4fff	stmdb	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, lr}
      4:	e24dde41	sub 	sp,	sp,	0x410
-     8:	e28f0084	add 	r0,	pc,	0x84
+     8:	e28f007c	add 	r0,	pc,	0x7c
      c:	e1a06000	mov 	r6, r0
     10:	e28d1008	add 	r1,	sp,	0x8
     14:	e1a07001	mov 	r7, r1
@@ -10,41 +10,39 @@
     24:	ba000002	blt	0x34
     28:	e1a0e00f	mov 	lr, pc
     2c:	e1a0f007	mov 	pc, r7
-    30:	ea00000f	b	0x74
+    30:	ea00000d	b	0x6c
     34:	e24dd020	sub 	sp,	sp,	0x20
     38:	e3a03005	mov 	r3, 0x5
     3c:	e3a02004	mov 	r2, 0x4
-    40:	e59f105c	ldr 	r1, [pc, 0x5c] <- 0xf81f
-    44:	e59f005c	ldr 	r0, [pc, 0x5c] <- 0xfe5b
+    40:	e59f1054	ldr 	r1, [pc, 0x54] <- 0xf81f
+    44:	e59f0054	ldr 	r0, [pc, 0x54] <- 0xfe5b
     48:	e98d000f	stmib	sp, {r0, r1, r2, r3}
-    4c:	e28f3058	add 	r3,	pc,	0x58
+    4c:	e28f3050	add 	r3,	pc,	0x50
     50:	e58d3000	str 	r3, [sp]
     54:	e3a030dc	mov 	r3, 0xdc
     58:	e3a0202e	mov 	r2, 0x2e
     5c:	e3a01000	mov 	r1, 0x0
     60:	e3a00000	mov 	r0, 0x0
-    64:	e59f9058	ldr 	r9, [pc, 0x58] <- 0x20044d28
-    68:	e1a0e00f	mov 	lr, pc
-    6c:	e1a0f009	mov 	pc, r9
-    70:	e28dd020	add 	sp,	sp,	0x20
-    74:	e28dde41	add 	sp,	sp,	0x410
+    64:	e59f9050	ldr 	r9, [pc, 0x50] <- 0x20044d28
+    68:	e28dd020	add 	sp,	sp,	0x20
+    6c:	e28dde41	add 	sp,	sp,	0x410
+    70:	e1a00000	mov 	r0, r0
+    74:	e1a00000	mov 	r0, r0
     78:	e1a00000	mov 	r0, r0
     7c:	e1a00000	mov 	r0, r0
     80:	e1a00000	mov 	r0, r0
-    84:	e1a00000	mov 	r0, r0
-    88:	e1a00000	mov 	r0, r0
-    8c:	e8bd4fff	ldmia	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, lr}
-    90:	ea000090	b	0x2d8
-    94:	4f4f424d	swimi
-    98:	52444c54	subpl 	r4,	r4,	0x5400
-    9c:	4e49422e	cdpmi	2, 4, cr4, cr9, cr14, {1}
-    a0:	00000000
-    a4:	0000f81f
-    a8:	0000fe5b
-    ac:	6c696146	copvs
-    b0:	74206465	strvc	error 'write back' set
-    b4:	6f6c206f	swivs
-    b8:	63206461	teqvs 	??????????????
-    bc:	2e65646f	cdpcs	4, 6, cr6, cr5, cr15, {3}
-    c0:	00000000
-    c4:	20044d28
+    84:	e8bd4fff	ldmia	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, lr}
+    88:	ea000092	b	0x2d8
+    8c:	4f4f424d	swimi
+    90:	52444c54	subpl 	r4,	r4,	0x5400
+    94:	4e49422e	cdpmi	2, 4, cr4, cr9, cr14, {1}
+    98:	00000000
+    9c:	0000f81f
+    a0:	0000fe5b
+    a4:	6c696146	copvs
+    a8:	74206465	strvc	error 'write back' set
+    ac:	6f6c206f	swivs
+    b0:	63206461	teqvs 	??????????????
+    b4:	2e65646f	cdpcs	4, 6, cr6, cr5, cr15, {3}
+    b8:	00000000
+    bc:	20044d28

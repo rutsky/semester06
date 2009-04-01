@@ -139,8 +139,8 @@ loading_error:
         MOV     R0, 0
         ;BL      $ + ((RealDrawTextCenterFuncAddr - RealStartAddr) - ($ - start)) ; TODO: Remove this line.
         LDR     R9, [PC, -8 + (RealDrawTextCenterFunc_addr - $)]
-        MOV     LR, PC
-        MOV     PC, R9
+        ;MOV     LR, PC
+        ;MOV     PC, R9
         
         ; Freeing memory on stack.
         ADD     SP, SP, MemOnStack
