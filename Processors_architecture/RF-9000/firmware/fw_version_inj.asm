@@ -47,11 +47,105 @@
     USE32
     format binary
     
-    realStartAddr = 0x20009CAC
-    realEndAddr   = 0x20009F84
+    RealStartAddr      = 0x20009CAC
+    RealEndAddr        = 0x20009F84
+
+    ; Loading file contents from `CONFIG' directory function.
+    ;   Input:
+    ;     R0 - pointer to file name string
+    ;     R1 - pointer to buffer
+    ;     R2 - length
+    ;   Result:
+    ;     R0 >= 0, on success
+    ; Function don't touch R4-R10 registers states.
+    RealLoadConfigFuncAddr = 0x20021174
+    
+    ; Sample on this function can be found in code below.
+    RealDrawTextCenterFuncAddr = 0x20044D28
+    
 start:
         ; Saving process state.
         STMFD   SP!, {R0-R11,LR}
+        
+        ;******************************************************
+        ; Loading and executing code from file on flash drive.
+        ;******************************************************
+
+        StackAdditionalSpace = 16
+        BlockSize            = 1024
+        BlockStackOffset     = 8
+        
+        ; Allocating memory on stack.
+        SUB     SP, SP, BlockSize + StackAdditionalSpace
+        
+        ; Setting file name to load from.
+        MOV     R0, file_name ; FIXME!
+        MOV     R6, R0                                 ; storing pointer to file name string in R6
+        
+        ; Setting buffer pointer
+        ADD     R1, SP, BlockStackOffset               ; additional offset for some cases.
+        MOV     R7, R1                                 ; storing pointer to loading block in R7
+        
+        ; Setting size of block to load.
+        MOV     R2, BlockSize
+        
+        ; Loading block from file using firmware function.
+        BL $ + ((RealLoadConfigFuncAddr - RealStartAddr) - ($ - start))
+        
+        ; Checking is file loaded correctly.
+        CMP     R0, 0
+        BLT     loading_error
+loading_success:
+        ; File contents succesfull loaded.
+        
+        ; Running loaded code now.
+        ADD     LR, PC, 8 ; saving return point
+        MOV     PC, R7
+        
+        B       boot_ldr_end
+        
+loading_error:
+        ; Failed to load file contents.
+
+        ; Printing error message as done here:
+        ;RAM:20009CE8                 MOV     R3, #5
+        ;RAM:20009CEC                 MOV     R2, #4
+        ;RAM:20009CF0                 LDR     R1, =0xF81F
+        ;RAM:20009CF4                 LDR     R0, =0xFE5B
+        ;RAM:20009CF8                 STMFA   SP, {R0-R3}
+        ;RAM:20009CFC                 ADR     R3, aOct08200720571 ; "Oct 08 2007 20:57:16"
+        ;RAM:20009D00                 STR     R3, [SP]
+        ;RAM:20009D04                 MOV     R3, #0xDC
+        ;RAM:20009D08                 MOV     R2, #0x2E
+        ;RAM:20009D0C                 MOV     R1, #0
+        ;RAM:20009D10                 MOV     R0, #0
+        ;RAM:20009D14                 BL      DrawTextCenterFunc
+        
+        ; Allocating memory at stack.
+        MemOnStack = 32
+        SUB     SP, SP, MemOnStack
+        
+        ; Calling `DrawTextCenterFunc'.
+        MOV     R3, 5
+        MOV     R2, 4
+        LDR     R1, [PC, print_text_smth1 - $ - 8]
+        LDR     R0, [PC, print_text_smth0 - $ - 8]
+        STMFA   SP, {R0-R3}                                       ; this requires memory on stack
+        ADD     R3, PC, error_str - $ - 8
+        STR     R3, [SP]
+        MOV     R3, 0xDC
+        MOV     R2, 0x2E
+        MOV     R1, 0
+        MOV     R0, 0
+        BL $ + ((RealDrawTextCenterFuncAddr - RealStartAddr) - ($ - start))
+        
+        ; Freeing memory on stack.
+        ADD     SP, SP, MemOnStack
+
+boot_ldr_end:
+        ; Setting back stack pointer.
+        ADD     SP, SP, BlockSize + StackAdditionalSpace
+        ;******************************************************
         
 ;loop:   B       loop ; Checking that this code is actually runs
         NOP
@@ -62,4 +156,9 @@ start:
         
         ; Restoring process state.
         LDMFD   SP!, {R0-R11,LR}
-        B $ + ((realEndAddr - realStartAddr) - ($ - start))
+        B $ + ((RealEndAddr - RealStartAddr) - ($ - start))
+
+file_name        DB     'MBOOTLDR.BIN',32
+print_text_smth1 DW     0x0F81F
+print_text_smth0 DW     0x0FE5B
+error_str        DB     'Failed to load code.',32
