@@ -8,7 +8,7 @@
     1c:	eb005d29	bl	0x174c8
     20:	e3500000	cmp 	r0,	0x0
     24:	ba000002	blt	0x34
-    28:	e28fe008	add 	lr,	pc,	0x8
+    28:	e1a0e00f	mov 	lr, pc
     2c:	e1a0f007	mov 	pc, r7
     30:	ea00000d	b	0x6c
     34:	e24dd020	sub 	sp,	sp,	0x20

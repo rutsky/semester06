@@ -99,7 +99,7 @@ loading_success:
         ; File contents succesfull loaded.
         
         ; Running loaded code now.
-        ADD     LR, PC, 8 ; saving return point
+        MOV     LR, PC ; saving return point
         MOV     PC, R7
         
         B       boot_ldr_end
