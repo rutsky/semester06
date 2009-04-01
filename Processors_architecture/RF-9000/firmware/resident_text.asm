@@ -16,10 +16,10 @@ resident_start:
         ; Drawing `Hello' string.
         MOV     R3, 5
         MOV     R2, 4
-        LDR     R1, [PC, foreground_color - $ - 8]
-        LDR     R0, [PC, background_color - $ - 8]
+        LDR     R1, [PC, -8 + (foreground_color - $)]
+        LDR     R0, [PC, -8 + (background_color - $)]
         STMFA   SP, {R0-R3}                                       ; this requires memory on stack
-        ADD     R3, PC, hello_string - $ - 8
+        ADD     R3, PC, -8 + (hello_string - $)
         STR     R3, [SP]
         MOV     R3, 0xDC
         MOV     R2, 0x2E
@@ -27,10 +27,11 @@ resident_start:
         MOV     R0, 0
         
         MOV     LR, PC
-        LDR     PC, [PC, RealDrawTextCenterFunc_addr - $ - 8]
+        LDR     PC, [PC, -8 + (RealDrawTextCenterFunc_addr - $)]
 
         ADD     SP, SP, MemOnStack
         LDMFD   SP!, {R0-R11,PC}
+                         ; aligning:  123 123 123 123
 RealDrawTextCenterFunc_addr  DW     RealDrawTextCenterFunc
 
 ; TODO: May be in other order.
