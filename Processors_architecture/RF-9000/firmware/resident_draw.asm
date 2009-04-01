@@ -27,12 +27,12 @@ resident_start:
         ; Drawing something on screen till some key will not be pressed.
         
 loop:
+        MOV     R3, R5          ; R3 == position in frame buffer
+        
         MOV     R0, 0           ; R0 == row number
 loop_row:
         
         MOV     R1, 0           ; R1 == column number
-        
-        MOV     R3, R5          ; R3 == position in frame buffer
 loop_column:
         
         ; Calculating `color'.
