@@ -7,6 +7,8 @@ FASMARM=fasmarm
 ARM_DISASS=../arm_disass/arm_disass
 
 all: jump.bin func.bin nop.bin version_hook.bin fw_version_inj.bin
+
+firmware: all
 	./build_fw.sh
 
 # TODO: Organize list of assembler items.
