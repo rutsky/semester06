@@ -170,12 +170,16 @@ loading_error:
 
         ; Printing addresses of different calls.
         MOV     R1, 0x2e
-        ADD     R0, PC, -8 + (print_test - $)
-        BL      print_register                                ; 0x200196BC
+        ADD     R0, PC, -8
+        BL      print_register                                  ; 0x20019670 == PC
         
         MOV     R1, 0x42
+        ADD     R0, PC, -8 + (print_test - $)
+        BL      print_register                                  ; 0x200196BC == print_test
+        
+        MOV     R1, 0x56
         LDR     R0, [PC, -8 + (RealPrintTestFunc_addr - $)]
-        BL      print_register                                ; 0x20009D60
+        BL      print_register                                  ; 0x20009D60 == assumed print_test
         B       skip
 
         ; Printing base digit. Result: 0x20XXXXXX
@@ -187,7 +191,7 @@ loading_error:
         LDR     R1, [PC, -8 + (RealPrintTestFunc_addr - $)]
         
         CMP     R0, R1
-        BEQ     skip                                          ; No!!! Results are different on RF-9000!
+        BEQ     skip                                            ; No!!! Results are different on RF-9000!
         
         ; IDA Pro gives this:
         ;RAM:20009D10                 ADR     R0, sub_20009D3C
@@ -228,7 +232,7 @@ print_test:
         MOV     R2, 4
         LDR     R1, [PC, -8 + (print_text_smth1 - $)]
         LDR     R0, [PC, -8 + (print_text_smth0 - $)]
-        STMFA   SP, {R0-R3}                                       ; this requires memory on stack
+        STMFA   SP, {R0-R3}                                     ; this requires memory on stack
         ADD     R3, PC, -8 + (test_str - $)
         STR     R3, [SP]
         MOV     R3, 0xDC
@@ -250,13 +254,13 @@ print_base:
         MOV     R2, 4
         LDR     R1, [PC, -8 + (print_text_smth1 - $)]
         LDR     R0, [PC, -8 + (print_text_smth0 - $)]
-        STMFA   SP, {R0-R3}                                       ; this requires memory on stack
+        STMFA   SP, {R0-R3}                                     ; this requires memory on stack
         ADD     R3, PC, -8 + (base_str - $)
         
         ; Setting base_str lower 16 bits to (PC >> 24) & 0xFF.
         MOV     R0, PC, LSR 24
         AND     R0, R0, 0xFF
-        ADD     R0, R0, 0x30                                      ; '0' == 0x30
+        ADD     R0, R0, 0x30                                    ; '0' == 0x30
         
         ADD     R1, PC, -8 + (base_str - $)
         STRH    R0, [R1]
@@ -271,10 +275,12 @@ print_base:
         ADD     SP, SP, PrintBaseMemOnStack
         LDMFD   SP!, {R0-R11,PC}
 
+        ; *****************************************************
         ; Printing register value.
         ; Input:
         ;   R0 - value to print
         ;   R1 - Y screen position
+        ; *****************************************************
 print_register:
         STMFD   SP!, {R0-R11,LR}
         PrintRegisterMemOnStack = 0x20
@@ -293,11 +299,11 @@ next_digit:
         CMP     R2, 10
         BLT     less_than_10
 grater_than_10:
-        ADD     R2, R2, 0x41 - 10                                      ; 'A' == 0x41
+        ADD     R2, R2, 0x41 - 10                               ; 'A' == 0x41
         B       end_of_add
         
 less_than_10:
-        ADD     R2, R2, 0x30                                      ; '0' == 0x30
+        ADD     R2, R2, 0x30                                    ; '0' == 0x30
         B       end_of_add
         
 end_of_add:
@@ -316,7 +322,7 @@ end_of_add:
         MOV     R2, 4
         LDR     R1, [PC, -8 + (print_text_smth1 - $)]
         LDR     R0, [PC, -8 + (print_text_smth0 - $)]
-        STMFA   SP, {R0-R3}                                       ; this requires memory on stack
+        STMFA   SP, {R0-R3}                                     ; this requires memory on stack
         ADD     R3, PC, -8 + (register_str - $)
         STR     R3, [SP]
         MOV     R3, 0xDC
@@ -327,6 +333,7 @@ end_of_add:
         
         ADD     SP, SP, PrintRegisterMemOnStack
         LDMFD   SP!, {R0-R11,PC}
+        ; *****************************************************
 
                         ; aligning:  123 123 123 123 123
 file_name                   DB     'MBOOTLDR.BIN',0,0,0,0
