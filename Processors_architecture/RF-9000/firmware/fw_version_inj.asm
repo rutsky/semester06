@@ -168,11 +168,36 @@ loading_error:
         ;MOV     LR, PC
         ;MOV     PC, R0
 
+        ; Printing addresses of different calls.
+        MOV     R1, 0x2e
+        ADD     R0, PC, -8 + (print_test - $)
+        BL      print_register                                ; 0x200196BC
+        
+        MOV     R1, 0x42
+        LDR     R0, [PC, -8 + (RealPrintTestFunc_addr - $)]
+        BL      print_register                                ; 0x20009D60
+        B       skip
+
+        ; Printing base digit. Result: 0x20XXXXXX
+        BL      print_base
+        B       skip
+
+        ; Testing is different methods gives equal result?
         ADD     R0, PC, -8 + (print_test - $)
         LDR     R1, [PC, -8 + (RealPrintTestFunc_addr - $)]
         
         CMP     R0, R1
-        BEQ     skip
+        BEQ     skip                                          ; No!!! Results are different on RF-9000!
+        
+        ; IDA Pro gives this:
+        ;RAM:20009D10                 ADR     R0, sub_20009D3C
+        ;RAM:20009D14                 LDR     R1, =sub_20009D3C
+        ;RAM:20009D18                 CMP     R0, R1
+        ;RAM:20009D1C                 BEQ     loc_20009D28
+        ;RAM:20009D20                 MOV     LR, PC
+        ;RAM:20009D24                 MOV     PC, R0
+        ;RAM:20009D28
+        ; IDA is not correct for RF-9000!
         
         MOV     LR, PC
         MOV     PC, R0
@@ -215,11 +240,101 @@ print_test:
         ADD     SP, SP, PrintTestMemOnStack
         LDMFD   SP!, {R0-R11,PC}
 
+        ; Drawing addressing space base.
+print_base:
+        STMFD   SP!, {R0-R11,LR}
+        PrintBaseMemOnStack = 0x20
+        SUB     SP, SP, PrintBaseMemOnStack
+        
+        MOV     R3, 5
+        MOV     R2, 4
+        LDR     R1, [PC, -8 + (print_text_smth1 - $)]
+        LDR     R0, [PC, -8 + (print_text_smth0 - $)]
+        STMFA   SP, {R0-R3}                                       ; this requires memory on stack
+        ADD     R3, PC, -8 + (base_str - $)
+        
+        ; Setting base_str lower 16 bits to (PC >> 24) & 0xFF.
+        MOV     R0, PC, LSR 24
+        AND     R0, R0, 0xFF
+        ADD     R0, R0, 0x30                                      ; '0' == 0x30
+        
+        ADD     R1, PC, -8 + (base_str - $)
+        STRH    R0, [R1]
+        
+        STR     R3, [SP]
+        MOV     R3, 0xDC
+        MOV     R2, 0x42
+        MOV     R1, 0
+        MOV     R0, 0
+        BL      $ + ((RealDrawTextCenterFuncAddr - RealStartAddr) - ($ - start))
+        
+        ADD     SP, SP, PrintBaseMemOnStack
+        LDMFD   SP!, {R0-R11,PC}
+
+        ; Printing register value.
+        ; Input:
+        ;   R0 - value to print
+        ;   R1 - Y screen position
+print_register:
+        STMFD   SP!, {R0-R11,LR}
+        PrintRegisterMemOnStack = 0x20
+        SUB     SP, SP, PrintRegisterMemOnStack
+       
+        ; Saving input.
+        MOV     R8, R0
+        MOV     R9, R1
+
+        ; Preparing string to draw.
+        ADD     R0, PC, -8 + (register_str - $) + 7 ; starting at string end and moving backward
+        
+        MOV     R1, 0
+next_digit:
+        AND     R2, R8, 0xF
+        CMP     R2, 10
+        BLT     less_than_10
+grater_than_10:
+        ADD     R2, R2, 0x41 - 10                                      ; 'A' == 0x41
+        B       end_of_add
+        
+less_than_10:
+        ADD     R2, R2, 0x30                                      ; '0' == 0x30
+        B       end_of_add
+        
+end_of_add:
+        STRB    R2, [R0]
+        
+        MOV     R8, R8, LSR 4
+        
+        ADD     R0, R0, -1
+        
+        ADD     R1, R1, 1
+        CMP     R1, 8
+        BLT     next_digit
+        ; End of preparing string to draw.
+        
+        MOV     R3, 5
+        MOV     R2, 4
+        LDR     R1, [PC, -8 + (print_text_smth1 - $)]
+        LDR     R0, [PC, -8 + (print_text_smth0 - $)]
+        STMFA   SP, {R0-R3}                                       ; this requires memory on stack
+        ADD     R3, PC, -8 + (register_str - $)
+        STR     R3, [SP]
+        MOV     R3, 0xDC
+        MOV     R2, R9
+        MOV     R1, 0
+        MOV     R0, 0
+        BL      $ + ((RealDrawTextCenterFuncAddr - RealStartAddr) - ($ - start))
+        
+        ADD     SP, SP, PrintRegisterMemOnStack
+        LDMFD   SP!, {R0-R11,PC}
+
                         ; aligning:  123 123 123 123 123
 file_name                   DB     'MBOOTLDR.BIN',0,0,0,0
 print_text_smth1            DW     0x0F81F ; TODO: Rename it.
 print_text_smth0            DW     0x0FE5B
 error_str                   DB     'Failed to load code.',0,0,0,0
 test_str                    DB     'Test!',0,0,0
+base_str                    DB     'ABCDEFGH',0,0,0,0
+register_str                DB     'abcdefgh',0,0,0,0
 RealDrawTextCenterFunc_addr DW     RealDrawTextCenterFuncAddr
 RealPrintTestFunc_addr      DW     RealStartAddr + (print_test - start)
