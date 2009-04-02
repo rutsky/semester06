@@ -149,10 +149,19 @@ loading_error:
         ;MOV     LR, PC
         ;LDR     PC, [PC, -8 + (RealPrintTestFunc_addr - $)]
         
-        ; Trying this:
-        LDR     R9, [PC, -8 + (RealPrintTestFunc_addr - $)]
+        ; Not working:
+        ;LDR     R9, [PC, -8 + (RealPrintTestFunc_addr - $)]
+        ;MOV     LR, PC
+        ;MOV     PC, R9
+
+        ; Not working:
+        ;LDR     R0, [PC, -8 + (RealPrintTestFunc_addr - $)]
+        ;MOV     LR, PC
+        ;MOV     PC, R0
+
+        ; Works:
         MOV     LR, PC
-        MOV     PC, R9
+        ADD     PC, PC, -8 + (print_test - $)
         
         ; Freeing memory on stack.
         ADD     SP, SP, MemOnStack
