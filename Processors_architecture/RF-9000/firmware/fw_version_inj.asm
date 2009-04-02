@@ -47,8 +47,10 @@
     USE32
     format binary
     
-    RealStartAddr      = 0x20009CAC
-    RealEndAddr        = 0x20009F84
+    FWOffset               = 0xF95C
+    
+    RealStartAddr          = 0x20009CAC + FWOffset
+    RealEndAddr            = 0x20009F84 + FWOffset
 
     ; Loading file contents from `CONFIG' directory function.
     ;   Input:
@@ -58,10 +60,10 @@
     ;   Result:
     ;     R0 >= 0, on success
     ; Function don't touch R4-R10 registers states.
-    RealLoadConfigFuncAddr = 0x20021174
+    RealLoadConfigFunc     = 0x20021174 + FWOffset
     
     ; Sample on this function can be found in code below.
-    RealDrawTextCenterFuncAddr = 0x20044D28
+    RealDrawTextCenterFunc = 0x20044D28 + FWOffset
     
 start: ; TODO: Rename.
         ; Saving process state.
@@ -90,7 +92,7 @@ start: ; TODO: Rename.
         MOV     R2, BlockSize
         
         ; Loading block from file using firmware function.
-        BL      $ + ((RealLoadConfigFuncAddr - RealStartAddr) - ($ - start))
+        BL      $ + ((RealLoadConfigFunc - RealStartAddr) - ($ - start))
         
         ; Checking is file loaded correctly.
         CMP     R0, 0
@@ -138,9 +140,8 @@ loading_error:
         MOV     R1, 0
         MOV     R0, 0
         ;BL      $ + ((RealDrawTextCenterFuncAddr - RealStartAddr) - ($ - start)) ; TODO: Remove this line.
-        ;LDR     R9, [PC, -8 + (RealDrawTextCenterFunc_addr - $)]
         ;MOV     LR, PC
-        ;MOV     PC, R9
+        ;MOV     PC, [PC, -8 + (RealDrawTextCenterFunc_addr - $)]
         
         ; This kind of calling works:
         ;BL      print_test
@@ -183,15 +184,15 @@ loading_error:
         B       skip
 
         ; Printing base digit. Result: 0x20XXXXXX
-        BL      print_base
-        B       skip
+        ; BL      print_base
+        ; B       skip
 
         ; Testing is different methods gives equal result?
-        ADD     R0, PC, -8 + (print_test - $)
-        LDR     R1, [PC, -8 + (RealPrintTestFunc_addr - $)]
+        ; ADD     R0, PC, -8 + (print_test - $)
+        ; LDR     R1, [PC, -8 + (RealPrintTestFunc_addr - $)]
         
-        CMP     R0, R1
-        BEQ     skip                                            ; No!!! Results are different on RF-9000!
+        ; CMP     R0, R1
+        ; BEQ     skip                                            ; No!!! Results are different on RF-9000!
         
         ; IDA Pro gives this:
         ;RAM:20009D10                 ADR     R0, sub_20009D3C
@@ -203,8 +204,9 @@ loading_error:
         ;RAM:20009D28
         ; IDA is not correct for RF-9000!
         
-        MOV     LR, PC
-        MOV     PC, R0
+        ; MOV     LR, PC
+        ; MOV     PC, R0
+        ; End of test.
 skip:
 
         ; Freeing memory on stack.
@@ -239,7 +241,7 @@ print_test:
         MOV     R2, 0x42
         MOV     R1, 0
         MOV     R0, 0
-        BL      $ + ((RealDrawTextCenterFuncAddr - RealStartAddr) - ($ - start))
+        BL      $ + ((RealDrawTextCenterFunc - RealStartAddr) - ($ - start))
         
         ADD     SP, SP, PrintTestMemOnStack
         LDMFD   SP!, {R0-R11,PC}
@@ -270,7 +272,7 @@ print_base:
         MOV     R2, 0x42
         MOV     R1, 0
         MOV     R0, 0
-        BL      $ + ((RealDrawTextCenterFuncAddr - RealStartAddr) - ($ - start))
+        BL      $ + ((RealDrawTextCenterFunc - RealStartAddr) - ($ - start))
         
         ADD     SP, SP, PrintBaseMemOnStack
         LDMFD   SP!, {R0-R11,PC}
@@ -329,7 +331,7 @@ end_of_add:
         MOV     R2, R9
         MOV     R1, 0
         MOV     R0, 0
-        BL      $ + ((RealDrawTextCenterFuncAddr - RealStartAddr) - ($ - start))
+        BL      $ + ((RealDrawTextCenterFunc - RealStartAddr) - ($ - start))
         
         ADD     SP, SP, PrintRegisterMemOnStack
         LDMFD   SP!, {R0-R11,PC}
@@ -343,5 +345,5 @@ error_str                   DB     'Failed to load code.',0,0,0,0
 test_str                    DB     'Test!',0,0,0
 base_str                    DB     'ABCDEFGH',0,0,0,0
 register_str                DB     'abcdefgh',0,0,0,0
-RealDrawTextCenterFunc_addr DW     RealDrawTextCenterFuncAddr
+RealDrawTextCenterFunc_addr DW     RealDrawTextCenterFunc
 RealPrintTestFunc_addr      DW     RealStartAddr + (print_test - start)
