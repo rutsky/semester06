@@ -5,11 +5,13 @@
 
     USE32
     format binary
+    
+    FWOffset               = 0xF95C
 
     RealFrameBufferVarAddr = 0x200FEA64
-    RealCheckYesNoKeysFunc = 0x200237A0
-    RealOSSleepFunc        = 0x20090D64
-    RealDrawTextCenterFunc = 0x20044D28
+    RealCheckYesNoKeysFunc = 0x200237A0 + FWOffset
+    RealOSSleepFunc        = 0x20090D64 + FWOffset
+    RealDrawTextCenterFunc = 0x20044D28 + FWOffset
 
 resident_start:
         STMFD   SP!, {R0-R11,LR}
@@ -29,15 +31,20 @@ resident_start:
         MOV     R1, 0
         MOV     R0, 0
         
+        ; Calling.
         MOV     LR, PC
         LDR     PC, [PC, -8 + (RealDrawTextCenterFunc_addr - $)]
+        
+        ;B       resident_end
 
         ; Loading frame buffer information
         LDR     R5, [PC, -8 + (frame_buffer_descr_real_addr - $)]
         
         ; TODO: Use LDMIA R5, {R6, R7}
         LDR     R6, [R5, 0]     ; R6 = width
-        LDR     R7, [R0, 4]     ; R7 = height
+        LDR     R7, [R5, 4]     ; R7 = height
+        ; FIXME:
+        MOV     R7, 50
         
         ; Set R1 to real frame buffer.
         ADD     R5, R5, 8
@@ -45,12 +52,12 @@ resident_start:
         ; Drawing something on screen till some key will not be pressed.
         
 loop:
-        MOV     R3, R5          ; R3 == position in frame buffer
+        MOV     R3, R5                                          ; R3 == position in frame buffer
         
-        MOV     R0, 0           ; R0 == row number
+        MOV     R0, 0                                           ; R0 == row number
 loop_row:
         
-        MOV     R1, 0           ; R1 == column number
+        MOV     R1, 0                                           ; R1 == column number
 loop_column:
         
         ; Calculating `color'.
@@ -58,17 +65,17 @@ loop_column:
         ADD     R4, R4, R1
         
         ; Putting pixel.
-        STRH    R4, [R3]
+        STRH    R4, [R3] ; TODO: increment can be done here.
         
         ADD     R3, R3, 2
         
         ADD     R1, R1, 1
         CMP     R1, R6
-        BLT     loop_column
+        BLT     loop_column                                     ; end of loop_column
         
         ADD     R0, R0, 1
         CMP     R0, R7
-        BLT     loop_row
+        BLT     loop_row                                        ; end of loop_row
         
         ; Checking keys state.
         STMFD   SP!, {R0-R7}
