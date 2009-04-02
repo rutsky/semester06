@@ -5,8 +5,10 @@
 
     USE32
     format binary
+    
+    FWOffset               = 0xF95C
 
-    RealDrawTextCenterFunc = 0x20044D28
+    RealDrawTextCenterFunc = 0x20044D28 + FWOffset
 
 resident_start:
         STMFD   SP!, {R0-R11,LR}
@@ -37,4 +39,4 @@ RealDrawTextCenterFunc_addr  DW     RealDrawTextCenterFunc
 ; TODO: May be in other order.
 foreground_color             DW     0x0F81F
 background_color             DW     0x0FE5B
-hello_string                 DB     'Hello!',0,0
+hello_string                 DB     'Hello, World!',0,0

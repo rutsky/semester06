@@ -12,11 +12,13 @@
     2c:	e3a01000	mov 	r1, 0x0
     30:	e3a00000	mov 	r0, 0x0
     34:	e1a0e00f	mov 	lr, pc
-    38:	e59ff004	ldr 	pc, [pc, 0x4] <- 0x20044d28
+    38:	e59ff004	ldr 	pc, [pc, 0x4] <- 0x20054684
     3c:	e28dd020	add 	sp,	sp,	0x20
     40:	e8bd8fff	ldmia	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, pc}
-    44:	20044d28
+    44:	20054684
     48:	0000f81f
     4c:	0000fe5b
     50:	6c6c6548	copvs
-    54:	0000216f
+    54:	57202c6f	strpl	r2, [r0, -pc ror #24]!
+    58:	646c726f	strvsb	error 'write back' set
+    5c:	64000021	strvs	r0, [r0], -0x21
