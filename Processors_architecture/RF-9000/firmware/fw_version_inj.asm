@@ -303,7 +303,7 @@ next_digit:
         AND     R2, R8, 0xF
         CMP     R2, 10
         BLT     less_than_10
-grater_than_10:
+greater_than_10:
         ADD     R2, R2, 0x41 - 10                               ; 'A' == 0x41
         B       end_of_add
         
