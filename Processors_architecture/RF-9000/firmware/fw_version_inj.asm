@@ -140,8 +140,10 @@ loading_error:
         MOV     R1, 0
         MOV     R0, 0
         ;BL      $ + ((RealDrawTextCenterFuncAddr - RealStartAddr) - ($ - start)) ; TODO: Remove this line.
-        ;MOV     LR, PC
-        ;MOV     PC, [PC, -8 + (RealDrawTextCenterFunc_addr - $)]
+        MOV     LR, PC
+        LDR     PC, [PC, -8 + (RealDrawTextCenterFunc_addr - $)]
+        
+        B       skip
         
         ; This kind of calling works:
         ;BL      print_test
@@ -170,18 +172,19 @@ loading_error:
         ;MOV     PC, R0
 
         ; Printing addresses of different calls.
-        MOV     R1, 0x2e
-        ADD     R0, PC, -8
-        BL      print_register                                  ; 0x20019670 == PC
+        ; MOV     R1, 0x2e
+        ; ADD     R0, PC, -8
+        ; BL      print_register                                  ; 0x20019670 == PC
         
-        MOV     R1, 0x42
-        ADD     R0, PC, -8 + (print_test - $)
-        BL      print_register                                  ; 0x200196BC == print_test
+        ; MOV     R1, 0x42
+        ; ADD     R0, PC, -8 + (print_test - $)
+        ; BL      print_register                                  ; 0x200196BC == print_test
         
-        MOV     R1, 0x56
-        LDR     R0, [PC, -8 + (RealPrintTestFunc_addr - $)]
-        BL      print_register                                  ; 0x20009D60 == assumed print_test
-        B       skip
+        ; MOV     R1, 0x56
+        ; LDR     R0, [PC, -8 + (RealPrintTestFunc_addr - $)]
+        ; BL      print_register                                  ; 0x20009D60 == assumed print_test
+        ; B       skip
+        ; End of printing calls addresses.
 
         ; Printing base digit. Result: 0x20XXXXXX
         ; BL      print_base
