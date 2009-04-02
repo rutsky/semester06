@@ -160,9 +160,24 @@ loading_error:
         ;MOV     PC, R0
 
         ; Works:
-        MOV     LR, PC
-        ADD     PC, PC, -8 + (print_test - $)
+        ;MOV     LR, PC
+        ;ADD     PC, PC, -8 + (print_test - $)
+
+        ; Works:
+        ;ADD     R0, PC, -8 + (print_test - $)
+        ;MOV     LR, PC
+        ;MOV     PC, R0
+
+        ADD     R0, PC, -8 + (print_test - $)
+        LDR     R1, [PC, -8 + (RealPrintTestFunc_addr - $)]
         
+        CMP     R0, R1
+        BEQ     skip
+        
+        MOV     LR, PC
+        MOV     PC, R0
+skip:
+
         ; Freeing memory on stack.
         ADD     SP, SP, MemOnStack
 
