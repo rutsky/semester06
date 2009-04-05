@@ -1,5 +1,5 @@
 % linear_programming_problem.tex
-% Report on using golden section search algorithm for finding one dimensional special type function minimum.
+% Report on solving linear programming problems.
 % Vladimir Rutsky <altsysrq@gmail.com>
 % 23.03.2009
 
@@ -16,8 +16,7 @@
 \usepackage[T2A]{fontenc}
 \usepackage[russian]{babel}
 
-% At least for \leqslant.
-\usepackage{amssymb}
+\usepackage{amsmath, amsthm, amssymb}
 
 % From K.V.Voroncov Latex in samples, 2005.
 \textheight=24cm   % Text height.
@@ -46,8 +45,16 @@
 \usepackage{tikz}
 \usetikzlibrary{trees,positioning,arrows}
 
+% For listings.
+\usepackage{listings}
+
 % Transpose symbol in math mode.
 \newcommand\T{^\mathrm{\textsf{\tiny{T}}}}
+% Real number space.
+\newcommand\RR{\mathbb{R}}
+
+% Source code listings.
+\renewcommand{\lstlistingname}{Исходный код}
 
 
 \title{Решение задачи линейного программирования}
@@ -67,7 +74,7 @@ $$ \min c\T x, \quad \forall x \in S $$
 $$ S = \{ \, x\ |\ a_i\T x - b^{(i)} = 0, \quad i = \overline{1,\!M}, x \geqslant 0 \, \},$$
 где $c\T x$~--- целевая функция, а множество $S$~--- множество допустимых точек.
 
-Результатом решения задачи линейного программирования в представленной форме является один из следующих выводов:
+Результатом решения задачи линейного программирования в представленной выше форме является один из следующих выводов:
 \begin{enumerate}
   \item Множество допустимых точек непусто и найдётся точка $x_* \in S$ такая, что $c\T x_* \leqslant c\T x, \quad \forall x \in S$. 
 Такая точка $x_*$ называется \textit{оптимальной}.
@@ -79,23 +86,42 @@ $$ S = \{ \, x\ |\ a_i\T x - b^{(i)} = 0, \quad i = \overline{1,\!M}, x \geqslan
 $$ \min c\T[N] \, x[N], \quad x[N] \in S $$
 $$ S = \{ \, x[N]\ |\ A[M,N] \, x[N] = b[M], \quad x[N] \geqslant 0 \, \}.$$
 
-Я решаю задачу для следующих данных:
+В данной работе решается задача для следующих исходных данных:
 $$A[M,N] = \left( \input{matrix_A} \right), \quad
 b[M] = \left( \input{vector_b} \right)$$
 $$c\T[N] = \left( \input{vector_c} \right)$$
 
-\section{Исследование применимости метода}
+\section{Исследование применимости методов}
 
-\subsection{Симплекс метод}
-Симплекс метод применим для любой задачи линейного программирования представленной в указанной выше матричной форме,
-а значит и применим в данном случае.
+\subsection{Симплекс метод} % + двойственная задача
+Симплекс метод применим для решения любой задачи линейного программирования.
+
+Однако используемая конкретная реализация симплекс метода требует, 
+чтобы задача была приведена к каноническому виду и 
+ранг матрицы ограничений $A$ был полным, 
+что выполняется в данных условиях.
 
 \subsection{Метод перебора крайних точек множества допустимых точек}
 \subsection{Генетический алгоритм}
 
 \section{Описание алгоритма}
+
+\subsection{Симплекс метод} % + двойственная задача
+\subsection{Метод перебора крайних точек множества допустимых точек}
+\subsection{Генетический алгоритм}
+
 \section{Код программы}
+
+\subsection{Симплекс метод} % + двойственная задача
+\subsection{Метод перебора крайних точек множества допустимых точек}
+\subsection{Генетический алгоритм}
+
 \section{Результаты решения}
+
+\subsection{Симплекс метод} % + двойственная задача
+\subsection{Метод перебора крайних точек множества допустимых точек}
+\subsection{Генетический алгоритм}
+
 \section{Возможные дополнительные исследования}
 \section{Обоснование достоверности полученного результата}
 
