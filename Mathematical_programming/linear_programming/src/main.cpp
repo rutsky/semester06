@@ -14,20 +14,15 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <iterator>
+#include <algorithm>
 
 #include <boost/tuple/tuple.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include "numeric/numeric.hpp"
 
-// debug
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/matrix_proxy.hpp>
-#include <boost/numeric/ublas/io.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <iterator>
-#include <algorithm>
-// end of debug
-
+/* The main program function */
 int main()
 {
   typedef numeric::ublas::vector     <double> vector_type;
@@ -76,17 +71,6 @@ int main()
       ofs.reset(new std::ofstream("../report/vector_c.tex"));
       numeric::output_vector_tex(*ofs, c, true);
     }
-  }
-  
-  {
-    /*
-    numeric::matrix_type m(3, 3);
-    std::vector<size_t> rows, cols;
-    size_t nRows, nCols;
-    boost::tie(nRows, nCols) = 
-      numeric::simplex::li_submatrix(m, 
-        std::back_inserter(rows), std::back_inserter(cols));
-    */
   }
   
   return 0;

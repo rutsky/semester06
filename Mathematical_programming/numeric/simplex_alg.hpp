@@ -33,18 +33,6 @@
 
 namespace numeric
 {
-/*
-template< class VectorType, class MatrixType >
-class simplex
-{
-public:
-  typedef VectorType vector_type; 
-  typedef MatrixType matrix_type; 
-  
-  BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<vector_type>));
-  BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<matrix_type>));
-*/
-
 namespace simplex
 {
   // TODO: Move implementation lower.
@@ -56,6 +44,7 @@ namespace simplex
     srt_min_found = 0,                // Function has minimum and it was founded.
     srt_not_limited,                  // Function is not limited from below.
     srt_none,                         // Set of admissible points is empty.
+    srt_loop,                         // Loop in changing basis detected.
   };
   
   // Types of searching first basic vector results.
@@ -72,6 +61,7 @@ namespace simplex
     nbrt_min_found,                   // Current basic vector is solution of problem.
     nbrt_not_limited,                 // Function is not limited from below.
     nbrt_none,                        // Set of admissible points is empty.
+    nbrt_loop,                        // Loop in changing basis detected.
   };
   
   namespace
@@ -271,7 +261,7 @@ namespace simplex
           std::set_difference(Nk.begin(), Nk.end(), Nkp.begin(), Nkp.end(), std::back_inserter(Nkz));
           BOOST_ASSERT(std::adjacent_find(Nkz.begin(), Nkz.end(), std::greater<size_type>()) == Nkz.end());
           
-          // Filling 'Lk'
+          // Filling 'Lk'.
           std::set_difference(N.begin(), N.end(), Nk.begin(), Nk.end(), std::back_inserter(Lk));
           
           BOOST_ASSERT(Nk.size() == M.size());
@@ -279,6 +269,7 @@ namespace simplex
           BOOST_ASSERT(Lk.size() == N.size() - M.size());
           
           // debug
+          /*
           std::cout << "N: ";
           std::copy(N.begin(), N.end(), std::ostream_iterator<size_t>(std::cout, " "));
           std::cout << "\n";
@@ -302,13 +293,18 @@ namespace simplex
           std::cout << "Lk: ";
           std::copy(Lk.begin(), Lk.end(), std::ostream_iterator<size_t>(std::cout, " "));
           std::cout << "\n";
+          */
           // end of debug
 
           // Calculating 'A' submatrix inverse.
           matrix_type BNk(M.size(), M.size());
           BOOST_VERIFY(invert_matrix(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk));
-          std::cout << "zero m mod: " << ublas::matrix_norm_inf<matrix_type>::apply(ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size())) << "\n"; // debug
-          std::cout << "zero m: " << ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size()) << std::endl; // debug
+          /*
+          std::cout << "zero m mod: " << 
+              ublas::matrix_norm_inf<matrix_type>::apply(ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size())) << "\n"; // debug
+          std::cout << "zero m: " << 
+              ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size()) << std::endl; // debug
+          */
           /*
           // TODO: Precision.
           BOOST_ASSERT(
@@ -322,7 +318,7 @@ namespace simplex
           d = c - ublas::prod(ublas::trans(A), vector_type(ublas::prod(ublas::trans(BNk), subvector(c, Nk.begin(), Nk.end()))));
           BOOST_ASSERT(scalar_traits_type::equals(ublas::vector_norm_inf<matrix_type>::apply(subvector(d, Nk.begin(), Nk.end())), 0));
           
-          std::cout << "d: " << d << "\n"; // debug
+          //std::cout << "d: " << d << "\n"; // debug
           
           vector_subvector<vector_type> dLk(subvector(d, Lk.begin(), Lk.end()));
           typename vector_subvector<vector_type>::const_iterator jkIt = std::find_if(
@@ -346,7 +342,7 @@ namespace simplex
             subvector(u, Nk.begin(), Nk.end()) = ublas::prod(BNk, ublas::column(A, jk));
             u[jk] = -1;
             
-            std::cout << "u: " << u << "\n"; // debug
+            //std::cout << "u: " << u << "\n"; // debug
             
             vector_subvector<vector_type> uNk(subvector(u, Nk.begin(), Nk.end()));
             typename vector_subvector<vector_type>::const_iterator iuIt = std::find_if(
@@ -408,9 +404,8 @@ namespace simplex
       }      
     } while (combination::next_combination(Nk.begin(), N.size(), M.size()));
     
-    // Impossible: basis not found.
-    BOOST_ASSERT(0);
-    return nbrt_none;
+    // Basis not found: loop detected.
+    return nbrt_loop;
   }
   
   // Solves linear programming problem described in augment form:
@@ -455,6 +450,10 @@ namespace simplex
         
       case nbrt_none:
         return srt_none;
+        break;
+        
+      case nbrt_loop:
+        return srt_loop;
         break;
       }
     }
