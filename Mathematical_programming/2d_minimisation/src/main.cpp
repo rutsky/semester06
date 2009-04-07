@@ -67,7 +67,7 @@ int main()
       
       std::for_each(points.begin(), points.end(), 
                     boost::bind<void>(&numeric::output_vector_coordinates<std::ofstream, vector_type>, 
-                                      boost::ref(*ofs), _1, " ", "\n"));
+                                      boost::ref(*ofs), _1, " ", "\n", "%1$15.8f"));
     }
     
     if (points.begin() != points.end())
@@ -121,6 +121,11 @@ int main()
           *ofs << boost::format("%1e") % (curFMinVal - *prevFMinVal);
         
         prevFMinVal = curFMinVal;
+        
+        vector_type const curGrad = df(xMin);
+        *ofs << " & (";
+        numeric::output_vector_coordinates(*ofs, curGrad, ", ", "", "%1e");
+        *ofs << ")";
 
         *ofs << " \\\\\n";
       }
@@ -235,8 +240,13 @@ int main()
         
         if (prevFMinVal)
           *ofs << boost::format("%1e") % (curFMinVal - *prevFMinVal);
-        
         prevFMinVal = curFMinVal;
+        
+        vector_type const curGrad = df(xMin);
+        *ofs << " & (";
+        numeric::output_vector_coordinates(*ofs, curGrad, ", ", "", "%1e");
+        *ofs << ")";
+
 
         *ofs << " \\\\\n";
       }

@@ -72,9 +72,10 @@ namespace numeric
   }
   
   template< class OutStream, class Vector >
-  void output_vector_coordinates( OutStream &ostr, Vector v, 
+  void output_vector_coordinates( OutStream &ostr, Vector v,
                                   char const *delimiter = " ", 
-                                  char const *end = "\n" )
+                                  char const *end = "\n",
+                                  char const *format = "%1$15.8f" )
   {
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<Vector>));
     BOOST_ASSERT(v.size() > 0);
@@ -83,7 +84,7 @@ namespace numeric
     for (size_t r = 1; r < v.size(); ++r)
     {
       ostr << delimiter;
-      ostr << boost::format("%1$15.8f") % v(r);
+      ostr << boost::format(format) % v(r);
     }
     
     ostr << end;
