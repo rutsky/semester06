@@ -144,8 +144,9 @@ int main()
     mutations(0) = function::mutationX;
     mutations(1) = function::mutationY;
     
-    size_t const nIndividuals = function::nIndividuals;
-    double const liveRate     = function::liveRate;
+    size_t const nIndividuals     = function::nIndividuals;
+    size_t const nPrecisionSelect = function::nPrecisionSelect;
+    double const liveRate         = function::liveRate;
     
     typedef std::vector<vector_type>     points_vec_type;
     typedef std::vector<points_vec_type> points_vecs_vec_type;
@@ -158,7 +159,7 @@ int main()
     vector_type const xMin = numeric::genetic::vectorSpaceGeneticSearch
       <generator_type, crossover_type, mutation_type, vector_type, function_type, scalar_type>(
         generator_type(loGen, hiGen), crossover_type(), mutation_type(mutations.begin(), mutations.end()), f, 
-        nIndividuals, liveRate, preferedPrecision,
+        nIndividuals, liveRate, preferedPrecision, nPrecisionSelect,
         std::back_inserter(selectedPointsVecs), std::back_inserter(notSelectedPointsVec));
     
     {
@@ -221,7 +222,7 @@ int main()
         vector_type const xMin = numeric::genetic::vectorSpaceGeneticSearch
           <generator_type, crossover_type, mutation_type, vector_type, function_type, scalar_type>(
             generator_type(loGen, hiGen), crossover_type(), mutation_type(mutations.begin(), mutations.end()), f, 
-            nIndividuals, liveRate, precision,
+            nIndividuals, liveRate, precision, nPrecisionSelect,
             std::back_inserter(selectedPointsVecs), std::back_inserter(notSelectedPointsVec));
         
         *ofs << boost::format("%1$1.0e") % precision << " & " << selectedPointsVecs.size() << " & (";

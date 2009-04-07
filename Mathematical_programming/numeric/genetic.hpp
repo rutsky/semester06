@@ -11,6 +11,7 @@
 #include "numeric_common.hpp"
 
 #include <vector>
+#include <deque>
 
 #include <boost/assert.hpp>
 #include <boost/concept/assert.hpp>
@@ -109,8 +110,8 @@ namespace genetic
       deviations_.assign(first, beyond);
     }
     
-    template< class V >
-    V operator()( V const &x ) const
+    template< class V, class S >
+    V operator()( V const &x, S const scale ) const
     {
       BOOST_ASSERT(deviations_.size() == x.size());
       
@@ -124,7 +125,7 @@ namespace genetic
   
         double const lambda = uni();
         
-        result(r) = x(r) + deviations_[r] * lambda;
+        result(r) = x(r) + deviations_[r] * lambda * scale;
       }
       
       return result;
@@ -138,7 +139,8 @@ namespace genetic
   // TODO: Documentation.
   template< class Generator, class Crossover, class Mutation, class V, class Func, class FuncScalar, class PointsVecsOut >
   V vectorSpaceGeneticSearch( Generator generator, Crossover crossover, Mutation mutation, Func fitness,
-                              size_t nIndividuals, double liveRate, typename V::value_type precision,
+                              size_t nIndividuals, double liveRate, 
+                              typename V::value_type precision, size_t nPrecisionSelect,
                               PointsVecsOut selectedPointsVecsOut, PointsVecsOut notSelectedPointsVecsOut )
   {
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V>));
@@ -151,6 +153,7 @@ namespace genetic
     typedef std::vector<vector_type> individuals_vector_type;
     
     BOOST_ASSERT(0 <= liveRate && liveRate <= 1);
+    BOOST_ASSERT(nPrecisionSelect > 0);
     
     individuals_vector_type population;
     population.reserve(nIndividuals);
@@ -158,6 +161,9 @@ namespace genetic
     nextPopulation.reserve(nIndividuals);
     
     base_generator_type rndGenerator(57u);
+    
+    typedef std::deque<vector_type> fitted_individuals_deque_type;
+    fitted_individuals_deque_type fittedIndividuals;
     
     // Spawning initial population.
     for (size_t i = 0; i < nIndividuals; ++i)
@@ -187,30 +193,33 @@ namespace genetic
         *notSelectedPointsVecsOut++ = notSelected;
       }
       
+      fittedIndividuals.push_front(population[0]);
+      
+      BOOST_ASSERT(nPrecisionSelect > 0);
+      while (fittedIndividuals.size() > nPrecisionSelect)
+        fittedIndividuals.pop_back();
+      
+      if (fittedIndividuals.size() == nPrecisionSelect)
       {
-        // Checking is current population meets precision requirement.
-        vector_type lo = population[0], hi = population[0];
+        // Checking is most fitted individual is changing in range of precision.
         
-        // TODO: Use algorithms.
-        for (size_t i = 0; i < nSelected; ++i)
+        vector_type const lastMostFittedIndividual = fittedIndividuals.front();
+        bool satisfy(true);
+        for (typename fitted_individuals_deque_type::const_iterator it = boost::next(fittedIndividuals.begin()); it != fittedIndividuals.end(); ++it)
         {
-          vector_type const v = population[i];
-          
-          for (size_t r = 0; r < v.size(); ++r)
+          value_type const dist = ublas::norm_2(lastMostFittedIndividual - *it);
+          if (dist >= precision)
           {
-            if (v(r) < lo(r))
-              lo(r) = v(r);
-            if (v(r) > hi(r))
-              hi(r) = v(r);
+            satisfy = false;
+            break;
           }
         }
         
-        value_type const dist = ublas::norm_2(hi - lo);
         
-        if (dist < precision)
+        if (satisfy)
         {
           // Evolved to population which meets precision requirements.
-          return (hi - lo) / 2;
+          return lastMostFittedIndividual;
         }
       }
       
@@ -241,7 +250,7 @@ namespace genetic
           vector_type const child = crossover(x, y);
           
           // Mutation.
-          vector_type const mutant = mutation(child);
+          vector_type const mutant = mutation(child, ublas::norm_2(x - y)); // TODO: Process may be unstable.
           
           nextPopulation.push_back(mutant);
         }

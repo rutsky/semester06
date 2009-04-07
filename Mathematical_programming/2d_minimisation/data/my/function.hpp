@@ -28,12 +28,13 @@ namespace function
   // Genetic algorithm specific.
   double const loGenX       = -0.9;
   double const loGenY       = -3;
-  double const hiGenX       = 3;
-  double const hiGenY       = 3;
-  size_t const nIndividuals = 10;
+  double const hiGenX       = 2;
+  double const hiGenY       = 1;
+  size_t const nIndividuals = 1000;
+  size_t const nPrecisionSelect = 20;
   double const liveRate     = 0.8;
-  double const mutationX    = 0.3;
-  double const mutationY    = 0.3;
+  double const mutationX    = 0.2;
+  double const mutationY    = 0.2;
 
   // Warning! Functions are not inline! :(
   
