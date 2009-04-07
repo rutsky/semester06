@@ -1,3 +1,6 @@
 [submodule "Mathematical_programming/summary/s.nastya_mathprog_till2009-04-06"]
 	path = Mathematical_programming/summary/s.nastya_mathprog_till2009-04-06
 	url = git@github.com:rutsky/s.nastya_mathprog_till2009-04-06.git
+[submodule "Computer_algebra/summary/p.sergey_compalg_till2009-04-06"]
+	path = Computer_algebra/summary/p.sergey_compalg_till2009-04-06
+	url = git://github.com/rutsky/p.sergey_compalg_till2009-04-06.git
