@@ -1,1 +1,0 @@
-../input/gen_function.gp

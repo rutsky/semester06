@@ -1,5 +1,5 @@
 # draw.gp
-# Drawing program running result with GNU Plot.
+# Drawing program running result with Gnuplot.
 # Vladimir Rutsky <altsysrq@gmail.com>
 # 30.03.2009
 
@@ -29,5 +29,5 @@ set ticslevel 0
 
 #set style data lines
 
-load "gd_function.gp"
+load "input/gd_function.gp"
 pause -1

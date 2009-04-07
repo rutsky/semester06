@@ -99,6 +99,7 @@ int main()
         return 1;
       }
       
+      boost::optional<scalar_type> prevFMinVal;
       for (size_t p = 0; p < numeric::array_size(function::precisions); ++p)
       {
         scalar_type const precision = function::precisions[p];
@@ -110,7 +111,18 @@ int main()
         
         *ofs << boost::format("%1$1.0e") % precision << " & " << points.size() << " & (";
         numeric::output_vector_coordinates(*ofs, xMin, ", ", "");
-        *ofs << ") & " << boost::format("%1$15.8f") % f(xMin) << " \\\\\n";
+        *ofs << ") & ";
+        
+        scalar_type const curFMinVal = f(xMin);
+        
+        *ofs << boost::format("%1$15.8f") % curFMinVal << " & ";
+        
+        if (prevFMinVal)
+          *ofs << boost::format("%1e") % (curFMinVal - *prevFMinVal);
+        
+        prevFMinVal = curFMinVal;
+
+        *ofs << " \\\\\n";
       }
     }
   }
@@ -198,6 +210,7 @@ int main()
         return 1;
       }
       
+      boost::optional<scalar_type> prevFMinVal;
       for (size_t p = 0; p < numeric::array_size(function::precisions); ++p)
       {
         scalar_type const precision = function::precisions[p];
@@ -213,7 +226,18 @@ int main()
         
         *ofs << boost::format("%1$1.0e") % precision << " & " << selectedPointsVecs.size() << " & (";
         numeric::output_vector_coordinates(*ofs, xMin, ", ", "");
-        *ofs << ") & " << boost::format("%1$15.8f") % f(xMin) << " \\\\\n";
+        *ofs << ") & ";
+
+        scalar_type const curFMinVal = f(xMin);
+        
+        *ofs << boost::format("%1$15.8f") % curFMinVal << " & ";
+        
+        if (prevFMinVal)
+          *ofs << boost::format("%1e") % (curFMinVal - *prevFMinVal);
+        
+        prevFMinVal = curFMinVal;
+
+        *ofs << " \\\\\n";
       }
     }
   }
