@@ -11,4 +11,5 @@ HEADERS = combination.hpp \
     gradient_descent.hpp \
     golden_section_search.hpp \
     lerp.hpp \
-    genetic.hpp
+    genetic.hpp \
+    newton.hpp

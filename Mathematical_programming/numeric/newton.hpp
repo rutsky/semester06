@@ -1,12 +1,12 @@
 /*
- * gradient_descent.hpp
- * Searching multidimensional function minimum with gradient descent algorithm.
+ * newton.hpp
+ * Searching multidimensional function minimum with Newton algorithm.
  * Vladimir Rutsky <altsysrq@gmail.com>
- * 29.03.2009
+ * 07.04.2009
  */
 
-#ifndef NUMERIC_GRADIENT_DESCENT_HPP
-#define NUMERIC_GRADIENT_DESCENT_HPP
+#ifndef NUMERIC_NEWTON_HPP
+#define NUMERIC_NEWTON_HPP
 
 #include "numeric_common.hpp"
 
@@ -21,12 +21,13 @@
 
 namespace numeric
 {
-namespace gradient_descent
+namespace newton
 {
-  template< class Func, class FuncGrad, class V, class PointsOut >
+  // TODO: Inverse Hessian is a bad thing.
+  template< class Func, class FuncGrad, class FuncInvHessian, class V, class PointsOut >
   inline
   ublas::vector<typename V::value_type> 
-    find_min( Func function, FuncGrad functionGrad, 
+    find_min( Func function, FuncGrad functionGrad, FuncInvHessian functionInvHessian,
               V const &startPoint,
               typename V::value_type precision,
               typename V::value_type step,
@@ -39,6 +40,7 @@ namespace gradient_descent
 
     typedef typename V::value_type            scalar_type;
     typedef ublas::vector<scalar_type>        vector_type;
+    typedef ublas::matrix<scalar_type>        matrix_type;
     typedef ublas::scalar_traits<scalar_type> scalar_traits_type;
     
     BOOST_CONCEPT_ASSERT((boost::UnaryFunction<Func,     scalar_type, vector_type>));
@@ -54,17 +56,21 @@ namespace gradient_descent
     size_t iterations = 0;
     while (true)
     {
-      // Searching next point in direction opposite to gradient.
-      vector_type const grad = functionGrad(x);
+      // Searching next point in specific direction based on antigradient.
       
-      scalar_type const gradNorm = ublas::norm_2(grad);
-      if (scalar_traits_type::equals(gradNorm, 0))
+      vector_type const grad       = functionGrad(x);
+      matrix_type const invHessian = functionInvHessian(x);
+      vector_type const dirLong    = -ublas::prod(invHessian, grad);
+      
+      scalar_type const dirLen = ublas::norm_2(dirLong);
+      if (scalar_traits_type::equals(dirLen, 0))
       {
-        // Function gradient is almost zero, found minimum.
+        // Function gradient is al  most zero, found minimum.
         return x;
       }
       
-      vector_type const dir = -grad / gradNorm;
+      // Obtaining normalized direction of moving.
+      vector_type const dir = dirLong / dirLen;
       BOOST_ASSERT(scalar_traits_type::equals(ublas::norm_2(dir), 1));
       
       vector_type const s0 = x;
@@ -89,6 +95,7 @@ namespace gradient_descent
       // end of debug
       
       vector_type const nextX = s0 + dir * step * section;
+      //std::cout << "dist= " << ublas::norm_2(x - nextX) << std::endl; // debug
       if (ublas::norm_2(x - nextX) < precision)
       {
         // Next point is equal to current (with precision), seems found minimum.
@@ -112,7 +119,7 @@ namespace gradient_descent
     
     return x;
   }
-} // End of namespace 'gradient_descent'.
+} // End of namespace 'newton'.
 } // End of namespace 'numeric'.
 
-#endif // NUMERIC_GRADIENT_DESCENT_HPP
+#endif // NUMERIC_NEWTON_HPP

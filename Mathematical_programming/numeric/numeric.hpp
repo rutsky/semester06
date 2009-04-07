@@ -18,5 +18,6 @@
 #include "gradient_descent.hpp"
 #include "golden_section_search.hpp"
 #include "genetic.hpp"
+#include "newton.hpp"
 
 #endif // NUMERIC_NUMERIC_HPP

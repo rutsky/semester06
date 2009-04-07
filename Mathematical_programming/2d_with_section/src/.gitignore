@@ -1,0 +1,9 @@
+# Ignoring Qt Creator stuff.
+2d_with_section.pro.user
+2d_with_section
+Makefile
+Makefile.Debug
+Makefile.Release
+qtc-gdbmacros/
+debug/
+release/

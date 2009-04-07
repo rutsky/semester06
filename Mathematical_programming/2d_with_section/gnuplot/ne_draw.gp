@@ -1,5 +1,5 @@
-# gd_draw.gp
-# Drawing gradient descent program running result with Gnuplot.
+# ne_draw.gp
+# Drawing program running result with Gnuplot.
 # Vladimir Rutsky <altsysrq@gmail.com>
 # 30.03.2009
 
