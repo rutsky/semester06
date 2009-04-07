@@ -3,13 +3,11 @@
 # Vladimir Rutsky <altsysrq@gmail.com>
 # 17.03.2009
 
-precPows = [-3:-1:-6];
-#precPows = [-3:-1:-3];
-#func = inline("sin(1./x)");
-#range = [0.15, 0.6];
+precPows = [-3:-1:-8];
 
-load data/function.mat
-load data/segment.mat
+load data/function.mat     # func
+load data/function_der.mat # funcDer
+load data/segment.mat      # range
 
 function plotFunction( func, a, b, step )
   assert(a <= b);
@@ -27,18 +25,20 @@ function retval = goldenSectionSearch( func, a, b, precision )
   #hold on; # drawing graphic
   
   # Plotting function.
-  #plotFunction(func, a, b, 1e-3); # drawing graphic
+  plotFunction(func, a, b, 1e-3); # drawing graphic
   
   # Searching minimum with golden section search (with visualization).
   phi = (5^0.5 + 1) / 2;
   alpha = 1 / phi;
   
   originalRange = [a, b];
+
+  fcalls = 0;
   
   x1 = a + (1 - alpha) * (b - a);
   x2 = a + (    alpha) * (b - a);
-  y1 = func(x1);
-  y2 = func(x2);
+  y1 = func(x1); fcalls++;
+  y2 = func(x2); fcalls++;
   i = 0;
   while (abs(b - a) >= precision)
     assert(a < x1);
@@ -51,20 +51,20 @@ function retval = goldenSectionSearch( func, a, b, precision )
     #yMax = max([func(x1), func(x2)]);
     x = [a,    x1,   x2,   b   ];
     y = [yMax, yMax, yMax, yMax];
-    #plot(x, y, "+k"); # drawing graphic
+    plot(x, y, "+k"); # drawing graphic
     
     if (y1 <= y2)
       b  = x2;
       x2 = x1;
       x1 = a + (1 - alpha) * (b - a);
       y2 = y1;
-      y1 = func(x1);
+      y1 = func(x1); fcalls++;
     else
       a  = x1;
       x1 = x2;
       x2 = a + alpha * (b - a);
       y1 = y2;
-      y2 = func(x2);
+      y2 = func(x2); fcalls++;
     endif
 
     newDist = b - a;
@@ -79,24 +79,46 @@ function retval = goldenSectionSearch( func, a, b, precision )
     res = x2;
   endif
   
-  resStr = sprintf("Minimum at x=%9.7f, with precision of %5.2e", res, precision)
+  resStr = sprintf("Minimum at x=%11.9f, with precision of %5.2e", res, precision);
   title(resStr);
   
   #drawnow(); # drawing graphic
   
-  retval = [res, i];
+  retval = [res, i, fcalls];
 endfunction
+
+# Outputting to a file by the way.
+filename = "../output/result.tex";
+fid = fopen(filename, "w");
 
 # Iterating through precisions.
 precs = 10 .^ precPows;
+
+prevFuncInit = 0;
+prevFunc = 0;
+
 for prec = precs
   retval = goldenSectionSearch(func, range(1), range(2), prec)
   
-  # TODO: output to a file.
-  #filename = "../output/result.tex";
-  #fid = fopen(filename, "w");
-  #fputs (fid, "Free Software is needed for Free Science");
-  #fclose(fid);
+  res = retval(1);
+  fres = func(res);
+  
+  # Table: precision, iterations, function calls, result.
+  buf = sprintf("%2.1e & %d & %d & %11.9f & %11.9f & ", prec, retval(2), retval(3), res, fres);
+  fputs(fid, buf);
+  
+  if (prevFuncInit)
+    buf = sprintf("%e", fres - prevFunc);
+    fputs(fid, buf);
+  endif
+  
+  buf = sprintf(" & %11.9f \\\\\n", funcDer(res));
+  fputs(fid, buf);
+  
+  prevFuncInit = 1;
+  prevFunc = fres;
 endfor
+
+fclose(fid);
 
 #input("Press enter to quit."); # drawing graphic 

@@ -10,3 +10,6 @@ all:
 
 run:
 	octave -q $(SOURCE)
+
+graphic:
+	octave -q graphic.m
