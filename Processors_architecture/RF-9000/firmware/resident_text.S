@@ -1,4 +1,4 @@
-; resident_text.asm
+; resident_text.S
 ; Drawing text demo.
 ; Vladimir Rutsky <altsysrq@gmail.com>
 ; 01.04.2009

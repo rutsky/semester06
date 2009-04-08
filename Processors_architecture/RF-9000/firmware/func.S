@@ -1,4 +1,4 @@
-; test.asm
+; func.S
 ; Test block that will be appended to firmware end and runned from some point.
 ; Vladimir Rutsky <altsysrq@gmail.com>
 ; 15.03.2009

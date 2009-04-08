@@ -1,4 +1,4 @@
-; resident_draw.asm
+; resident_draw.S
 ; Drawing demo.
 ; Vladimir Rutsky <altsysrq@gmail.com>
 ; 01.04.2009

@@ -1,4 +1,4 @@
-; clear_screen.asm
+; resident_clear_screen.S
 ; Clearing screen demo.
 ; Vladimir Rutsky <altsysrq@gmail.com>
 ; 08.04.2009
