@@ -15,36 +15,18 @@
 
 resident_start:
         STMFD   SP!, {R0-R11,LR}
-        MemOnStack = 0x20
+        MemOnStack = 0x0
         SUB     SP, SP, MemOnStack
         
-        ; Drawing `Hello' string.
-        MOV     R3, 5
-        MOV     R2, 4
-        LDR     R1, [PC, -8 + (foreground_color - $)]
-        LDR     R0, [PC, -8 + (background_color - $)]
-        STMFA   SP, {R0-R3}                                       ; this requires memory on stack
-        ADD     R3, PC, -8 + (hello_string - $)
-        STR     R3, [SP]
-        MOV     R3, 0xDC
-        MOV     R2, 0x2E
-        MOV     R1, 0
-        MOV     R0, 0
-        
-        ; Calling.
-        MOV     LR, PC
-        LDR     PC, [PC, -8 + (RealDrawTextCenterFunc_addr - $)]
-        
-        ;B       resident_end
-
         ; Loading frame buffer information
         LDR     R5, [PC, -8 + (frame_buffer_descr_real_addr - $)]
         
         ; TODO: Use LDMIA R5, {R6, R7}
-        LDR     R6, [R5, 0]     ; R6 = width
-        LDR     R7, [R5, 4]     ; R7 = height
-        ; FIXME:
-        MOV     R7, 50
+        ;LDR     R6, [R5, 0]     ; R6 = width
+        ;LDR     R7, [R5, 4]     ; R7 = height
+        ; debug
+        MOV     R6, 100
+        MOV     R7, 100
         
         ; Set R1 to real frame buffer.
         ADD     R5, R5, 8
@@ -64,6 +46,9 @@ loop_column:
         MUL     R4, R0, R6
         ADD     R4, R4, R1
         
+        ; Forcing color. DEBUG
+        LDR     R4, [PC, -8 + (some_color - $)]
+        
         ; Putting pixel.
         STRH    R4, [R3] ; TODO: increment can be done here.
         
@@ -76,6 +61,8 @@ loop_column:
         ADD     R0, R0, 1
         CMP     R0, R7
         BLT     loop_row                                        ; end of loop_row
+        
+        ;B       resident_end
         
         ; Checking keys state.
         STMFD   SP!, {R0-R7}
@@ -97,7 +84,7 @@ loop_column:
         CMP     R9, 0
         BNE     resident_end
         
-        B      loop
+        ;B      loop
         
 resident_end:
         ADD     SP, SP, MemOnStack
@@ -114,3 +101,5 @@ foreground_color             DW     0x0F81F
 background_color             DW     0x0FE5B
 hello_string                 DB     'Hello!',0,0
 test_string                  DB     'Test',0,0,0,0
+
+some_color                   DW     0xAAAA
