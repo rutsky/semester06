@@ -15,7 +15,7 @@
 
 resident_start:
         STMFD   SP!, {R0-R11,LR}
-        MemOnStack = 0x0
+        MemOnStack = 0x20
         SUB     SP, SP, MemOnStack
         
         ; Loading frame buffer information
@@ -83,6 +83,23 @@ loop_column:
         ; Exiting if key was pressed.
         CMP     R9, 0
         BNE     resident_end
+        
+        ; Drawing `Hello' string.
+        MOV     R3, 5
+        MOV     R2, 4
+        LDR     R1, [PC, -8 + (foreground_color - $)]
+        LDR     R0, [PC, -8 + (background_color - $)]
+        STMFA   SP, {R0-R3}                                     ; this requires memory on stack
+        ADD     R3, PC, -8 + (hello_string - $)
+        STR     R3, [SP]
+        MOV     R3, 0xDC
+        MOV     R2, 0x2E
+        MOV     R1, 0
+        MOV     R0, 0
+
+        MOV     LR, PC
+        LDR     PC, [PC, -8 + (RealDrawTextCenterFunc_addr - $)]
+        ; End of string drawing.
         
         B      loop
         
