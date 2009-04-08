@@ -3,13 +3,10 @@
 ; Vladimir Rutsky <altsysrq@gmail.com>
 ; 08.04.2009
 
+include 'resident_common.S'
+
     USE32
     format binary
-    
-    FWOffset               = 0xF95C
-
-    RealFrameBufferVarAddr = 0x200FEA64
-    RealClearScreenFunc    = 0x2040174
 
 resident_start:
         STMFD   SP!, {R0-R11,LR}
@@ -17,12 +14,16 @@ resident_start:
         SUB     SP, SP, MemOnStack
         
         ; Calling `ClearScreen' function.
+        MOV     R0, 0
+        LDR     R1, [PC, -8 + (black_color - $)]
         MOV     LR, PC
-        LDR     PC, [PC, -8 + (RealClearScreenFunc_addr - $)]
+        LDR     PC, [PC, -8 + (fwClearScreenFunc_addr - $)]
         
 resident_end:
         ADD     SP, SP, MemOnStack
         LDMFD   SP!, {R0-R11,PC}
         
-frame_buffer_descr_real_addr DW     RealFrameBufferVarAddr
-RealClearScreenFunc_addr     DW     RealClearScreenFunc
+frame_buffer_descr_real_addr DW     fwFrameBufferVarAddr
+fwClearScreenFunc_addr       DW     fwClearScreenFunc
+
+black_color                  DW     0x0000                      ; black
