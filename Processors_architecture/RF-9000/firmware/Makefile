@@ -16,13 +16,13 @@ firmware: asm
 
 all: asm
 
-%.bin: %.asm
-	$(FASMARM) $(basename $@).asm $(basename $@).bin
-	$(ARM_DISASS) $(basename $@).bin > $(basename $@).disasm
+%.bin: %.S
+	$(FASMARM) $(basename $@).S $(basename $@).bin
+	$(ARM_DISASS) $(basename $@).bin > $(basename $@).disasm.S
 
 unlock:
 	rm -rf .lock
 
 clean:
 	rm -rf $(BIN_TARGETS)
-	rm -rf $(foreach A,$(ASM_TARGETS),$(A).disasm)
+	rm -rf $(foreach A,$(ASM_TARGETS),$(A).disasm.S)
