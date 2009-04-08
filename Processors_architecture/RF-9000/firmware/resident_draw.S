@@ -84,7 +84,7 @@ loop_column:
         CMP     R9, 0
         BNE     resident_end
         
-        ;B      loop
+        B      loop
         
 resident_end:
         ADD     SP, SP, MemOnStack
