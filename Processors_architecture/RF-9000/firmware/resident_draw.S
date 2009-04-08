@@ -12,6 +12,7 @@
     RealCheckYesNoKeysFunc = 0x200237A0 + FWOffset
     RealOSSleepFunc        = 0x20090D64 + FWOffset
     RealDrawTextCenterFunc = 0x20044D28 + FWOffset
+    RealOSTimerFunc        = 0x2003FCDC + FWOffset
 
 resident_start:
         STMFD   SP!, {R0-R11,LR}
@@ -101,6 +102,10 @@ loop_column:
         LDR     PC, [PC, -8 + (RealDrawTextCenterFunc_addr - $)]
         ; End of string drawing.
         
+        MOV     R0, 0
+        MOV     LR, PC
+        LDR     PC, [PC, -8 + (RealOSTimerFunc_addr - $)]
+        
         B      loop
         
 resident_end:
@@ -112,6 +117,7 @@ frame_buffer_descr_real_addr DW     RealFrameBufferVarAddr
 RealCheckYesNoKeysFunc_addr  DW     RealCheckYesNoKeysFunc
 RealOSSleepFunc_addr         DW     RealOSSleepFunc
 RealDrawTextCenterFunc_addr  DW     RealDrawTextCenterFunc
+RealOSTimerFunc_addr         DW     RealOSTimerFunc
 
 ; TODO: May be in other order.
 foreground_color             DW     0x0F81F
