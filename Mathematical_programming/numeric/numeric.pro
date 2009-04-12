@@ -12,4 +12,5 @@ HEADERS = combination.hpp \
     golden_section_search.hpp \
     lerp.hpp \
     genetic.hpp \
-    newton.hpp
+    newton.hpp \
+    lipschitz_constant.hpp

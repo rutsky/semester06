@@ -24,6 +24,14 @@ namespace function
   // Gradient descent algorithm specific.
   double const startX    = 2.5;
   double const startY    = 2.5;
+  
+  // Lipschitz specific.
+  double const loLipschitzX       = -0.9;
+  double const loLipschitzY       = -3;
+  double const hiLipschitzX       = 2;
+  double const hiLipschitzY       = 1;
+  double const lipschitzStepX     = 0.01;
+  double const lipschitzStepY     = 0.01;
 
   // Genetic algorithm specific.
   double const loGenX       = -0.9;

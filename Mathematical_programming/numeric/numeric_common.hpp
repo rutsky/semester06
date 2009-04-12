@@ -31,6 +31,11 @@
 namespace numeric
 {
   namespace ublas = boost::numeric::ublas;
+  
+  using ublas::vector;
+  using ublas::vector_expression;
+  using ublas::matrix;
+  using ublas::matrix_expression;
 
   // TODO: Move boost stuff to separate file.
   template< class OP, class E > 
@@ -85,7 +90,30 @@ namespace numeric
   }
   
   template< typename T, int size >
-  size_t array_size( T (&)[size] ) { return size; };
+  size_t array_size( T (&)[size] ) 
+  { 
+    return size; 
+  };
+  
+  template< class T >
+  T & make_min( T &a, T const &b )
+  {
+    if (a > b) a = b;
+    return a;
+  }
+  
+  template< class T >
+  T & make_max( T &a, T const &b )
+  {
+    if (a < b) a = b;
+    return a;
+  }
+  
+  template< class T >
+  T abs( T const &v )
+  {
+    return v < 0 ? -v : v;
+  }
 } // End of namespace 'numeric'.
 
 #endif // NUMERIC_NUMERIC_COMMON_HPP

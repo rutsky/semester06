@@ -19,5 +19,6 @@
 #include "golden_section_search.hpp"
 #include "genetic.hpp"
 #include "newton.hpp"
+#include "lipschitz_constant.hpp"
 
 #endif // NUMERIC_NUMERIC_HPP

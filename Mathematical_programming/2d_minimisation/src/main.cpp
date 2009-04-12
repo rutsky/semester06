@@ -34,11 +34,50 @@ int main()
   
   typedef scalar_type (*function_type     )( vector_type const & );
   typedef vector_type (*function_grad_type)( vector_type const & );
+  typedef scalar_type (*scalar_norm_type  )( scalar_type const & );
+  typedef scalar_type (*vector_norm_type  )( numeric::ublas::vector_expression<vector_type> const & );
     
   function_type      const f                 = &function::function<vector_type>;
   function_grad_type const df                = &function::functionGrad<vector_type>;
   scalar_type        const preferedPrecision = function::preferedPrecision;
   scalar_type        const step              = function::step;
+  scalar_norm_type   const sNorm             = &numeric::abs<scalar_type>;
+  vector_norm_type   const vNorm             = &numeric::ublas::norm_2<vector_type>;
+  
+  {
+    // 
+    // Calculating Lipschitz constant.
+    //
+    
+    vector_type x(2);
+    x(0) = function::loLipschitzX;
+    x(1) = function::loLipschitzY;
+
+    vector_type y(2);
+    y(0) = function::hiLipschitzX;
+    y(1) = function::hiLipschitzY;
+    
+    vector_type step(2);
+    step(0) = function::lipschitzStepX;
+    step(1) = function::lipschitzStepY;
+
+    scalar_type const R = 
+        numeric::lipschitz_constant<function_type, scalar_type, scalar_norm_type, vector_type, vector_norm_type>(
+            f, sNorm, x, y, vNorm, step);
+    
+    {
+      // Saving Lipschitz constant.
+      char const *dataFileName = "../output/lipschitz_const.tex";
+      boost::scoped_ptr<std::ofstream> ofs(new std::ofstream(dataFileName));
+      if (ofs->fail())
+      {
+        std::cerr << "Failed to open data file '" << dataFileName << "'.\n";
+        return 1;
+      }
+      
+      *ofs << boost::format("%1$15.8f") % R;
+    }
+  }
 
   {
     //
