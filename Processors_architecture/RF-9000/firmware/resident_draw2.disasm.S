@@ -1,7 +1,7 @@
      0:	e92d4fff	stmdb	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, lr}
      4:	e24dd020	sub 	sp,	sp,	0x20
-     8:	e3a00050	mov 	r0, 0x50
-     c:	e3a01058	mov 	r1, 0x58
+     8:	e28f0040	add 	r0,	pc,	0x40
+     c:	e28f1044	add 	r1,	pc,	0x44
     10:	e1a0e00f	mov 	lr, pc
     14:	e59ff030	ldr 	pc, [pc, 0x30] <- 0x200573c8
     18:	e1a0e00f	mov 	lr, pc

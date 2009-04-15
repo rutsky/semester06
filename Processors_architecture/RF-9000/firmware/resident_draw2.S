@@ -14,8 +14,8 @@ resident_start:
         SUB     SP, SP, MemOnStack
         
         ; Calling `Draw2Lines' finction.
-        MOV     R0, string1
-        MOV     R1, string2
+        ADD     R0, PC, -8 + (string1 - $)
+        ADD     R1, PC, -8 + (string2 - $)
 
         MOV     LR, PC
         LDR     PC, [PC, -8 + (fwDraw2LinesFunc_addr - $)]
