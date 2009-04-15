@@ -3,6 +3,8 @@
 ; Vladimir Rutsky <altsysrq@gmail.com>
 ; 01.04.2009
 
+include 'resident_common.S'
+
     USE32
     format binary
     
@@ -18,6 +20,13 @@ resident_start:
         STMFD   SP!, {R0-R11,LR}
         MemOnStack = 0x20
         SUB     SP, SP, MemOnStack
+        
+        ; Calling `ClearScreen' function.
+        MOV     R0, 0
+        LDR     R1, [PC, -8 + (black_color - $)]
+        MOV     LR, PC
+        LDR     PC, [PC, -8 + (fwClearScreenFunc_addr - $)]
+                                                
         
 loop: ; TODO
         ; Loading frame buffer information
@@ -132,6 +141,7 @@ RealCheckYesNoKeysFunc_addr  DW     RealCheckYesNoKeysFunc
 RealOSSleepFunc_addr         DW     RealOSSleepFunc
 RealDrawTextCenterFunc_addr  DW     RealDrawTextCenterFunc
 RealOSTimerFunc_addr         DW     RealOSTimerFunc
+fwClearScreenFunc_addr       DW     fwClearScreenFunc
 
 ; TODO: May be in other order.
 foreground_color             DW     0x0F81F
