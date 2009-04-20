@@ -77,17 +77,6 @@ namespace gradient_descent
           golden_section::find_min<function_bind_type, scalar_type>(functionBind, 0.0, 1.0, precision / step);
       BOOST_ASSERT(0 <= section && section <= 1);
       
-      // debug
-      /*
-      std::cout << "x="; 
-      output_vector_coordinates(std::cout, x);
-      std::cout << "f(x0) = " << function(s0 + dir * step * 0) << std::endl;
-      std::cout << "f(x)  = " << function(s0 + dir * step * section) << std::endl;
-      std::cout << "f(x1) = " << function(s0 + dir * step * 1) << std::endl;
-      std::cout << "section=" << section << std::endl; // debug
-      */
-      // end of debug
-      
       vector_type const nextX = s0 + dir * step * section;
       if (ublas::norm_2(x - nextX) < precision)
       {
