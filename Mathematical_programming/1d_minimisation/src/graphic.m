@@ -14,4 +14,5 @@ y = func(x);
 plot(x, y, "-k");
 drawnow();
 
+print -dpng "../output/graphic.png"
 print -dpslatex "../output/graphic.tex"

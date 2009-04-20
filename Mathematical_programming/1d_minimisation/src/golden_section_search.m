@@ -107,12 +107,14 @@ for prec = precs
   buf = sprintf("%2.1e & %d & %d & %11.9f & %11.9f & ", prec, retval(2), retval(3), res, fres);
   fputs(fid, buf);
   
+  # Table: function value delta.
   if (prevFuncInit)
     buf = sprintf("%e", fres - prevFunc);
     fputs(fid, buf);
   endif
   
-  buf = sprintf(" & %11.9f \\\\\n", funcDer(res));
+  # Table: function derivative.
+  buf = sprintf(" & %11.9e \\\\\n", funcDer(res));
   fputs(fid, buf);
   
   prevFuncInit = 1;

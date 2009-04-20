@@ -1,7 +1,7 @@
-# Created by Octave 3.0.1, Tue Mar 24 05:19:27 2009 MSK <bob@bob>
+# Created by Octave 3.0.1, Mon Apr 20 23:18:59 2009 MSD <bob@bob>
 # name: funcDer
 # type: inline function
 # nargs: 1
 x
 0
--1./x^2.*cos(1./x)
+(-sin(x) .* x.^2 .- cos(x) .* 2 .* x)./x.^4
