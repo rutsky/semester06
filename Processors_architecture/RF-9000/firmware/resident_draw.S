@@ -21,14 +21,27 @@ resident_start:
         MemOnStack = 0x20
         SUB     SP, SP, MemOnStack
         
+        ; Debug.
+        LDR     R0, [PC, -8 + (some_color - $)]
+        STRH    R0, [SP]
+        ; End of debug.
+
+
+loop: ; TODO
+
         ; Calling `ClearScreen' function.
+        LDR     R0, [PC, -8 + (black_color - $)]
+        LDR     R1, [SP]
+        ADD     R1, R0, 1
+        AND     R1, R1, R0
+        STR     R1, [SP]
+        
         MOV     R0, 0
-        LDR     R1, [PC, -8 + (black_color - $)]
+
         MOV     LR, PC
         LDR     PC, [PC, -8 + (fwClearScreenFunc_addr - $)]
-                                                
-        
-loop: ; TODO
+        ; End of 'ClearScreen' calling.
+
         ; Loading frame buffer information
         LDR     R5, [PC, -8 + (frame_buffer_descr_real_addr - $)]
         
