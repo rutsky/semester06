@@ -5,9 +5,10 @@
 
 precPows = [-3:-1:-8];
 
-load data/function.mat     # func
-load data/function_der.mat # funcDer
-load data/segment.mat      # range
+load data/function.mat      # func
+load data/function_der.mat  # funcDer
+load data/function_der2.mat # funcDer2
+load data/segment.mat       # range
 
 function plotFunction( func, a, b, step )
   assert(a <= b);
@@ -113,8 +114,8 @@ for prec = precs
     fputs(fid, buf);
   endif
   
-  # Table: function derivative.
-  buf = sprintf(" & %11.9e \\\\\n", funcDer(res));
+  # Table: function derivative, function second derivative.
+  buf = sprintf(" & %7.3e & %7.3e \\\\\n", funcDer(res), funcDer2(res));
   fputs(fid, buf);
   
   prevFuncInit = 1;
