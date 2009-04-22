@@ -15,9 +15,12 @@ resident_start:
         
         ; Main loop.
 loop: 
-        LDR     R5, [PC, -9 + (fwFrameBufferVar_addr - $)]
-        ;LDR     R6, [PC, -9 + (hwIMG_REG_BASE0_addr - $)]
+        ;LDR     R5, [PC, -8 + (fwFrameBufferVar_addr - $)]
+        ;LDR     R6, [PC, -8 + (hwIMG_REG_BASE0_addr - $)]
         ;STR     R5, [R6]
+        
+        LDR     R4, [PC, -8 + (hwIMG_REG_BASE0_addr - $)]
+        LDR     R5, [R4]
 
         ; Loading colors.
         LDR     R0, [PC, -8 + (white_color - $)]
