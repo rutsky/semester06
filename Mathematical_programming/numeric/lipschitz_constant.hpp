@@ -94,7 +94,7 @@ namespace numeric
       }
     }
     
-    scalar_type const resultR = ublas::norm_2(R);
+    scalar_type const resultR = ublas::norm_2(R); // FIXME: I think this is incorrect.
     return resultR;
   }
 } // End of namespace 'numeric'.
