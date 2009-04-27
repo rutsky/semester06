@@ -57,4 +57,4 @@ namespace numeric
   }
 } // End of namespace 'numeric'.
 
-#endif // NUMERIC_GOLDEN_SECTION_SEARCH_HPP
+#endif // NUMERIC_LERP_HPP
