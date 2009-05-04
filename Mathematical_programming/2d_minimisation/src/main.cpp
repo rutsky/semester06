@@ -37,12 +37,12 @@ int main()
   typedef scalar_type (*scalar_norm_type  )( scalar_type const & );
   typedef scalar_type (*vector_norm_type  )( numeric::ublas::vector_expression<vector_type> const & );
     
-  function_type      const f                 = &function::function<vector_type>;
-  function_grad_type const df                = &function::functionGrad<vector_type>;
-  scalar_type        const preferedPrecision = function::preferedPrecision;
-  scalar_type        const step              = function::step;
-  scalar_norm_type   const sNorm             = &numeric::abs<scalar_type>;
-  vector_norm_type   const vNorm             = &numeric::ublas::norm_2<vector_type>;
+  function_type      const f                  = &function::function<vector_type>;
+  function_grad_type const df                 = &function::functionGrad<vector_type>;
+  scalar_type        const preferredPrecision = function::preferredPrecision;
+  scalar_type        const step               = function::step;
+  scalar_norm_type   const sNorm              = &numeric::abs<scalar_type>;
+  vector_norm_type   const vNorm              = &numeric::ublas::norm_2<vector_type>;
   
   {
     // 
@@ -92,7 +92,7 @@ int main()
     
     vector_type const xMin = numeric::gradient_descent::find_min
                                <function_type, function_grad_type, vector_type>(
-                                  f, df, startPoint, preferedPrecision, step, std::back_inserter(points));
+                                  f, df, startPoint, preferredPrecision, step, std::back_inserter(points));
     
     {
       // Saving passed spots.
@@ -203,7 +203,7 @@ int main()
     vector_type const xMin = numeric::genetic::vectorSpaceGeneticSearch
       <generator_type, crossover_type, mutation_type, vector_type, function_type, scalar_type>(
         generator_type(loGen, hiGen), crossover_type(), mutation_type(mutations.begin(), mutations.end()), f, 
-        nIndividuals, liveRate, preferedPrecision, nPrecisionSelect,
+        nIndividuals, liveRate, preferredPrecision, nPrecisionSelect,
         std::back_inserter(selectedPointsVecs), std::back_inserter(notSelectedPointsVec));
     
     {
