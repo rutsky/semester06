@@ -33,7 +33,7 @@ namespace gradient_descent
               PointsOut pointsOut )
   {
     // TODO: Now we assume that vector's coordinates and function values are same scalar types.
-    // TODO: Assert on correctness of `ostr'.
+    // TODO: Assert on correctness of `pointsOut'.
     
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V>));
 
