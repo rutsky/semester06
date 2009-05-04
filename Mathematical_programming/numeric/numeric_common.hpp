@@ -114,6 +114,48 @@ namespace numeric
   {
     return v < 0 ? -v : v;
   }
+  
+  // TODO!
+  template< class S > 
+  vector<S> invert_vector( vector<S> const &v )
+  {
+    vector<S> result = v;
+    for (size_t i = 0; i < v.size(); ++i)
+      result(i) = 1.0 / v(i);
+    
+    return result;
+  }
+  
+  struct DummyOutputIterator
+  {
+    // FIXME! This iterator is probably not correct!
+    DummyOutputIterator const & operator *  () const { return *this; }
+    DummyOutputIterator       & operator *  ()       { return *this; }
+    
+    template< class T >
+    DummyOutputIterator       & operator =  ( T const & ) { return *this; }
+    
+    DummyOutputIterator const & operator ++ ()      const { return *this; }
+    DummyOutputIterator       & operator ++ ()            { return *this; }
+    DummyOutputIterator const & operator ++ ( int ) const { return *this; }
+    DummyOutputIterator       & operator ++ ( int )       { return *this; }
+  };
+  
+  // TODO: There must be better ways than implementing own class.
+  struct true_predicate
+  {
+    // TODO: Inherit from std::...predicate... ot something.
+    bool operator()() const { return true; }
+    template< class T >
+    bool operator()( T const & ) const { return true; }
+  };
+  struct false_predicate
+  {
+    // TODO: Inherit from std::...predicate... ot something.
+    bool operator()() const { return false; }
+    template< class T >
+    bool operator()( T const & ) const { return false; }
+  };
 } // End of namespace 'numeric'.
 
 #endif // NUMERIC_NUMERIC_COMMON_HPP

@@ -92,7 +92,8 @@ int main()
     
     vector_type const xMin = numeric::gradient_descent::find_min
                                <function_type, function_grad_type, vector_type>(
-                                  f, df, startPoint, preferredPrecision, step, std::back_inserter(points));
+                                  f, df, startPoint, preferredPrecision, step, numeric::true_predicate(), 
+                                  std::back_inserter(points));
     
     {
       // Saving passed spots.
@@ -146,7 +147,8 @@ int main()
         std::vector<vector_type> points;
         vector_type const xMin = numeric::gradient_descent::find_min
                                    <function_type, function_grad_type, vector_type>(
-                                      f, df, startPoint, precision, step, std::back_inserter(points));
+                                      f, df, startPoint, precision, step, numeric::true_predicate(),
+                                      std::back_inserter(points));
         
         *ofs << boost::format("%1$1.0e") % precision << " & " << points.size() << " & (";
         numeric::output_vector_coordinates(*ofs, xMin, ", ", "");

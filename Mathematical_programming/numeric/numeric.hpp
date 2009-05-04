@@ -20,5 +20,6 @@
 #include "genetic.hpp"
 #include "newton.hpp"
 #include "lipschitz_constant.hpp"
+#include "barrier_method.hpp"
 
 #endif // NUMERIC_NUMERIC_HPP

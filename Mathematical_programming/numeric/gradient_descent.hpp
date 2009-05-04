@@ -23,14 +23,15 @@ namespace numeric
 {
 namespace gradient_descent
 {
-  template< class Func, class FuncGrad, class V, class PointsOut >
+  template< class Func, class FuncGrad, class V, class ConstrainPredicate, class PointsOut >
   inline
   ublas::vector<typename V::value_type> 
     find_min( Func function, FuncGrad functionGrad, 
               V const &startPoint,
               typename V::value_type precision,
               typename V::value_type step,
-              PointsOut pointsOut )
+              ConstrainPredicate constrainPred,
+              PointsOut          pointsOut )
   {
     // TODO: Now we assume that vector's coordinates and function values are same scalar types.
     // TODO: Assert on correctness of `pointsOut'.
@@ -48,6 +49,7 @@ namespace gradient_descent
     
     // Setting current point to start point.
     vector_type x = startPoint;
+    BOOST_ASSERT(constrainPred(x));
     
     *pointsOut++ = x;
     
@@ -67,22 +69,30 @@ namespace gradient_descent
       vector_type const dir = -grad / gradNorm;
       BOOST_ASSERT(scalar_traits_type::equals(ublas::norm_2(dir), 1));
       
-      vector_type const s0 = x;
-      vector_type const s1 = s0 + dir * step;
-      
-      typedef boost::function<scalar_type ( scalar_type )> function_bind_type;
-      function_bind_type functionBind = 
-          boost::bind<scalar_type>(function, boost::bind<vector_type>(Lerp<scalar_type, vector_type>(0.0, 1.0, s0, s1), _1));
-      scalar_type const section = 
-          golden_section::find_min<function_bind_type, scalar_type>(functionBind, 0.0, 1.0, precision / step);
-      BOOST_ASSERT(0 <= section && section <= 1);
-      
-      vector_type const nextX = s0 + dir * step * section;
-      if (ublas::norm_2(x - nextX) < precision)
+      scalar_type currStep = step;
+      vector_type nextX;
+      do
       {
-        // Next point is equal to current (with precision), seems found minimum.
-        return x;
-      }
+        vector_type const s0 = x;
+        vector_type const s1 = s0 + dir * currStep;
+        
+        typedef boost::function<scalar_type ( scalar_type )> function_bind_type;
+        function_bind_type functionBind = 
+            boost::bind<scalar_type>(function, boost::bind<vector_type>(Lerp<scalar_type, vector_type>(0.0, 1.0, s0, s1), _1));
+        scalar_type const section = 
+            golden_section::find_min<function_bind_type, scalar_type>(functionBind, 0.0, 1.0, precision / step);
+        BOOST_ASSERT(0 <= section && section <= 1);
+        
+        nextX = s0 + dir * step * section;
+        if (ublas::norm_2(x - nextX) < precision)
+        {
+          // Next point is equal to current (with precision and constrain), seems found minimum.
+          return x;
+        }
+        
+        // Decreasing search step.
+        currStep /= 2.;
+      } while (!constrainPred(nextX));
 
       // Moving to next point.
       x = nextX;

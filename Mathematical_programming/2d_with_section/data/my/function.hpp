@@ -18,12 +18,16 @@ namespace function
   namespace ublas = boost::numeric::ublas;
 
   double const preferredPrecision = 1e-6;
-  double const precisions[] = { 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8 };
-  double const step      = 30;
+  double const precisions[]       = { 1e-1, 1e-2, 1e-3 };
+  double const step               = 30; // TODO: what is this?
   
-  // Gradient descent algorithm specific.
-  double const startX    = 25;
-  double const startY    = 25;
+  // Minimum search start point (admissible point).
+  double const startX    = -20;
+  double const startY    = -20;
+  
+  // Barrier method specific.
+  double const startMu = 1000;
+  double const beta    = 0.1;
 
   // Warning! Functions are not inline! :(
   
@@ -107,4 +111,45 @@ namespace function
     
     return hessian;
   }
-} // End of namespace 'function'
+  
+  // TODO: Use single class for all constrain functions.
+  template< class S >
+  S limitFunc1( ublas::vector<S> const &x ) // TODO: Rename to 'constrain...'
+  {
+    BOOST_ASSERT(x.size() == 2);
+
+    return x(0) + 2 * x(1) - 2;
+  }
+  
+  template< class S >
+  ublas::vector<S>
+    limitFuncGrad1( ublas::vector<S> const &x )
+  {
+    BOOST_ASSERT(x.size() == 2);
+    
+    ublas::vector<S> v(2);
+    v(0) = 1;
+    v(1) = 2;
+    return v;
+  }
+  
+  template< class S >
+  S limitFunc2( ublas::vector<S> const &x )
+  {
+    BOOST_ASSERT(x.size() == 2);
+
+    return 2 * x(0) + x(1) - 2;
+  }
+  
+  template< class S >
+  ublas::vector<S>
+    limitFuncGrad2( ublas::vector<S> const &x )
+  {
+    BOOST_ASSERT(x.size() == 2);
+    
+    ublas::vector<S> v(2);
+    v(0) = 2;
+    v(1) = 1;
+    return v;
+  }
+} // End of namespace 'function'.
