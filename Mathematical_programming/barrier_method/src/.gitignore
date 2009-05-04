@@ -1,0 +1,9 @@
+# Ignoring Qt Creator stuff.
+barrier_method.pro.user
+barrier_method
+Makefile
+Makefile.Debug
+Makefile.Release
+qtc-gdbmacros/
+debug/
+release/
