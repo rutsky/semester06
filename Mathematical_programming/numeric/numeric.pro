@@ -13,4 +13,5 @@ HEADERS = combination.hpp \
     lerp.hpp \
     genetic.hpp \
     newton.hpp \
-    lipschitz_constant.hpp
+    lipschitz_constant.hpp \
+    barrier_method.hpp

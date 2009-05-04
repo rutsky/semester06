@@ -1,7 +1,7 @@
 /*
  * main.cpp
  * Six task on optimization methods.
- * Constrained minimization using barrier methods.
+ * Constrained minimization using barrier method.
  * Vladimir Rutsky <altsysrq@gmail.com>
  * 04.05.2009
  */
