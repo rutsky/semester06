@@ -114,7 +114,15 @@ namespace numeric
   {
     return v < 0 ? -v : v;
   }
+
+  template< class T >
+  T sqr( T const &x )
+  {
+    return x * x;
+  }
+
   
+  /*
   // TODO!
   template< class S > 
   vector<S> invert_vector( vector<S> const &v )
@@ -125,6 +133,18 @@ namespace numeric
     
     return result;
   }
+  
+  // TODO
+  template< class S > 
+  vector<S> invert_vector2( vector<S> const &v )
+  {
+    vector<S> result = v;
+    for (size_t i = 0; i < v.size(); ++i)
+      result(i) = 1.0 / sqr(v(i));
+    
+    return result;
+  }
+  */
   
   struct DummyOutputIterator
   {

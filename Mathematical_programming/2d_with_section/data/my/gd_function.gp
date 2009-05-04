@@ -18,5 +18,7 @@ set contour
 load '../output/ne_contours.gp'
 
 splot f(x, y) title fName, \
-  '../output/ne_points.dat' using 1:2:(f($1, $2) + 1) notitle linewidth 3 linecolor rgb "#0000FF" with lines, \
-  '../output/ne_points.dat' using 1:2:(f($1, $2) - 1) notitle linewidth 3 linecolor rgb "#0000FF" with lines
+  '../output/ne_points.dat' using 1:2:(f($1, $2) + 1) notitle linewidth 3 linecolor rgb "#0000FF" with lines,      \
+  '../output/ne_points.dat' using 1:2:(f($1, $2) - 40) notitle linewidth 3 linecolor rgb "#0000FF" with lines,      \
+  'input/real_points.dat' using 1:(constrain1Line($1)):(constrainHeight) notitle linewidth 1 pointtype 0 linecolor rgb "#FF0000" with lines, \
+  'input/real_points.dat' using 1:(constrain2Line($1)):(constrainHeight) notitle linewidth 1 pointtype 0 linecolor rgb "#FF0000" with lines

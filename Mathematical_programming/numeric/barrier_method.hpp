@@ -76,31 +76,43 @@ namespace barrier_method
       typedef vector<scalar_type>                                      vector_type;
       
     private:
+      typedef boost::function<scalar_type( vector_type )>              function_type;
       typedef boost::function<vector_type( vector_type )>              function_grad_type;
+      typedef std::vector<function_type>                               limit_functions_vec_type;
       typedef std::vector<function_grad_type>                          limit_functions_grads_vec_type;
       
     public:
-      template< class FuncGrad, class LimitFuncGradIterator >
+      template< class FuncGrad, class LimitFuncIterator, class LimitFuncGradIterator >
       AdditionalFunctionGradient( FuncGrad funcGrad, 
+                                  LimitFuncIterator     limitFuncBegin,     LimitFuncIterator     limitFuncEnd,
                                   LimitFuncGradIterator limitFuncGradBegin, LimitFuncGradIterator limitFuncGradEnd )
         : functionGrad_       (funcGrad)
+        , limitFunctions_     (limitFuncBegin,     limitFuncEnd)
         , limitFunctionsGrads_(limitFuncGradBegin, limitFuncGradEnd)
       {
         // TODO: Assertions on input types.
+        BOOST_ASSERT(limitFunctions_.size() == limitFunctionsGrads_.size());
       }
       
       vector_type operator()( scalar_type mu, vector_type const &x )
       {
         vector_type result = functionGrad_(x);
         
-        for (size_t i = 0; i < limitFunctionsGrads_.size(); ++i)
-          result += mu * -1.0 * invert_vector(limitFunctionsGrads_[i](x));
+        for (size_t i = 0; i < limitFunctions_.size(); ++i)
+        {
+          scalar_type const &fx     = limitFunctions_     [i](x);
+          vector_type const &fgradx = limitFunctionsGrads_[i](x);
           
+          for (size_t r = 0; r < x.size(); ++r)
+            result[r] += mu / sqr(fx) * fgradx[r];
+        }
+        
         return result;
       }
       
     private:
       function_grad_type             functionGrad_;
+      limit_functions_vec_type       limitFunctions_;
       limit_functions_grads_vec_type limitFunctionsGrads_;
     };
     
@@ -188,7 +200,7 @@ namespace barrier_method
     typedef ConstrainPredicate<scalar_type>             constrain_predicate_type;
     
     additional_function_type          additionalFunc    (function,     gBegin,     gEnd);
-    additional_function_gradient_type additionalFuncGrad(functionGrad, gGradBegin, gGradEnd);
+    additional_function_gradient_type additionalFuncGrad(functionGrad, gBegin,     gEnd, gGradBegin, gGradEnd);
     constrain_predicate_type          constrainPred     (gBegin, gEnd);
     
     // Initializing
@@ -233,7 +245,7 @@ namespace barrier_method
       // debug
       if (iterations >= 1000)
       {
-        std::cerr << "Too many iterations!\n";
+        std::cerr << "barrier_method::find_min(): Too many iterations!\n";
         break;
       }
       // end of debug

@@ -101,9 +101,9 @@ namespace gradient_descent
       ++iterations;
       
       // debug
-      if (iterations >= 100)
+      if (iterations >= 1000)
       {
-        std::cerr << "Too many iterations!\n";
+        std::cerr << "gradient_descent::find_min(): Too many iterations!\n";
         break;
       }
       // end of debug
