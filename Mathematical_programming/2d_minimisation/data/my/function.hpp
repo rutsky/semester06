@@ -17,7 +17,7 @@ namespace function
 {
   namespace ublas = boost::numeric::ublas;
 
-  double const preferedPrecision = 1e-4;
+  double const preferredPrecision = 1e-4;
   double const precisions[] = { 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8 };
   double const step      = 0.5;
   
