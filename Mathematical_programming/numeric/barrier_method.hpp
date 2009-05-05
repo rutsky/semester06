@@ -56,7 +56,22 @@ namespace barrier_method
         
         result += function_(x);
         for (size_t i = 0; i < limitFunctions_.size(); ++i)
-          result += -mu / limitFunctions_[i](x);
+        {
+          scalar_type const denominator = limitFunctions_[i](x);
+          
+          // TODO: Use normal constants.
+          scalar_type const eps = 1e-8;
+          scalar_type const inf = 1e+8;
+          if (abs(denominator) < eps)
+          {
+            // Division by zero.
+            result = inf;
+          }
+          else
+          {
+            result += -mu / denominator;
+          }
+        }
           
         return result;
       }
@@ -104,7 +119,20 @@ namespace barrier_method
           vector_type const fgradx = limitFunctionsGrads_[i](x);
           
           for (size_t r = 0; r < x.size(); ++r)
-            result[r] += mu / sqr(fx) * fgradx[r];
+          {
+            // TODO: Use normal constants.
+            scalar_type const eps = 1e-8;
+            scalar_type const inf = 1e+8;
+            if (abs(sqr(fx)) < eps)
+            {
+              // Division by zero.
+              result[r] = inf;
+            }
+            else
+            {
+              result[r] += mu / sqr(fx) * fgradx[r];
+            }
+          }
         }
         
         return result;
