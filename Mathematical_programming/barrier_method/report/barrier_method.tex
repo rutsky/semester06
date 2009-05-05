@@ -1,0 +1,115 @@
+% barrier_method.tex
+% Som kind of report data on barrier method algorithm.
+% Vladimir Rutsky <altsysrq@gmail.com>
+% 05.05.2009
+
+\documentclass[10pt,a4paper,titlepage]{article}
+
+% Spaces after commas.
+\frenchspacing
+% Minimal carrying number of characters,
+\righthyphenmin=2
+
+% Encoding support.
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+
+\usepackage{amsmath, amsthm, amssymb}
+
+% From K.V.Voroncov Latex in samples, 2005.
+\textheight=24cm   % Text height.
+\textwidth=16cm    % Text width
+\oddsidemargin=0pt % Left side indention.
+\topmargin=-1.5cm  % Top side indention.
+\parindent=24pt    % Paragraph indent.
+\parskip=0pt       % Distance between paragraphs.
+\tolerance=2000
+%\flushbottom       % Page height aligning.
+
+% Algorithms stuff.
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\newcommand{\INPUT}{\textbf{Вход:~}}
+\newcommand{\OUTPUT}{\textbf{Выход:~}}
+\floatname{algorithm}{Алгоритм}
+\renewcommand{\algorithmicrepeat}{\textbf{do}}
+\renewcommand{\algorithmicuntil}{\textbf{while}}
+
+% Images.
+%\usepackage[pdftex]{graphicx}
+
+% Drawing figures.
+\usepackage{subfig}
+
+% Drawing graphs.
+\usepackage{tikz}
+\usetikzlibrary{trees,positioning,arrows}
+
+% For listings.
+\usepackage{listings}
+
+% Альбомная ориентация страниц % TODO: Comment.
+\usepackage{lscape}
+
+
+% Transpose symbol in math mode.
+\newcommand\T{^\mathrm{\textsf{\tiny{T}}}}
+% Real number space.
+\newcommand\RR{\mathbb{R}}
+
+% Source code listings.
+\renewcommand{\lstlistingname}{Исходный код}
+
+
+\title{Решение задачи многомерной минимизации функции с~ограничениями методом барьеров}
+\author{Владимир Руцкий, 3057/2}
+\date{} % cheat ;)
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+% Content.
+%\section{Постановка задачи}
+%\section{Исследование применимости метода}
+%\section{Описание алгоритма}
+\section*{Код программы}
+\lstset{language=C++, caption=Барьерный метод,%
+label=bm-source-code, basicstyle=\footnotesize,%
+numbers=left, numberstyle=\footnotesize, numbersep=5pt, frame=single, breaklines=true, breakatwhitespace=false,%
+inputencoding=utf8x}
+\lstinputlisting{data/barrier_method.hpp}
+
+\section*{Результаты решения}
+%Результаты решения приведены в таблице \ref{gd-result-table}.
+
+%TODO: spaces!
+%Начальной точкой была выбрана точка \input{data/gd_start_point.tex}\!, % TODO: \!
+%шаг для поиска минимума методом золотого сечения был равен \input{data/gd_step.tex}\!. % TODO: \!
+% TODO: Рисунок с шагами.
+
+\begin{landscape}
+\begin{table}[H]
+\caption{Результаты работы барьерного метода}
+\label{bm-result-table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline
+Точность & Шаги & $x$ & $f(x)$ & $f_i(x) - f_{i - 1}(x)$ & $\nabla f(x)$ & $g_1(x)$ &  $g_2(x)$ \\
+\hline
+%TODO: Formatting.
+\input{data/ne_points.tex} % TODO: Correct file name.
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+\end{landscape}
+
+%\section{Возможные дополнительные исследования}
+%\section{Обоснование достоверности полученного результата}
+
+\end{document}

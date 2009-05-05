@@ -236,10 +236,6 @@ namespace barrier_method
     std::vector<limit_func_grad_type> gGrad(gGradBegin, gGradEnd);
     
     BOOST_ASSERT(g.size() == gGrad.size());
-    
-    // Asserting that start point lies inside of admissible points set.
-    //BOOST_ASSERT(std::find_if(g.begin(), g.end(), 
-    //                          boost::bind<bool>(std::less<scalar_type>(0, boost::bind(boost::_1, startPoint)))) == g.end());
     BOOST_ASSERT(beta > 0 && beta < 1);
     
     // Building additional function and it's gradient.

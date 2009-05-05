@@ -1,0 +1,1 @@
+/home/bob/public/semester06/Mathematical_programming/numeric/barrier_method.hpp
