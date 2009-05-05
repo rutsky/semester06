@@ -88,7 +88,20 @@ int main()
       }
       
       for (size_t i = 0; i < points.size(); ++i)
-        numeric::output_vector_coordinates<std::ofstream, vector_type>(*ofs, points[i].x, " ", "\n", "%1$15.8f");
+      {
+        points_debug_info_type const &pdi = points[i];
+        
+        numeric::output_vector_coordinates<std::ofstream, vector_type>(*ofs, pdi.x, " ", "\n", "%1$15.8f");
+        
+        std::cout << 
+            i << " " << 
+            boost::format("%1$15.8f") % (pdi.mu) << " " <<
+            boost::format("%1$15.8f") % (pdi.x) << " " <<
+            boost::format("%1$15.8f") % (pdi.fx) << " " <<
+            boost::format("%1$15.8f") % (pdi.Bx) << " " <<
+            boost::format("%1$15.8f") % (pdi.fx + pdi.mu * pdi.Bx) << " " <<
+            boost::format("%1$15.8f") % (pdi.mu * pdi.Bx) << std::endl;
+      }
     }
     
     if (points.begin() != points.end())
