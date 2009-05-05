@@ -34,6 +34,8 @@ int main()
   typedef scalar_type (*function_type            )( vector_type const & );
   typedef vector_type (*function_grad_type       )( vector_type const & );
   typedef matrix_type (*function_inv_hessian_type)( vector_type const & );
+  
+  typedef numeric::barrier_method::PointDebugInfo<scalar_type> points_debug_info_type;
     
   function_type             const f                  = &function::function<vector_type>;
   function_grad_type        const df                 = &function::functionGrad<vector_type>;
@@ -46,13 +48,13 @@ int main()
   scalar_type const startMu = function::startMu;
   scalar_type const beta    = function::beta;
   
-  std::vector<function_type>      constrains;
-  std::vector<function_grad_type> constrainsGrads;
+  std::vector<function_type>      constraints;
+  std::vector<function_grad_type> constraintsGrads;
   
-  constrains.     push_back(&function::limitFunc1<scalar_type>);
-  constrains.     push_back(&function::limitFunc2<scalar_type>);
-  constrainsGrads.push_back(&function::limitFuncGrad1<scalar_type>);
-  constrainsGrads.push_back(&function::limitFuncGrad2<scalar_type>);
+  constraints.     push_back(&function::limitFunc1<scalar_type>);
+  constraints.     push_back(&function::limitFunc2<scalar_type>);
+  constraintsGrads.push_back(&function::limitFuncGrad1<scalar_type>);
+  constraintsGrads.push_back(&function::limitFuncGrad2<scalar_type>);
 
   // TODO: Separate this constants.
   scalar_type               const gradientDescentPrecision = 1e-5;
@@ -63,13 +65,13 @@ int main()
     // Barrier method.
     //
     
-    std::vector<vector_type> points;
+    std::vector<points_debug_info_type> points;
     
     vector_type const xMin = numeric::barrier_method::find_min
                                  <function_type, function_grad_type, scalar_type>(
                                     f, df, 
-                                    constrains.begin(),      constrains.end(), 
-                                    constrainsGrads.begin(), constrainsGrads.end(),
+                                    constraints.begin(),      constraints.end(), 
+                                    constraintsGrads.begin(), constraintsGrads.end(),
                                     startPoint, 
                                     startMu, beta,
                                     preferredPrecision, 
@@ -85,9 +87,8 @@ int main()
         return 1;
       }
       
-      std::for_each(points.begin(), points.end(), 
-                    boost::bind<void>(&numeric::output_vector_coordinates<std::ofstream, vector_type>, 
-                                      boost::ref(*ofs), _1, " ", "\n", "%1$15.8f"));
+      for (size_t i = 0; i < points.size(); ++i)
+        numeric::output_vector_coordinates<std::ofstream, vector_type>(*ofs, points[i].x, " ", "\n", "%1$15.8f");
     }
     
     if (points.begin() != points.end())
@@ -103,8 +104,9 @@ int main()
       
       *ofs << "set cntrparam levels discrete ";
       
-      std::transform(++points.begin(), points.end(), std::ostream_iterator<double>(*ofs, ","), f);
-      *ofs << f(*points.begin());
+      for (size_t i = 1; i < points.size(); ++i)
+        *ofs << points[i].fx << ",";
+      *ofs << points[0].fx;
       *ofs << std::endl;
     }
   }
@@ -125,17 +127,18 @@ int main()
     {
       scalar_type const precision = function::precisions[p];
       
-      std::vector<vector_type> points;
+      std::vector<points_debug_info_type> points;
       vector_type const xMin = numeric::barrier_method::find_min
                                  <function_type, function_grad_type, scalar_type>(
                                     f, df, 
-                                    constrains.begin(),      constrains.end(), 
-                                    constrainsGrads.begin(), constrainsGrads.end(),
+                                    constraints.begin(),      constraints.end(), 
+                                    constraintsGrads.begin(), constraintsGrads.end(),
                                     startPoint, 
                                     startMu, beta,
                                     precision, 
                                     gradientDescentPrecision, gradientDescentStep, std::back_inserter(points));
       
+      // Outputting: precision, number of iterations, xMin, f(xMin), f(xMin) - f(xPrevMin), grad f, g1(xMin), g2(xMin).
       *ofs << boost::format("%1$1.0e") % precision << " & " << points.size() << " & (";
       numeric::output_vector_coordinates(*ofs, xMin, ", ", "");
       *ofs << ") & ";
@@ -153,6 +156,9 @@ int main()
       *ofs << " & (";
       numeric::output_vector_coordinates(*ofs, curGrad, ", ", "", "%1e");
       *ofs << ")";
+      
+      *ofs << " & " << constraints[0](xMin);
+      *ofs << " & " << constraints[1](xMin);
 
       *ofs << " \\\\\n";
     }

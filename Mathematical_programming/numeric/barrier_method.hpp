@@ -56,7 +56,7 @@ namespace barrier_method
         
         result += function_(x);
         for (size_t i = 0; i < limitFunctions_.size(); ++i)
-          result += mu * -1.0 / limitFunctions_[i](x);
+          result += -mu / limitFunctions_[i](x);
           
         return result;
       }
@@ -100,8 +100,8 @@ namespace barrier_method
         
         for (size_t i = 0; i < limitFunctions_.size(); ++i)
         {
-          scalar_type const &fx     = limitFunctions_     [i](x);
-          vector_type const &fgradx = limitFunctionsGrads_[i](x);
+          scalar_type const fx     = limitFunctions_     [i](x);
+          vector_type const fgradx = limitFunctionsGrads_[i](x);
           
           for (size_t r = 0; r < x.size(); ++r)
             result[r] += mu / sqr(fx) * fgradx[r];
@@ -149,6 +149,28 @@ namespace barrier_method
       limit_functions_vec_type limitFunctions_;
     };
   } // End of anonymous namespace
+  
+  template< class S >
+  struct PointDebugInfo
+  {
+    typedef S                   scalar_type;
+    typedef vector<scalar_type> vector_type;
+    
+    PointDebugInfo()
+    {}
+    
+    PointDebugInfo( vector_type const &newx, scalar_type newmu, scalar_type newfx, scalar_type newBx )
+      : x (newx)
+      , mu(newmu)
+      , fx(newfx)
+      , Bx(newBx)
+    {}
+        
+    vector_type x;
+    scalar_type mu;
+    scalar_type fx;
+    scalar_type Bx;
+  };
   
   // TODO: Habdle more end cases, not all problems input have solutions.
   template< class Func, class FuncGrad, 
@@ -198,18 +220,20 @@ namespace barrier_method
     typedef AdditionalFunction        <scalar_type>     additional_function_type;
     typedef AdditionalFunctionGradient<scalar_type>     additional_function_gradient_type;
     typedef ConstrainPredicate<scalar_type>             constrain_predicate_type;
+    typedef PointDebugInfo<scalar_type>                 points_debug_info_type;
     
-    additional_function_type          additionalFunc    (function,     gBegin,     gEnd);
-    additional_function_gradient_type additionalFuncGrad(functionGrad, gBegin,     gEnd, gGradBegin, gGradEnd);
+    additional_function_type          additionalFunc    (function,     gBegin, gEnd);
+    additional_function_gradient_type additionalFuncGrad(functionGrad, gBegin, gEnd, gGradBegin, gGradEnd);
     constrain_predicate_type          constrainPred     (gBegin, gEnd);
     
     // Initializing
     vector_type x  = startPoint;
     scalar_type mu = startMu;
     
-    BOOST_ASSERT(constrainPred(x));
+    BOOST_ASSERT(constrainPred(x)); // TODO: Rename `constrain' by `constraint'.
     
-    *pointsOut++ = x;
+    points_debug_info_type pdi(x, mu, function(x), additionalFunc(mu, x) - function(x));
+    *pointsOut++ = pdi;
     
     size_t iterations = 0;
     while (true)
@@ -226,8 +250,10 @@ namespace barrier_method
                gradientDescentPrecision, gradientDescentStep, 
                constrainPred, DummyOutputIterator());
 
-      *pointsOut++ = newx;
+      points_debug_info_type pdi(newx, mu, function(newx), currFunc(newx) - function(newx));
+      *pointsOut++ = pdi;
       
+      // mu_k * B(x_k+1) < epsilon
       if (currFunc(newx) - function(newx) < epsilon)
       {
         // Required precision reached.

@@ -18,7 +18,7 @@ namespace function
   namespace ublas = boost::numeric::ublas;
 
   double const preferredPrecision = 1e-3;
-  double const precisions[]       = { 1e-1, 1e-2, 1e-3 };
+  double const precisions[]       = { 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9 };
   double const step               = 30; // TODO: what is this?
   
   // Minimum search start point (admissible point).
@@ -26,7 +26,7 @@ namespace function
   double const startY    = -20;
   
   // Barrier method specific.
-  double const startMu = 1000;
+  double const startMu = 1e6;
   double const beta    = 0.1;
 
   // Warning! Functions are not inline! :(
