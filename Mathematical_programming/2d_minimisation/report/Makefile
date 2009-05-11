@@ -3,20 +3,22 @@
 # Vladimir Rutsky <altsysrq@gmail.com>
 # 22.03.2009
 
-SOURCE  = 2d_minimisation
+SOURCES = 2d_minimisation 2d_minimisation_newton
 DEPENDENCY = data/*
 TEX2PDF = pdflatex
 
-all: $(SOURCE).pdf
+PDF_TARGETS := $(foreach A,$(SOURCES),$(A).pdf)
 
-$(SOURCE).pdf: $(SOURCE).tex $(DEPENDENCY)
-	$(TEX2PDF) $(SOURCE).tex
+pdf: $(PDF_TARGETS)
+
+all: pdf
+
+%.pdf: %.tex $(DEPENDENCY)
+	$(TEX2PDF) $(basename $@).tex
 
 clean:
 	rm -f *~
-	rm -f *.aux
-	rm -f *.dvi
-	rm -f $(SOURCE).log
+	rm -f $(foreach A,$(SOURCES),$(A).aux $(A).dvi $(A).tex.backup $(A).log)
 
 distclean: clean
-	rm -f $(SOURCE).pdf
+	rm -f $(PDF_TARGETS)
