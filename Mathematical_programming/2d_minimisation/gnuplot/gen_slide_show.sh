@@ -14,3 +14,6 @@ for i in `seq 0 $(($nFiles - 1))`; do
   
   sleep 1
 done
+
+rm output/gen_selected_points.dat
+rm output/gen_not_selected_points.dat
