@@ -1,0 +1,291 @@
+% 2d_minimisation_2.tex
+% Report on 2d minimisations algorithms (Newton method).
+% Vladimir Rutsky <altsysrq@gmail.com>
+% 21.04.2009
+
+\documentclass[10pt,a4paper,titlepage]{article}
+
+% Spaces after commas.
+\frenchspacing
+% Minimal carrying number of characters,
+\righthyphenmin=2
+
+% Encoding support.
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+
+\usepackage{amsmath, amsthm, amssymb}
+
+% From K.V.Voroncov Latex in samples, 2005.
+\textheight=24cm   % Text height.
+\textwidth=16cm    % Text width
+\oddsidemargin=0pt % Left side indention.
+\topmargin=-1.5cm  % Top side indention.
+\parindent=24pt    % Paragraph indent.
+\parskip=0pt       % Distance between paragraphs.
+\tolerance=2000
+%\flushbottom       % Page height aligning.
+
+% Algorithms stuff.
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\newcommand{\INPUT}{\textbf{Вход:~}}
+\newcommand{\OUTPUT}{\textbf{Выход:~}}
+\floatname{algorithm}{Алгоритм}
+\renewcommand{\algorithmicrepeat}{\textbf{do}}
+\renewcommand{\algorithmicuntil}{\textbf{while}}
+
+% Images.
+%\usepackage[pdftex]{graphicx}
+
+% Drawing figures.
+\usepackage{subfig}
+
+% Drawing graphs.
+\usepackage{tikz}
+\usetikzlibrary{trees,positioning,arrows}
+
+% For listings.
+\usepackage{listings}
+
+% Transpose symbol in math mode.
+\newcommand\T{^\mathrm{\textsf{\tiny{T}}}}
+% Real number space.
+\newcommand\RR{\mathbb{R}}
+
+% Source code listings.
+\renewcommand{\lstlistingname}{Исходный код}
+
+
+\title{Решение задачи многомерной минимизации функции \\ Метод Ньютона}
+\author{Владимир Руцкий, 3057/2}
+\date{} % cheat ;)
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+% Content.
+\section{Постановка задачи}
+Требуется найти с наперёд заданной точностью точку, в которой достигается минимум (локальный) многомерной функции $f(x)$ 
+в некоторой области:
+$$ \min f(x), \quad x \in \RR^n, $$
+используя \textit{метод Ньютона}.
+
+Исходная функция: $f(x) = \input{data/function},$ заданная на $\RR^2.$ %TODO: Dimension specified directly.
+
+\section{Исследование применимости метода Ньютона}
+Исходная функция непрерывно дифференцируема:
+$$
+  \frac{\partial f}{\partial x_1} = \input{data/function_dx1},
+$$
+$$
+  \frac{\partial f}{\partial x_2} = \input{data/function_dx2}.
+$$
+
+Функция не является ни выпуклой, ни ограниченной на $\RR^2$, значит следует искать локальный минимум в некоторой области.
+
+Построив график функции, можно попытаться найти достаточно близкую к локальному минимуму область, 
+на которой функция будет выпуклой.
+% \DeclareGraphicsRule{.pdftex}{pdf}{.pdftex}{}
+% \includegraphics{data/function_graph.pdf}
+\begin{figure}[h]
+  \label{function-graph}
+  %\caption{График функции $f(x) = \input{data/function}$}
+  \caption{График функции $f(x)$}
+  \begin{center}
+  \input{data/function_graph}
+  \end{center}
+\end{figure}
+
+Из графика видно, что минимум достигается близко к точке $(0, -1)$, будем исследовать функцию в окрестности этой точки.
+
+Функция в исследуемой области не имеет особенных точек, ограничена и гладка, 
+что предраспологает к выполнению условия условия Липшица:
+% TODO: Это не условие Липшица, а R это не коэффицент Липшица, см. Википедию.
+$$
+  \exists R \in \RR: \quad \left|\left| \nabla f(x) - \nabla f(y) \right|\right| \leqslant R || x - y ||, \forall x, y \in \RR^n,
+$$
+Константа Липшица $R$ была вычислена численно для дискретного набора точек из сетки 
+$[-0.9; 2] \times [-3; 1]$ с шагом $0.01,$ %TODO
+и оказалась равной примерно $15.8.$ %TODO
+Cледовательно итерационный процесс градиентного спуска будет сходиться.
+
+\subsection{Генетический алгоритм}
+Генетический алгоритм применим для поиска минимума выпуклой функции, 
+а значит его можно использовать на области близкой к локальному минимуму функции, 
+там где функция выпукла.
+
+\section{Описание алгоритма}
+\subsection{Метод градиентного спуска}
+
+\textit{Метод градиентного спуска} основывается на том, что для гладкой выпуклой функции градиент функции в точке направлен
+в сторону увеличения функции (в некоторой окрестности).
+Используя этот факт строится итерационный процесс приближения рассматриваемых точек области определения 
+к точке минимума.
+
+Выбирается начальное приближение минимума, далее строится последовательность точек,
+в которой каждая следующая точка выбирается на антиградиенте (луче, противоположном градиенту) в текущей точке:
+$$ x_{k+1} = x_k - \lambda_k \nabla f(x_k), \quad \lambda_k > 0 $$
+
+Шаг, на который ``двигается'' текущая точка за одну итерацию, выбирается следующим образом:
+$$
+  \lambda_k \in (0, q)\!: 
+    \quad f(x_k - \lambda_k \nabla f(x_k)) = \min\limits_{0 < \lambda < q} f(x_k - \lambda \nabla f(x_k)),
+$$
+значение $\lambda_k$ ищется \textit{методом золотого сечения}.
+
+Константа $q$ задаёт интервал поиска минимума на антиградиенте.
+
+Условием остановки итерационного процесса является событие, когда следующая точка находится от предыдущей 
+на расстоянии меньшим $\varepsilon$:
+$$ || x_{k+1} - x_k || < \varepsilon. $$ % TODO: Module symbol.
+% TODO: Критерий остановки по малой величине градиента.
+
+%TODO!: Псевдокод алгоритма.
+
+\subsection{Генетический алгоритм}
+Суть \textit{генетического алгоритма} для поиска минимума состоит в моделировании процесса биологической эволюции таким образом, 
+что в качестве наиболее приспособленных особей выступают объекты, соответствующие минимуму функции.
+
+Точки области определения функции $f$ выступают в роли особей. 
+Первоначальная популяция выбирается как набор произвольных точек в исследуемой области определения функции.
+
+Каждая итерация работы алгоритма~--- это смена поколения. 
+Смена поколения определяется трёмя процессами:
+\begin{itemize}
+  \item Отбор. 
+  
+    Из текущей популяции выбираются наиболее приспособленные.
+    В качестве функции приспособленности выступает $f$: особь (точка) $x$ более приспособлена чем $y$, 
+    если $f(x) < f(y)$.
+  
+    Отобранная, более приспособленная часть текущего поколения, перейдёт в следующее поколение.
+  \item Размножение. 
+  
+    Особи популяции в произвольном порядке скрещиваются друг с другом.
+    Скрещивание особей (точек) $x_1,$ $x_2$ порождает третью точку $y = \lambda x_1 + (1 - \lambda) x_2,$
+    где $\lambda$ выбирается произвольным образом из отрезка $[0, 1]$.
+    
+    Такое скрещивание обеспечивает в некоторой степени передачу потомству признаков родителей: 
+    положения в пространстве.
+    
+  \item Мутация.
+  
+    В свойства потомков текущей популяции вносятся хаотические изменения, 
+    это обеспечивает стабильное разнообразие каждой новой популяции.
+    
+    Мутация реализована как смещение особи (точки) на некоторый произвольный вектор:
+    $y_{\textrm{mutated}} = y + \textrm{RandomVector}(||x_1 - x_2||).$ 
+    Модуль произвольного вектора линейно связан с расстоянием между родителями особи.
+\end{itemize}
+
+В результате новое поколение будет составлено из отобранных особей и мутировавших детей текущего поколения. 
+Количество особей в поколении постоянно, недостающие в результате отбора особи выбираются из потомства.
+
+Условием выхода из алгоритма является событие, что наиболее приспособленная особь (точка) на протяжении нескольких последних
+поколений не меняется больше чем на $\varepsilon$: $||x_i - x_{i-1}|| < \varepsilon$.
+
+\section{Код программы}
+\subsection{Метод градиентного спуска}
+\lstset{language=C++, caption=Градиентный спуск,%
+label=gd-source-code, basicstyle=\footnotesize,%
+numbers=left, numberstyle=\footnotesize, numbersep=5pt, frame=single, breaklines=true, breakatwhitespace=false,%
+inputencoding=utf8x}
+\lstinputlisting{data/gradient_descent.hpp}
+
+\subsection{Генетический алгоритм}
+\lstset{language=C++, caption=Генетический алгоритм,%
+label=gen-source-code, basicstyle=\footnotesize,%
+numbers=left, numberstyle=\footnotesize, numbersep=5pt, frame=single, breaklines=true, breakatwhitespace=false,%
+inputencoding=utf8x}
+\lstinputlisting{data/genetic.hpp}
+
+\section{Результаты решения}
+\subsection{Метод градиентного спуска}
+Результаты решения приведены в таблице \ref{gd-result-table}.
+
+%TODO: spaces!
+Начальной точкой была выбрана точка \input{data/gd_start_point.tex}\!, % TODO: \!
+шаг для поиска минимума методом золотого сечения был равен \input{data/gd_step.tex}\!. % TODO: \!
+% TODO: Рисунок с шагами.
+
+\begin{table}[H]
+\caption{Результаты работы алгоритма градиентного спуска}
+\label{gd-result-table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Точность & Шаги & $x$ & $f(x)$ & $f_i(x) - f_{i - 1}(x)$ & $\nabla f(x)$\\
+\hline
+%TODO: Formatting.
+\input{data/gd_result.tex}
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\subsection{Генетический алгоритм}
+Результаты решения приведены в таблице \ref{gen-result-table}.
+
+%TODO: Numbers!
+%TODO: 'x'
+Популяция состояла из 1000 особей, первоначально расположенных в прямоугольнике $[-0.9; 2] \times [-3; 1].$
+80\% особей отбирались и оставались в популяции.
+
+\begin{table}[H]
+\caption{Результаты работы генетического алгоритма}
+\label{gen-result-table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Точность* & Шаги & $x$ & $f(x)$ & $f_i(x) - f_{i - 1}(x)$ & $\nabla f(x)$ \\
+\hline
+%TODO: Formatting.
+\input{data/gen_result.tex}
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\section{Возможные дополнительные исследования}
+\subsection{Метод градиентного спуска}
+Найденная методом золотого сечения следующая точка на антиградиете $x_{k+1}$:
+$$
+  \lambda_k \in (0, q)\!:
+    \quad f(x_k - \lambda_k \nabla f(x_k)) = \min\limits_{0 < \lambda < q} f(x_k - \lambda \nabla f(x_k)),
+$$
+$$
+  x_{k+1} = x_k - \lambda_k \nabla f(x_k),
+$$
+является минимумом $\psi(v) = f(x_k - v \nabla f(x_k)), v \in (0, q).$
+Если $\lambda_k$ лежит сильно внутри $[0, q]$ 
+(возможен случай, когда $\lambda_k$ стремиться к $q$, если итерационный шаг недостаточно велик), 
+то из условия минимальности следует, что 
+$0 = f'(\lambda_k) = \frac{\left( \nabla f(x_{k+1}), \nabla f(x_{k}) \right) }{|| \nabla f(x_{k}) ||},$
+т.\,е.~величина проекции градиента $f$ в $x_{k+1}$ на линию антиградиента равна нулю. 
+Из этого следует, что, при достаточной длине шага, 
+у каждого отрезка $[x_k, x_{k+1}]$ 
+начало $x_k$ будет перпендикулярно силовой линии, проходящей через $x_k$, 
+а конец будет лежать на касательной к силовой линии, проходящей через $x_{k+1}$.
+
+Данная особенность слабо проявляется на исследуемой функции, т.к. был выбран достаточно малый шаг и большая часть 
+$x_{k+1}$ соответствует краям отрезков антиградиента.
+
+%\subsection{Генетический алгоритм}
+%FIXME:
+
+\section{Обоснование достоверности полученного результата}
+\subsection{Метод градиентного спуска}
+Градиент исходной функции (его норма), в полученном с точностью $\varepsilon$ решении, обращается в ноль с некоторой точностью, 
+пропорциональной $\varepsilon$, что является достаточным условием для минимума выпуклой функции.
+
+\subsection{Генетический алгоритм}
+Полученные результаты работы генетического алгоритма близки к результатам, полученным методом градиентного спуска, 
+но менее точны, ввиду большого числа случайных факторов, использовавшихся в алгоритме.
+
+\end{document}
