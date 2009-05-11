@@ -1,1 +1,4 @@
  * Upgrade all referencies to qt-creator 1.0.0 since we are using now 1.1.0
+ * Configure precompiled header files.
+ * Use better common interface for stating consideration function.
+ * Rename modules.
