@@ -1,0 +1,7 @@
+# Ignoring generate firmware version number.
+.fw_version
+# Ignoring firmware binary.
+FW_UB890.rom
+FW_UB890_1.15.rom
+FW_UB890_1.15.rom.disasm
+FontData.FNT
