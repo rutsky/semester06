@@ -14,4 +14,7 @@ HEADERS = combination.hpp \
     genetic.hpp \
     newton.hpp \
     lipschitz_constant.hpp \
-    barrier_method.hpp
+    barrier_method.hpp \
+    linear_problem.hpp \
+    kelley_cutting_plane.hpp
+linear_problem.hppkelley_cutting_plane.hpp

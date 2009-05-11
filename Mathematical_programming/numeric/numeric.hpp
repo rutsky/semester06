@@ -21,5 +21,7 @@
 #include "newton.hpp"
 #include "lipschitz_constant.hpp"
 #include "barrier_method.hpp"
+#include "linear_problem.hpp"
+#include "kelley_cutting_plane.hpp"
 
 #endif // NUMERIC_NUMERIC_HPP
