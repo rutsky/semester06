@@ -148,7 +148,7 @@ int main()
       {
         points_debug_info_type const &pdi = points[i];
         
-        *ofs << i << " & ";
+        *ofs << i + 1 << " & ";
         numeric::output_vector_coordinates(*ofs, pdi.x, ", ", " & ", "%1$15.8f");
         *ofs << boost::format("%1$15.8f") % (pdi.fx) << " & ";
         *ofs << boost::format("%1$15.8f") % (pdi.mu) << " & ";
