@@ -93,6 +93,22 @@ inputencoding=utf8x}
 % TODO: Рисунок с шагами.
 
 \begin{landscape}
+
+\begin{table}[H]
+\caption{Детальная работа алгоритма при точности $10^{-3}$}%TODO: Precision specified directly!
+\label{bm-detailed-result-table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline
+k & $x_k$ & $f(x_k)$ & $\mu_k$ & $B(x_k)$ & $\mu_k B(x_k)$ & $\theta(x_k)$ \\
+\hline
+%TODO: Formatting.
+\input{data/bm_points.tex} % TODO: Correct file name.
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
 \begin{table}[H]
 \caption{Результаты работы барьерного метода}
 \label{bm-result-table}
@@ -107,6 +123,7 @@ inputencoding=utf8x}
 \end{tabular}
 \end{center}
 \end{table}
+
 \end{landscape}
 
 %\section{Возможные дополнительные исследования}
