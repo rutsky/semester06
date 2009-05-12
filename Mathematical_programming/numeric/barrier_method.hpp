@@ -221,6 +221,8 @@ namespace barrier_method
     typedef ublas::scalar_traits<scalar_type> scalar_traits_type;
     
     // TODO: Check for iterators concept assert.
+    // Note: Input should be accurate so, that start point must be admissible not only for input function but for
+    //   additional function too.
     
     typedef typename LimitFuncIterator::value_type     limit_func_type;
     typedef typename LimitFuncGradIterator::value_type limit_func_grad_type;
@@ -256,12 +258,16 @@ namespace barrier_method
     
     BOOST_ASSERT(constrainPred(x)); // TODO: Rename `constrain' by `constraint'.
     
-    points_debug_info_type pdi(x, mu / beta, function(x), additionalFunc(mu / beta, x) - function(x));
+    mu /= beta;
+    points_debug_info_type pdi(x, mu, function(x), (additionalFunc(mu, x) - function(x)) / mu);
+    mu *= beta;
     *pointsOut++ = pdi;
     
     size_t iterations = 0;
     while (true)
     {
+      // Additional function: f(x) + mu * Summ(-1 / g_i(x))
+      
       function_type          currFunc     = boost::bind<scalar_type>(additionalFunc,     mu, _1);
       function_gradient_type currFuncGrad = boost::bind<vector_type>(additionalFuncGrad, mu, _1);
       
@@ -274,11 +280,14 @@ namespace barrier_method
                gradientDescentPrecision, gradientDescentStep, 
                constrainPred, DummyOutputIterator());
 
-      points_debug_info_type pdi(newx, mu, function(newx), currFunc(newx) - function(newx));
+      scalar_type const muBx = currFunc(newx) - function(newx);
+      scalar_type const Bx = muBx / mu;
+      points_debug_info_type pdi(newx, mu, function(newx), Bx);
       *pointsOut++ = pdi;
       
       // mu_k * B(x_k+1) < epsilon
-      if (currFunc(newx) - function(newx) < epsilon)
+      BOOST_ASSERT(muBx >= 0);
+      if (muBx < epsilon)
       {
         // Required precision reached.
         return newx;
