@@ -25,6 +25,14 @@ namespace function
   double const startX    = -20;
   double const startY    = -20;
   
+  // Lipschitz constant.
+  double const lipschitzStepX = 1e-3;
+  double const lipschitzStepY = 1e-3;
+  double const loLipschitzX = -30;
+  double const loLipschitzY = -30;
+  double const hiLipschitzX =  30;
+  double const hiLipschitzY =  30;
+  
   // Barrier method specific.
   double const startMu = 1e6;
   double const beta    = 0.1;

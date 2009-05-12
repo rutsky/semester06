@@ -256,7 +256,7 @@ namespace barrier_method
     
     BOOST_ASSERT(constrainPred(x)); // TODO: Rename `constrain' by `constraint'.
     
-    points_debug_info_type pdi(x, mu, function(x), additionalFunc(mu, x) - function(x));
+    points_debug_info_type pdi(x, mu / beta, function(x), additionalFunc(mu / beta, x) - function(x));
     *pointsOut++ = pdi;
     
     size_t iterations = 0;
