@@ -80,7 +80,7 @@ namespace numeric
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<Vector>));
     BOOST_ASSERT(v.size() > 0);
     
-    ostr << v(0);
+    ostr << boost::format(format) % v(0);
     for (size_t r = 1; r < v.size(); ++r)
     {
       ostr << delimiter;
