@@ -130,7 +130,7 @@ namespace barrier_method
           {
             // Division by zero.
             // TODO: Break loop and leave value infinite.
-            result = scalar_vector_type(inf);
+            return scalar_vector_type(x.size(), inf);
           }
           else
           {

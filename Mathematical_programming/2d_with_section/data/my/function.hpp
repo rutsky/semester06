@@ -18,7 +18,7 @@ namespace function
   namespace ublas = boost::numeric::ublas;
 
   double const preferredPrecision = 1e-3;
-  double const precisions[]       = { 1e-1, 1e-2, 1e-3, 1e-4 };
+  double const precisions[]       = { 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6 };
   double const step               = 30; // TODO: what is this?
   
   // Minimum search start point (admissible point).

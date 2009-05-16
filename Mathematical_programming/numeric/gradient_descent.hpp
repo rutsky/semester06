@@ -28,8 +28,10 @@ namespace gradient_descent
   {
     gd_close_point = 0,     // Ok, next point founded by one dimension minimisation is almost old point.
     gd_zero_gradient,       // Ok, found point with almost zero gradient.
+    gd_step_too_small,      // Ok, step decreased to value smaller than precision.
     gd_too_many_iterations, // Debug failure, iterations numer excided predefined number.
     gd_inf_gradient,        // Failure, in some point function gradient is infinite, algorithm interrupted.
+    gd_inf_function,        // Failure, function value is infimum.
   };
   
   template< class Func, class FuncGrad, class V, class ConstrainPredicate, class PointsOut >
@@ -45,6 +47,7 @@ namespace gradient_descent
   {
     // TODO: Now we assume that vector's coordinates and function values are same scalar types.
     // TODO: Assert on correctness of `pointsOut'.
+    // TODO: On each iteration something is stored in some container.
     
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V>));
 
@@ -79,7 +82,11 @@ namespace gradient_descent
       
       // TODO: Use normal constants.
       scalar_type const inf = 1e8;
-      if (gradNorm > inf)
+      // FIXME: Very tricky!
+      scalar_type const gradInfNorm = ublas::norm_inf(grad);
+      //std::cout << "grad=" << grad << std::endl;
+      //std::cout << "infNorm(grad)=" << gradInfNorm << std::endl;
+      if (gradInfNorm >= inf / 2)
       {
         // Infinite gradient. Thats bad. Really bad.
         result = x;
@@ -89,21 +96,22 @@ namespace gradient_descent
       vector_type const dir = -grad / gradNorm;
       BOOST_ASSERT(scalar_traits_type::equals(ublas::norm_2(dir), 1));
       
-      scalar_type currStep = step;
       vector_type nextX;
       do
       {
         vector_type const s0 = x;
-        vector_type const s1 = s0 + dir * currStep;
+        vector_type const s1 = s0 + dir * step;
         
+        //std::cout << "golden start" << std::endl; // debug
         typedef boost::function<scalar_type ( scalar_type )> function_bind_type;
         function_bind_type functionBind = 
             boost::bind<scalar_type>(function, boost::bind<vector_type>(Lerp<scalar_type, vector_type>(0.0, 1.0, s0, s1), _1));
         scalar_type const section = 
-            golden_section::find_min<function_bind_type, scalar_type>(functionBind, 0.0, 1.0, precision / currStep);
+            golden_section::find_min<function_bind_type, scalar_type>(functionBind, 0.0, 1.0, precision / step);
         BOOST_ASSERT(0 <= section && section <= 1);
+        //std::cout << "golden end" << std::endl; // debug
         
-        nextX = s0 + dir * currStep * section;
+        nextX = s0 + dir * step * section;
         if (ublas::norm_2(x - nextX) < precision)
         {
           // Next point is equal to current (with precision and constrain), seems found minimum.
@@ -112,8 +120,26 @@ namespace gradient_descent
           return gd_close_point;
         }
         
-        // Decreasing search step.
-        currStep /= 2.;
+        //std::cout << "nextX=" << nextX << std::endl; // debug
+        
+        // TODO: Use normal constants.
+        // FIXME: Tricky place!
+        if (abs(function(nextX)) >= inf / 2)
+        {
+          result = x;
+          return gd_inf_function;
+        }
+        
+        // Decreasing search step if point is not admissible.
+        if (!constrainPred(nextX)) // TODO: Do not rerund constrain predicate for same point.
+          step /= 2.;
+        
+        if (step <= precision)
+        {
+          result = x;
+          std::cout << "gd_step_too_small: " << x << ", step=" << step << ", prec=" << precision << std::endl; // debug
+          return gd_step_too_small;
+        }
       } while (!constrainPred(nextX));
 
       // Moving to next point.

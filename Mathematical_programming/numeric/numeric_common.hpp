@@ -175,12 +175,13 @@ namespace numeric
   
   struct CountingOutputIterator
   {
-    CountingOutputIterator()
-      : counter_(0)
+    // TODO: This is freaky.
+    CountingOutputIterator( size_t &counter )
+      : counter_(counter)
     {}
     
-    CountingOutputIterator( CountingOutputIterator const & )
-      : counter_(0)
+    CountingOutputIterator( CountingOutputIterator const &x )
+      : counter_(x.counter_)
     {}
     
     size_t count() const { return counter_; }
@@ -198,7 +199,7 @@ namespace numeric
     CountingOutputIterator       & operator ++ ( int )       { return *this; }
     
   private:
-    size_t counter_;
+    size_t &counter_;
   };
   
   // TODO: There must be better ways than implementing own class.

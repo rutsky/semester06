@@ -195,7 +195,8 @@ int main()
     {
       scalar_type const precision = function::precisions[p];
       
-      numeric::CountingOutputIterator outputIterator;
+      size_t nPoints(0);
+      numeric::CountingOutputIterator outputIterator(nPoints);
       vector_type const xMin = numeric::barrier_method::find_min
                                  <function_type, function_grad_type, scalar_type>(
                                     f, df, 
@@ -207,7 +208,7 @@ int main()
                                     gradientDescentPrecision, gradientDescentStep, outputIterator);
       
       // Outputting: precision, number of iterations, xMin, f(xMin), f(xMin) - f(xPrevMin), grad f, g1(xMin), g2(xMin).
-      *ofs << boost::format("%1$1.0e") % precision << " & " << outputIterator.count() << " & (";
+      *ofs << boost::format("%1$1.0e") % precision << " & " << nPoints << " & (";
       numeric::output_vector_coordinates(*ofs, xMin, ", ", "");
       *ofs << ") & ";
       
