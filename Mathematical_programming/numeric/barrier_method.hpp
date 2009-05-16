@@ -55,6 +55,7 @@ namespace barrier_method
         scalar_type result(0.0);
         
         result += function_(x);
+        //std::cout << "  F (" << x << ") = " << result << " + ";// debug
         for (size_t i = 0; i < limitFunctions_.size(); ++i)
         {
           scalar_type const denominator = limitFunctions_[i](x);
@@ -65,13 +66,16 @@ namespace barrier_method
           if (abs(denominator) < eps)
           {
             // Division by zero.
+            // TODO: Break loop and leave value infinite.
             result = inf;
           }
           else
           {
             result += -mu / denominator;
           }
+          //std::cout << -mu / denominator << " + ";// debug
         }
+        //std::cout << " == " << result << std::endl;// debug
           
         return result;
       }
@@ -91,6 +95,7 @@ namespace barrier_method
       typedef vector<scalar_type>                                      vector_type;
       
     private:
+      typedef scalar_vector<scalar_type>                               scalar_vector_type;
       typedef boost::function<scalar_type( vector_type )>              function_type;
       typedef boost::function<vector_type( vector_type )>              function_grad_type;
       typedef std::vector<function_type>                               limit_functions_vec_type;
@@ -118,20 +123,18 @@ namespace barrier_method
           scalar_type const gx     = limitFunctions_     [i](x);
           vector_type const gGradx = limitFunctionsGrads_[i](x);
           
-          for (size_t r = 0; r < x.size(); ++r)
+          // TODO: Use normal constants.
+          scalar_type const eps = 1e-8;
+          scalar_type const inf = 1e+8;
+          if (abs(sqr(gx)) < eps)
           {
-            // TODO: Use normal constants.
-            scalar_type const eps = 1e-8;
-            scalar_type const inf = 1e+8;
-            if (abs(sqr(gx)) < eps)
-            {
-              // Division by zero.
-              result[r] = inf;
-            }
-            else
-            {
-              result[r] += mu / sqr(gx) * gGradx[r];
-            }
+            // Division by zero.
+            // TODO: Break loop and leave value infinite.
+            result = scalar_vector_type(inf);
+          }
+          else
+          {
+            result = result + (mu / sqr(gx)) * gGradx;
           }
         }
         
@@ -272,13 +275,20 @@ namespace barrier_method
       function_gradient_type currFuncGrad = boost::bind<vector_type>(additionalFuncGrad, mu, _1);
       
       // Solving additional unconstrained problem.
-      vector_type const &newx = 
+      vector_type newx;
+      gradient_descent::gradient_descent_result const result =
           gradient_descent::find_min
             <function_type, function_gradient_type, vector_type>
               (currFunc, currFuncGrad, 
                x, 
                gradientDescentPrecision, gradientDescentStep, 
+               newx,
                constrainPred, DummyOutputIterator());
+      BOOST_ASSERT(result == result); // TODO: Handle result states.
+
+      // debug
+      std::cout << iterations << ": " << newx << std::endl;
+      // end of debug
 
       scalar_type const muBx = currFunc(newx) - function(newx);
       scalar_type const Bx = muBx / mu;
@@ -302,7 +312,7 @@ namespace barrier_method
       ++iterations;
       
       // debug
-      if (iterations >= 1000)
+      if (iterations >= 100)
       {
         std::cerr << "barrier_method::find_min(): Too many iterations!\n";
         break;

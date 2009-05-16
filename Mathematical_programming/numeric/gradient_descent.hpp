@@ -23,13 +23,23 @@ namespace numeric
 {
 namespace gradient_descent
 {
+  // TODO: Implement all possible states handling.
+  enum gradient_descent_result
+  {
+    gd_close_point = 0,     // Ok, next point founded by one dimension minimisation is almost old point.
+    gd_zero_gradient,       // Ok, found point with almost zero gradient.
+    gd_too_many_iterations, // Debug failure, iterations numer excided predefined number.
+    gd_inf_gradient,        // Failure, in some point function gradient is infinite, algorithm interrupted.
+  };
+  
   template< class Func, class FuncGrad, class V, class ConstrainPredicate, class PointsOut >
   inline
-  ublas::vector<typename V::value_type> 
+  gradient_descent_result
     find_min( Func function, FuncGrad functionGrad, 
               V const &startPoint,
               typename V::value_type precision,
               typename V::value_type step,
+              V &result,
               ConstrainPredicate constrainPred,
               PointsOut          pointsOut )
   {
@@ -63,7 +73,17 @@ namespace gradient_descent
       if (scalar_traits_type::equals(gradNorm, 0))
       {
         // Function gradient is almost zero, found minimum.
-        return x;
+        result = x;
+        return gd_zero_gradient;
+      }
+      
+      // TODO: Use normal constants.
+      scalar_type const inf = 1e8;
+      if (gradNorm > inf)
+      {
+        // Infinite gradient. Thats bad. Really bad.
+        result = x;
+        return gd_inf_gradient;
       }
       
       vector_type const dir = -grad / gradNorm;
@@ -80,14 +100,16 @@ namespace gradient_descent
         function_bind_type functionBind = 
             boost::bind<scalar_type>(function, boost::bind<vector_type>(Lerp<scalar_type, vector_type>(0.0, 1.0, s0, s1), _1));
         scalar_type const section = 
-            golden_section::find_min<function_bind_type, scalar_type>(functionBind, 0.0, 1.0, precision / step);
+            golden_section::find_min<function_bind_type, scalar_type>(functionBind, 0.0, 1.0, precision / currStep);
         BOOST_ASSERT(0 <= section && section <= 1);
         
-        nextX = s0 + dir * step * section;
+        nextX = s0 + dir * currStep * section;
         if (ublas::norm_2(x - nextX) < precision)
         {
           // Next point is equal to current (with precision and constrain), seems found minimum.
-          return x;
+          //std::cout << "GD exit by constrain: " << s0 << "; " << (s1 - s0) << " ; " << grad << std::endl; // debug
+          result = x;
+          return gd_close_point;
         }
         
         // Decreasing search step.
@@ -109,7 +131,8 @@ namespace gradient_descent
       // end of debug
     }
     
-    return x;
+    result = x;
+    return gd_too_many_iterations;
   }
 } // End of namespace 'gradient_descent'.
 } // End of namespace 'numeric'.

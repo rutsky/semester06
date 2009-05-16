@@ -26,7 +26,6 @@ namespace golden_section
                    size_t *nStepsPtr = 0 )
   {
     // TODO: Now we assume that coordinates and function value are same scalar types.
-    // TODO: Assert on correctness of `ostr'.
     
     typedef Scalar scalar_type;
     
@@ -52,6 +51,7 @@ namespace golden_section
       BOOST_ASSERT(x2 < b );
 
       scalar_type const oldDist = b - a;
+      scalar_type const oldFuncMin = std::min(y1, y2);
 
       if (y1 <= y2)
       {
@@ -73,6 +73,7 @@ namespace golden_section
       // debug
       scalar_type const newDist = b - a;
       BOOST_ASSERT(oldDist > newDist); 
+      BOOST_ASSERT(oldFuncMin >= std::min(y1, y2));
       // end of debug
     
       counter++;

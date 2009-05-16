@@ -149,8 +149,8 @@ int main()
         points_debug_info_type const &pdi = points[i];
         
         *ofs << i + 1 << " & ";
-        // TODO: Space before bracket.
-        *ofs << "("; numeric::output_vector_coordinates(*ofs, pdi.x, ", ", "", "%1$15.8f"); *ofs << ") & ";
+        // TODO: There is space between brackets and numbers!
+        *ofs << "( "; numeric::output_vector_coordinates(*ofs, pdi.x, ", ", "", "%1$15.8f"); *ofs << " ) & ";
         *ofs << boost::format("%1$15.8f") % (pdi.fx) << " & ";
         *ofs << boost::format("%1$15.8f") % (pdi.mu) << " & ";
         *ofs << boost::format("%1$15.8f") % (pdi.Bx) << " & ";
@@ -195,7 +195,7 @@ int main()
     {
       scalar_type const precision = function::precisions[p];
       
-      std::vector<points_debug_info_type> points;
+      numeric::CountingOutputIterator outputIterator;
       vector_type const xMin = numeric::barrier_method::find_min
                                  <function_type, function_grad_type, scalar_type>(
                                     f, df, 
@@ -204,10 +204,10 @@ int main()
                                     startPoint, 
                                     startMu, beta,
                                     precision, 
-                                    gradientDescentPrecision, gradientDescentStep, std::back_inserter(points));
+                                    gradientDescentPrecision, gradientDescentStep, outputIterator);
       
       // Outputting: precision, number of iterations, xMin, f(xMin), f(xMin) - f(xPrevMin), grad f, g1(xMin), g2(xMin).
-      *ofs << boost::format("%1$1.0e") % precision << " & " << points.size() << " & (";
+      *ofs << boost::format("%1$1.0e") % precision << " & " << outputIterator.count() << " & (";
       numeric::output_vector_coordinates(*ofs, xMin, ", ", "");
       *ofs << ") & ";
       

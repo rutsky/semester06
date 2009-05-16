@@ -37,6 +37,7 @@ namespace numeric
   using ublas::vector;
   using ublas::vector_expression;
   using ublas::zero_vector;
+  using ublas::scalar_vector;
   
   using ublas::matrix;
   using ublas::matrix_expression;
@@ -170,6 +171,34 @@ namespace numeric
     DummyOutputIterator       & operator ++ ()            { return *this; }
     DummyOutputIterator const & operator ++ ( int ) const { return *this; }
     DummyOutputIterator       & operator ++ ( int )       { return *this; }
+  };
+  
+  struct CountingOutputIterator
+  {
+    CountingOutputIterator()
+      : counter_(0)
+    {}
+    
+    CountingOutputIterator( CountingOutputIterator const & )
+      : counter_(0)
+    {}
+    
+    size_t count() const { return counter_; }
+    
+    // FIXME! This iterator is probably not correct!
+    CountingOutputIterator const & operator *  () const { return *this; }
+    CountingOutputIterator       & operator *  ()       { return *this; }
+    
+    template< class T >
+    CountingOutputIterator       & operator =  ( T const & ) { ++counter_; return *this; }
+    
+    CountingOutputIterator const & operator ++ ()      const { return *this; }
+    CountingOutputIterator       & operator ++ ()            { return *this; }
+    CountingOutputIterator const & operator ++ ( int ) const { return *this; }
+    CountingOutputIterator       & operator ++ ( int )       { return *this; }
+    
+  private:
+    size_t counter_;
   };
   
   // TODO: There must be better ways than implementing own class.
