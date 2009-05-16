@@ -90,6 +90,7 @@ namespace gradient_descent
       {
         // Infinite gradient. Thats bad. Really bad.
         result = x;
+        std::cout << "GD exit by inf gradient: " << x << "; " << grad << std::endl; // debug
         return gd_inf_gradient;
       }
       
@@ -115,7 +116,7 @@ namespace gradient_descent
         if (ublas::norm_2(x - nextX) < precision)
         {
           // Next point is equal to current (with precision and constrain), seems found minimum.
-          //std::cout << "GD exit by constrain: " << s0 << "; " << (s1 - s0) << " ; " << grad << std::endl; // debug
+          std::cout << "GD exit by constrain: " << s0 << "; " << (s1 - s0) << " ; " << grad << std::endl; // debug
           result = x;
           return gd_close_point;
         }

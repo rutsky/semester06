@@ -61,7 +61,7 @@ namespace barrier_method
           scalar_type const denominator = limitFunctions_[i](x);
           
           // TODO: Use normal constants.
-          scalar_type const eps = 1e-8;
+          scalar_type const eps = 1e-15; // FIXME
           scalar_type const inf = 1e+8;
           if (abs(denominator) < eps)
           {
@@ -124,7 +124,7 @@ namespace barrier_method
           vector_type const gGradx = limitFunctionsGrads_[i](x);
           
           // TODO: Use normal constants.
-          scalar_type const eps = 1e-8;
+          scalar_type const eps = 1e-30; // FIXME!
           scalar_type const inf = 1e+8;
           if (abs(sqr(gx)) < eps)
           {
