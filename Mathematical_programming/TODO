@@ -2,3 +2,4 @@
  * Configure precompiled header files.
  * Use better common interface for stating consideration function.
  * Rename modules.
+ * Rewrite places that used local infimum/epsilon constant. Move constants to local traits.
