@@ -328,7 +328,10 @@ namespace simplex
           // Calculating 'd' vector.
           vector_type d(M.size());
           d = c - ublas::prod(ublas::trans(A), vector_type(ublas::prod(ublas::trans(BNk), subvector(c, Nk.begin(), Nk.end()))));
-          BOOST_ASSERT(scalar_traits_type::equals(ublas::vector_norm_inf<matrix_type>::apply(subvector(d, Nk.begin(), Nk.end())), 0.));
+          
+          // TODO: Precision.
+          //BOOST_ASSERT(scalar_traits_type::equals(ublas::vector_norm_inf<matrix_type>::apply(subvector(d, Nk.begin(), Nk.end())), 0.));
+          BOOST_ASSERT(equal_zero(ublas::vector_norm_inf<matrix_type>::apply(subvector(d, Nk.begin(), Nk.end())), 1e-10)); // TODO
           
           std::cout << "d: " << d << "\n"; // debug
           
