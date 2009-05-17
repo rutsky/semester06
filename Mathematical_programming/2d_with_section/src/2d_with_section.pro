@@ -9,8 +9,7 @@ CONFIG -= app_bundle
 # QMAKE_CXXFLAGS += -std=c++98 -Wall -W -pedantic
 QMAKE_CXXFLAGS += -Winvalid-pch
 
-INCLUDEPATH += /usr/src/boost_1_38_0 \
-    $(MY_NUMERIC_ROOT)
+INCLUDEPATH += $(MY_NUMERIC_ROOT)
 DEFINES += USING_QT_CREATOR
 
 TEMPLATE = app
