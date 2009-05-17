@@ -1,15 +1,4 @@
-# Ignoring Code::Blocks stuff.
-bin/
-obj/
-*.save
-lp_problem.depend
-lp_problem.layout
 # Ignoring Qt Creator stuff.
 lp_problem.pro.user
 lp_problem
-Makefile
-Makefile.Debug
-Makefile.Release
-qtc-gdbmacros/
-debug/
-release/
+.build/
