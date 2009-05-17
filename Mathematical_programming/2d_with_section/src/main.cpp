@@ -1,7 +1,7 @@
 /*
  * main.cpp
  * Fifth task on optimization methods.
- * Different methods of locating 2d functions minimum with limitations.
+ * Different methods of locating 2d functions minimum with constraints.
  * Vladimir Rutsky <altsysrq@gmail.com>
  * 07.04.2009
  */

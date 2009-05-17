@@ -35,7 +35,7 @@ namespace kelley_cutting_plane
   //   these limits are defined by two vectors `startLimitLo' and `startLimitHi' this like:
   //   x >= startLimitLo
   //   x <= startLimitHi
-  //   (which is 2 * n inequations).
+  //   (which is 2n inequations).
   // TODO: Handle more cases, return value should be enumeration of different exit statuses.
   template< class V, class FuncIterator, class GradFuncIterator >
   inline 
@@ -155,7 +155,7 @@ namespace kelley_cutting_plane
       
       if (isInside)
       {
-        // Found minimum of linear problem lies inside convex limits, so this is the answer.
+        // Founded minimum of linear problem lies inside convex limits, so this is the answer.
         return commonResult;
       }
     }
