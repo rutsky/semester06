@@ -4,3 +4,4 @@
  * Rename modules.
  * Rewrite places that used local infimum/epsilon constant. Move constants to local traits.
  * Check that all functions in *.hpp are inline.
+ * Correct `linear problem' name.
