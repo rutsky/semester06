@@ -18,5 +18,6 @@ HEADERS = combination.hpp \
     linear_problem.hpp \
     kelley_cutting_plane.hpp \
     linear_problem_algs.hpp \
-    linear_problem_algs.hpp
+    linear_problem_algs.hpp \
+    xmath.hpp
 linear_problem.hppkelley_cutting_plane.hpp

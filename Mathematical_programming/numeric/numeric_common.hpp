@@ -30,8 +30,12 @@
 
 #include <boost/bind.hpp>
 
+#include "xmath.hpp"
+
 namespace numeric
 {
+  using namespace xmath;
+  
   namespace ublas = boost::numeric::ublas;
   
   using ublas::scalar_traits;
@@ -117,43 +121,6 @@ namespace numeric
     return res;
   }
   
-  template< typename T, int size >
-  inline
-  size_t array_size( T (&)[size] ) 
-  { 
-    return size; 
-  };
-  
-  template< class T >
-  inline
-  T & make_min( T &a, T const &b )
-  {
-    if (a > b) a = b;
-    return a;
-  }
-  
-  template< class T >
-  inline
-  T & make_max( T &a, T const &b )
-  {
-    if (a < b) a = b;
-    return a;
-  }
-  
-  template< class T >
-  inline
-  T abs( T const &v )
-  {
-    return v < 0 ? -v : v;
-  }
-
-  template< class T >
-  inline
-  T sqr( T const &x )
-  {
-    return x * x;
-  }
-
   struct DummyOutputIterator
   {
     // FIXME! This iterator is probably not correct!
@@ -222,10 +189,12 @@ namespace numeric
   
   template< class S > inline bool equal_zero   ( S a,      S eps = 0. ) { return equal(a, 0., eps); }
 
-  template< class S >
+  template< class V1, class V2, class S >
   inline
-  bool by_component_equal( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0. )
+  bool by_component_equal( V1 const &a, V2 const &b, S eps = 0. )
   {
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V1>));
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V2>));
     BOOST_ASSERT(a.size() == b.size());
     for (size_t i = 0; i < a.size(); ++i)
       if (!equal(a(i), b(i), eps))
@@ -234,10 +203,12 @@ namespace numeric
     return true;
   }
   
-  template< class S >
+  template< class V1, class V2, class S >
   inline
-  bool by_component_less( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0. )
+  bool by_component_less( V1 const &a, V2 const &b, S eps = 0. )
   {
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V1>));
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V2>));
     BOOST_ASSERT(a.size() == b.size());
     for (size_t i = 0; i < a.size(); ++i)
       if (!less(a(i), b(i), eps))
@@ -246,10 +217,12 @@ namespace numeric
     return true;
   }
   
-  template< class S >
+  template< class V1, class V2, class S >
   inline
-  bool by_component_less_equal( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0. )
+  bool by_component_less_equal( V1 const &a, V2 const &b, S eps = 0. )
   {
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V1>));
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V2>));
     BOOST_ASSERT(a.size() == b.size());
     for (size_t i = 0; i < a.size(); ++i)
       if (!less_equal(a(i), b(i), eps))
@@ -258,10 +231,12 @@ namespace numeric
     return true;
   }
   
-  template< class S >
+  template< class V1, class V2, class S >
   inline
-  bool by_component_greater( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0. )
+  bool by_component_greater( V1 const &a, V2 const &b, S eps = 0. )
   {
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V1>));
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V2>));
     BOOST_ASSERT(a.size() == b.size());
     for (size_t i = 0; i < a.size(); ++i)
       if (!greater(a(i), b(i), eps))
@@ -270,10 +245,12 @@ namespace numeric
     return true;
   }
   
-  template< class S >
+  template< class V1, class V2, class S >
   inline
-  bool by_component_greater_equal( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0. )
+  bool by_component_greater_equal( V1 const &a, V2 const &b, S eps = 0. )
   {
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V1>));
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V2>));
     BOOST_ASSERT(a.size() == b.size());
     for (size_t i = 0; i < a.size(); ++i)
       if (!greater_equal(a(i), b(i), eps))
