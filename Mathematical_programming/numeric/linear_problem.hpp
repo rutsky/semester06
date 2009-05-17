@@ -158,7 +158,7 @@ namespace linear_problem
   
   template< class CLPTraits >
   inline
-  bool variables_count( ICommonLinearProblem<CLPTraits> const &commonLP )
+  size_t variables_count( ICommonLinearProblem<CLPTraits> const &commonLP )
   {
     BOOST_ASSERT(is_valid(commonLP));
     return commonLP.A().size2();
@@ -166,7 +166,7 @@ namespace linear_problem
   
   template< class CLPTraits >
   inline
-  bool constraints_count( ICommonLinearProblem<CLPTraits> const &commonLP )
+  size_t constraints_count( ICommonLinearProblem<CLPTraits> const &commonLP )
   {
     BOOST_ASSERT(is_valid(commonLP));
     return commonLP.A().size1();
@@ -187,7 +187,7 @@ namespace linear_problem
     
     range_type M(0, constraints_count(commonLP));
     copy_if(M.begin(), M.end(), idxsOut, 
-        boost::bind<bool>(std::equal_to<inequality_sign_type>(), inequalitySign, boost::bind<scalar_type>(commonLP.ASign(), _1)));
+        boost::bind<bool>(std::equal_to<inequality_sign_type>(), inequalitySign, boost::bind<inequality_sign_type>(commonLP.ASign(), _1)));
   }
   
   template< class CLPTraits, class IndexesOut >
@@ -205,7 +205,7 @@ namespace linear_problem
     
     range_type N(0, variables_count(commonLP));
     copy_if(N.begin(), N.end(), idxsOut, 
-        boost::bind<bool>(std::equal_to<variable_sign_type>(), variableSign, boost::bind<scalar_type>(commonLP.cSign(), _1)));
+        boost::bind<bool>(std::equal_to<variable_sign_type>(), variableSign, boost::bind<variable_sign_type>(commonLP.cSign(), _1)));
   }
   
   //
