@@ -330,7 +330,8 @@ namespace linear_problem
     simplex::simplex_result_type const simplexResult = 
         simplex::solve_augment(canonicalLP.A(), canonicalLP.b(), canonicalLP.c(), canonicalResultVec);
     
-    result.assign(conv(canonicalResultVec));
+    if (simplexResult == simplex::srt_min_found)
+      result = conv(canonicalResultVec);
     
     return simplexResult;
   }

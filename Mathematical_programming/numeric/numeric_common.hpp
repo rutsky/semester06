@@ -45,6 +45,7 @@ namespace numeric
   using ublas::matrix_expression;
   using ublas::zero_matrix;
   using ublas::row;
+  using ublas::matrix_row;
   using ublas::column;
   
   using ublas::prod;
@@ -102,6 +103,16 @@ namespace numeric
         *res++ = *first;
       ++first;
     }
+  
+    return res;
+  }
+  
+  template< class SrcInpIterator, class DstOutIterator >
+  inline
+  DstOutIterator copy_n( SrcInpIterator first, size_t n, DstOutIterator res )
+  {
+    for (size_t i = 0; i < n; ++i)
+      *res++ = *first++;
   
     return res;
   }
@@ -203,15 +214,17 @@ namespace numeric
     bool operator()( T const & ) const { return false; }
   };
   
-  template< class S > inline bool equal        ( S a, S b, S eps = 0 ) { return abs(a - b) <= eps; }
-  template< class S > inline bool greater      ( S a, S b, S eps = 0 ) { return a - b >  -eps; }
-  template< class S > inline bool greater_equal( S a, S b, S eps = 0 ) { return a - b >= -eps; }
-  template< class S > inline bool less         ( S a, S b, S eps = 0 ) { return a - b <  +eps; }
-  template< class S > inline bool less_equal   ( S a, S b, S eps = 0 ) { return a - b <= +eps; }
+  template< class S > inline bool equal        ( S a, S b, S eps = 0. ) { return abs(a - b) <= eps; }
+  template< class S > inline bool greater      ( S a, S b, S eps = 0. ) { return a - b >  -eps; }
+  template< class S > inline bool greater_equal( S a, S b, S eps = 0. ) { return a - b >= -eps; }
+  template< class S > inline bool less         ( S a, S b, S eps = 0. ) { return a - b <  +eps; }
+  template< class S > inline bool less_equal   ( S a, S b, S eps = 0. ) { return a - b <= +eps; }
   
+  template< class S > inline bool equal_zero   ( S a,      S eps = 0. ) { return equal(a, 0., eps); }
+
   template< class S >
   inline
-  bool by_component_equal( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0 )
+  bool by_component_equal( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0. )
   {
     BOOST_ASSERT(a.size() == b.size());
     for (size_t i = 0; i < a.size(); ++i)
@@ -223,7 +236,7 @@ namespace numeric
   
   template< class S >
   inline
-  bool by_component_less( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0 )
+  bool by_component_less( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0. )
   {
     BOOST_ASSERT(a.size() == b.size());
     for (size_t i = 0; i < a.size(); ++i)
@@ -235,7 +248,7 @@ namespace numeric
   
   template< class S >
   inline
-  bool by_component_less_equal( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0 )
+  bool by_component_less_equal( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0. )
   {
     BOOST_ASSERT(a.size() == b.size());
     for (size_t i = 0; i < a.size(); ++i)
@@ -247,7 +260,7 @@ namespace numeric
   
   template< class S >
   inline
-  bool by_component_greater( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0 )
+  bool by_component_greater( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0. )
   {
     BOOST_ASSERT(a.size() == b.size());
     for (size_t i = 0; i < a.size(); ++i)
@@ -259,7 +272,7 @@ namespace numeric
   
   template< class S >
   inline
-  bool by_component_greater_equal( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0 )
+  bool by_component_greater_equal( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0. )
   {
     BOOST_ASSERT(a.size() == b.size());
     for (size_t i = 0; i < a.size(); ++i)
