@@ -29,6 +29,7 @@ namespace linear_problem
   // Common linear problem constraint inequality sign type.
   enum inequality_sign_type
   {
+    // TODO: Rename `inequality' to `constraint'.
     inequality_leq = -1, // less or equal
     inequality_eq  =  0, // equal
     inequality_geq = +1, // greater or equal
@@ -89,7 +90,7 @@ namespace linear_problem
     typedef vector<scalar_type>          vector_type;
     typedef matrix<scalar_type>          matrix_type;
     typedef vector<inequality_sign_type> inequality_signs_vector_type;
-    typedef vector<inequality_sign_type> variables_signs_vector_type;
+    typedef vector<variable_sign_type>   variables_signs_vector_type;
   };
   
   template< class Traits >
@@ -116,6 +117,7 @@ namespace linear_problem
     // Matrix of constaints.
     virtual matrix_type                  const & A    () const = 0;
     // Signs of constaints.
+    // TODO: Must be in plural form.
     virtual inequality_signs_vector_type const & ASign() const = 0;
     
     // Constraints absolute terms.
@@ -136,7 +138,22 @@ namespace linear_problem
     return 
         (commonLP.A().size1() > 0 && commonLP.A().size2() > 0) &&
         (commonLP.A().size1() == commonLP.b().size()) && (commonLP.ASign().size() == commonLP.b().size()) &&
-        (commonLP.A().size2() == commonLP.c().size()) && (commonLP.ASign().size() == commonLP.c().size());
+        (commonLP.A().size2() == commonLP.c().size()) && (commonLP.cSign().size() == commonLP.c().size());
+  }
+  
+  template< class CLPTraits >
+  inline
+  bool assert_valid( ICommonLinearProblem<CLPTraits> const &commonLP )
+  {
+    // TODO: Maybe smth. with rank?
+    BOOST_ASSERT(commonLP.A().size1() > 0);
+    BOOST_ASSERT(commonLP.A().size2() > 0);
+    BOOST_ASSERT(commonLP.A().size1() == commonLP.b().size());
+    BOOST_ASSERT(commonLP.ASign().size() == commonLP.b().size());
+    BOOST_ASSERT(commonLP.A().size2() == commonLP.c().size());
+    BOOST_ASSERT(commonLP.cSign().size() == commonLP.c().size());
+    
+    return is_valid(commonLP);
   }
   
   template< class CLPTraits >
@@ -208,37 +225,75 @@ namespace linear_problem
     typedef typename base_type::variables_signs_vector_type  variables_signs_vector_type;
     typedef typename base_type::inequality_signs_vector_type inequality_signs_vector_type;
     
+    canonical_linear_problem()
+    {}
+    
+    
+    // TODO!
+    /*
+    canonical_linear_problem( vector_expression<scalar_type> const &c, 
+                              matrix_expression<scalar_type> const &A, 
+                              vector_expression<scalar_type> const &b )
+      : c_(c)
+      , A_(A)
+      , b_(b)
+    {
+      init();
+    }
+    */
+    canonical_linear_problem( vector_type const &c, 
+                              matrix_type const &A, 
+                              vector_type const &b )
+      : c_(c)
+      , A_(A)
+      , b_(b)
+    {
+      init();
+    }
+    
+    explicit canonical_linear_problem( canonical_linear_problem const &other )
+      : c_(other.c_)
+      , A_(other.A_)
+      , b_(other.b_)
+    {
+      init();
+    }
+    
     bool                                 min  () const { return true; }
     
     vector_type                  const & c    () const { return c_; }
     vector_type                        & c    ()       { return c_; }
     
-    variables_signs_vector_type  const & cSign() const
-    { 
-      variables_signs_vector_type const result = 
-        scalar_vector<typename clp_traits_type::variable_sign_type>(c_.size(), clp_traits_type::variable_geq_zero);
-      BOOST_ASSERT(result.size() == c_.size());
-      return result;
-    }
+    variables_signs_vector_type  const & cSign() const { return cSign_; }
     
     matrix_type                  const & A    () const { return A_; }
     matrix_type                        & A    ()       { return A_; }
     
-    inequality_signs_vector_type const & ASign() const
-    {
-      inequality_signs_vector_type const result = 
-        scalar_vector<typename clp_traits_type::inequality_sign_type>(A_.size2(), clp_traits_type::inequality_leq);
-      BOOST_ASSERT(result.size() == A_.size2());
-      return result;
-    }
+    inequality_signs_vector_type const & ASign() const { return ASign_; }
     
     vector_type                  const & b    () const { return b_; }
     vector_type                        & b    ()       { return b_; }
     
   protected:
+    void init()
+    {
+      cSign_ = scalar_vector<variable_sign_type>(c_.size(), variable_geq_zero);
+      BOOST_ASSERT(cSign_.size() == c_.size());
+      
+      ASign_ = scalar_vector<inequality_sign_type>(A_.size1(), inequality_leq);
+      BOOST_ASSERT(ASign_.size() == A_.size1());
+      
+      BOOST_ASSERT(assert_valid(*this));
+    }
+    
+  protected:
     vector_type c_;
     matrix_type A_;
     vector_type b_;
+    
+    // TODO!
+    variables_signs_vector_type  cSign_;
+    inequality_signs_vector_type ASign_;
   };
   
   template< class Scalar, class Traits = common_linear_problem_traits<Scalar> >
@@ -254,7 +309,7 @@ namespace linear_problem
     typedef typename base_type::variables_signs_vector_type  variables_signs_vector_type;
     typedef typename base_type::inequality_signs_vector_type inequality_signs_vector_type;
     
-    bool                         const & min  () const { return min_; }
+    bool                                 min  () const { return min_; }
     bool                               & min  ()       { return min_; }
     
     vector_type                  const & c    () const { return c_; }

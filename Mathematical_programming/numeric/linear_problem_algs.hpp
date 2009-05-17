@@ -21,6 +21,7 @@
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/apply.hpp>
 #include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
 
 #include "linear_problem.hpp"
 #include "subvector.hpp"
@@ -139,7 +140,7 @@ namespace linear_problem
   
   // TODO: Use placeholder from boost::mpl.
   template< class S >
-  struct converter_type
+  struct converter_template_type
   {
     typedef boost::function<vector<S>( vector<S> const & )> type;
   };
@@ -150,8 +151,6 @@ namespace linear_problem
   public:
     typedef S                                                    scalar_type;
     typedef vector<scalar_type>                                  vector_type;
-    typedef boost::function<scalar_type ( vector_type const & )> coordinate_function_type;
-    typedef std::vector<coordinate_function_type>                coordinate_functions_type;
     
   public:
     lambda_vector( size_t inputSize, size_t outputSize )
@@ -159,8 +158,7 @@ namespace linear_problem
       , outputSize_(outputSize)
     {
       BOOST_ASSERT(inputSize > 0 && outputSize > 0);
-      functions_.resize(outputSize);
-      std::fill(functions_.begin(), functions_.end(), boost::lambda::_1 * 0);
+      differencies_.resize(outputSize);
     }
     
     vector_type operator()( vector_type const &v )
@@ -169,19 +167,33 @@ namespace linear_problem
       
       vector_type result(outputSize_);
       for (size_t r = 0; r < outputSize_; ++r) // TODO: Use algorithm.
-        result[r] = functions_[r](v);
+        if (differencies_[r])
+          result[r] = v(differencies_[r]->first) - v(differencies_[r]->second);
+        else
+        {
+          BOOST_ASSERT(v.size() > r); // Fail!
+          result[r] = v(r);
+        }
       
       return result;
     }
     
-    void setCoordinateFunction( size_t r, coordinate_function_type function )
+    // output(rOutput) = input(rMinuend) - input(rSubtrahend).
+    void setCoordinateFunction( size_t rOutput, size_t rMinuend, size_t rSubtrahend )
     {
-      BOOST_ASSERT(r < functions_.size());
-      functions_[r] = function;
+      BOOST_ASSERT(rOutput < differencies_.size());
+      BOOST_ASSERT(rMinuend < inputSize_);
+      BOOST_ASSERT(rSubtrahend < inputSize_);
+      
+      if (rMinuend != rSubtrahend)
+        differencies_[rOutput] = std::make_pair(rMinuend, rSubtrahend);
+      else
+        differencies_[rOutput].reset();
     }
     
   private:    
-    coordinate_functions_type functions_;
+    // TODO: Use boost::lambda.
+    std::vector<boost::optional<std::pair<size_t, size_t> > > differencies_;
 
     size_t inputSize_;
     size_t outputSize_;
@@ -189,11 +201,12 @@ namespace linear_problem
   
   template< class S, template< class > class CLPTraits >
   inline
-  typename converter_type<S>::type
+  typename converter_template_type<S>::type
     to_canonical( ICommonLinearProblem<CLPTraits<S> > const &commonLP, 
                   canonical_linear_problem<S>               &canonicalLP )
   {
     typedef S                                  scalar_type;
+    typedef CLPTraits<S>                       clp_traits_type;
     typedef vector<scalar_type>                vector_type;
     typedef matrix<scalar_type>                matrix_type;
     typedef basic_range<size_t, long>          range_type;
@@ -201,6 +214,8 @@ namespace linear_problem
     typedef zero_vector<scalar_type>           zero_vector_type;
     typedef common_linear_problem<scalar_type> common_linear_problem_type;
     typedef lambda_vector<scalar_type>         convertion_function_type;
+    
+    typedef canonical_linear_problem<scalar_type> canonical_linear_problem_type;
     
     BOOST_ASSERT(is_valid(commonLP));
     
@@ -213,47 +228,56 @@ namespace linear_problem
     // Calculating how much additional variables will be needed.
     range_type const M(0, commonLP.A().size1());
     range_type const N(0, commonLP.A().size2());
-    size_t const anySignVars = std::count(commonLP.cSign().begin(), commonLP.cSign().end(), common_linear_problem_type::variable_any_sign);
-    size_t const neALimits   = commonLP.ASign().size() - std::count(commonLP.ASign().begin(), commonLP.ASign().end(), common_linear_problem_type::inequality_eq);
+    size_t const anySignVars = std::count(commonLP.cSign().begin(), commonLP.cSign().end(), variable_any_sign);
+    size_t const neAConstraints   = commonLP.ASign().size() - std::count(commonLP.ASign().begin(), commonLP.ASign().end(), inequality_eq);
     
-    // Resizing canonical linear problem for result dimensions and filling with zeroes.
-    canonicalLP.A.assign(zero_matrix_type(M.size(), N.size() + anySignVars + neALimits));
-    canonicalLP.b.assign(zero_vector_type(M.size()));
-    canonicalLP.c.assign(zero_vector_type(N.size() + anySignVars + neALimits));
+    // Creating canonical linear problem for result dimensions and filling with zeroes.
+    matrix_type canonicalLPA(zero_matrix_type(M.size(), N.size() + anySignVars + neAConstraints));
+    vector_type canonicalLPb(zero_vector_type(M.size()));
+    vector_type canonicalLPc(zero_vector_type(N.size() + anySignVars + neAConstraints));
     
     // Setting known part of result.
-    submatrix(canonicalLP.A(), M.begin(), M.end(), N.begin(), N.end()) = commonLP.A();
-    canonicalLP.b()                                                    = commonLP.b();
-    subvector(canonicalLP.c(), N.begin(), N.end())                     = commonLP.c();
+    submatrix(canonicalLPA, M.begin(), M.end(), N.begin(), N.end()) = commonLP.A();
+    canonicalLPb                                                    = commonLP.b();
+    subvector(canonicalLPc, N.begin(), N.end())                     = commonLP.c();
     
     // Converting maximum search problem to minimum search problem.
     if (!commonLP.min())
-      canonicalLP.c() *= -1;
+      canonicalLPc = -canonicalLPc;
     
-    // Converting less or equal limits to greater or equal limits.
+    // Converting less or equal constraints to greater or equal constraints.
     for (size_t r = 0; r < M.size(); ++r)
-      if (commonLP.ASign()(r) == common_linear_problem_type::inequality_leq)
+      if (commonLP.ASign()(r) == inequality_leq)
       {
-        row(commonLP.A(), r) = -matrix_row_type(commonLP.A(), r);
-        commonLP.b()(r)      = -commonLP.b()(r);
+        row(canonicalLPA, r) = -row(canonicalLPA, r);
+        canonicalLPb(r)      = -canonicalLPb(r);
+      }
+    
+    // Converting less or equal zero variables to greater or equal zero variables.
+    for (size_t c = 0; c < N.size(); ++c)
+      if (commonLP.cSign()(c) == variable_leq_zero)
+      {
+        column(canonicalLPA, c) = -column(canonicalLPA, c);
+        canonicalLPc(c)         = -canonicalLPc(c);
       }
     
     // Converting any sign variables to pair of non negative variables
     //   and filling convertion function.
-    convertion_function_type conv(N.size() + anySignVars + neALimits, N.size());
+    convertion_function_type conv(N.size() + anySignVars + neAConstraints, N.size());
     size_t nextAdditionalVar = N.size();
     for (size_t c = 0; c < N.size(); ++c)
     {
-      if (commonLP.cSign()(c) == common_linear_problem_type::variable_geq_zero)
+      if (commonLP.cSign()(c) == variable_geq_zero || commonLP.cSign()(c) == variable_leq_zero)
       {
-        conv.setCoordinateFunction(c, boost::lambda::_1(c));
+        // Note: don't forget about convertion above.
+        // Identity convertion. Don't moduify anything.
+        // conv.setCoordinateFunction(c, c, c);
       }
-      else if (commonLP.cSign()(c) == common_linear_problem_type::variable_any_sign)
+      else if (commonLP.cSign()(c) == variable_any_sign)
       {
-        canonicalLP.c()(nextAdditionalVar) = -canonicalLP.c()(c);
-        column(canonicalLP.A(), nextAdditionalVar) = -column(canonicalLP.A(), c);
-        
-        conv.setCoordinateFunction(c, boost::lambda::_1(c) - boost::lambda::_1(nextAdditionalVar));
+        canonicalLPc(nextAdditionalVar) = -canonicalLPc(c);
+        column(canonicalLPA, nextAdditionalVar) = -column(canonicalLPA, c);
+        conv.setCoordinateFunction(c, c, nextAdditionalVar);
         
         ++nextAdditionalVar;
       }
@@ -268,15 +292,17 @@ namespace linear_problem
     // Converting greater or equal limits to equal limits.
     for (size_t r = 0; r < M.size(); ++r)
     {
-      if (commonLP.ASign()(r) != common_linear_problem_type::inequality_eq)
+      if (commonLP.ASign()(r) != inequality_eq)
       {
-        // Found greater or equal limit (less or equal was converted to greater or equal before).
-        canonicalLP.A()(r, ++nextAdditionalVar) = -1;
+        // Found greater or equal limit (less or equal was converted to greater or equal above).
+        canonicalLPA(r, nextAdditionalVar++) = -1;
       }
     }
-    BOOST_ASSERT(nextAdditionalVar == N.size() + anySignVars + neALimits);
+    BOOST_ASSERT(nextAdditionalVar == N.size() + anySignVars + neAConstraints);
     
-    BOOST_ASSERT(is_valid(canonicalLP));
+    canonicalLP = canonical_linear_problem_type(canonicalLPc, canonicalLPA, canonicalLPb);
+    
+    BOOST_ASSERT(assert_valid(canonicalLP));
     
     return conv;
   }
@@ -293,7 +319,7 @@ namespace linear_problem
     
     typedef common_linear_problem   <scalar_type, clp_traits_type> common_linear_problem_type;
     typedef canonical_linear_problem<scalar_type, clp_traits_type> canonical_linear_problem_type;
-    typedef converter_type          <scalar_type>                  converter_type;
+    typedef typename converter_template_type <scalar_type>::type   converter_type;
 
     // Converting linear problem to canonical form.
     canonical_linear_problem_type canonicalLP;

@@ -107,6 +107,7 @@ namespace simplex
       for (size_t r = 0; r < M.size(); ++r)
       {
         value_type const result = std::inner_product(ublas::row(A, r).begin(), ublas::row(A, r).end(), x.begin(), 0);
+        std::cout << "  result - b[r] = " << result - b[r] << std::endl; // debug
         BOOST_ASSERT(scalar_traits_type::equals(result, b[r]));
       }
       
@@ -269,7 +270,6 @@ namespace simplex
           BOOST_ASSERT(Lk.size() == N.size() - M.size());
           
           // debug
-          /*
           std::cout << "N: ";
           std::copy(N.begin(), N.end(), std::ostream_iterator<size_t>(std::cout, " "));
           std::cout << "\n";
@@ -293,18 +293,17 @@ namespace simplex
           std::cout << "Lk: ";
           std::copy(Lk.begin(), Lk.end(), std::ostream_iterator<size_t>(std::cout, " "));
           std::cout << "\n";
-          */
           // end of debug
 
           // Calculating 'A' submatrix inverse.
           matrix_type BNk(M.size(), M.size());
           BOOST_VERIFY(invert_matrix(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk));
-          /*
+          // debug
           std::cout << "zero m mod: " << 
               ublas::matrix_norm_inf<matrix_type>::apply(ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size())) << "\n"; // debug
           std::cout << "zero m: " << 
               ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size()) << std::endl; // debug
-          */
+          // end of debug
           /*
           // TODO: Precision.
           BOOST_ASSERT(
@@ -490,7 +489,6 @@ namespace simplex
     
     BOOST_ASSERT(M.size() < N.size());
     BOOST_ASSERT(is_linear_independent(matrix_rows_begin(A), matrix_rows_end(A)));
-    BOOST_ASSERT(resultV.size() == N.size());
     BOOST_ASSERT(c.size()       == N.size());
     BOOST_ASSERT(b.size()       == M.size());
 

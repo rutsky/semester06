@@ -54,9 +54,9 @@ namespace kelley_cutting_plane
     typedef typename FuncIterator::value_type           function_type;
     typedef typename GradFuncIterator::value_type       gradient_function_type;
     
-    typedef linear_problem::common_linear_problem   <scalar_type> common_linear_problem_type;
-    typedef linear_problem::canonical_linear_problem<scalar_type> canonical_linear_problem_type;
-    typedef linear_problem::converter_type          <scalar_type> converter_type;
+    typedef linear_problem::common_linear_problem           <scalar_type>       common_linear_problem_type;
+    typedef linear_problem::canonical_linear_problem        <scalar_type>       canonical_linear_problem_type;
+    typedef typename linear_problem::converter_template_type<scalar_type>::type converter_type;
 
     // TODO: Using same type in much places now (like scalar_type).
     BOOST_CONCEPT_ASSERT((boost::UnaryFunction<function_type,          scalar_type, vector_type>));

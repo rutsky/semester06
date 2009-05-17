@@ -10,7 +10,6 @@ CONFIG -= app_bundle
 QMAKE_CXXFLAGS += -Winvalid-pch
 
 INCLUDEPATH += $(MY_NUMERIC_ROOT)
-DEFINES += USING_QT_CREATOR
 
 TEMPLATE = app
 SOURCES += main.cpp
