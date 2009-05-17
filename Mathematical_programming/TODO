@@ -6,3 +6,4 @@
  * Check that all functions in *.hpp are inline.
  * Correct `linear problem' name.
  * Remove direct including of qt creator debug.
+ * Examine how to made vectors and matrices copy and fix it in all projects. Is it `assign' or `operator = '?
