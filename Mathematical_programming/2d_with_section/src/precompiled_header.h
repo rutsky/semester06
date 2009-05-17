@@ -9,6 +9,9 @@
 // STL stuff.
 #include <cstdlib>
 
+#include <algorithm>
+#include <iterator>
+
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -24,6 +27,8 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
+#include <boost/function.hpp>
+#include <boost/lambda/lambda.hpp>
 
 #include <boost/numeric/ublas/traits.hpp>
 #include <boost/numeric/ublas/vector.hpp>
