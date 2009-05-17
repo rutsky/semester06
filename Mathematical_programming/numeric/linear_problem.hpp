@@ -12,39 +12,77 @@
 
 #include <algorithm>
 #include <vector>
+#include <functional>
 
 #include <boost/assert.hpp>
 #include <boost/concept/assert.hpp>
 #include <boost/concept_check.hpp>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
-#include <boost/mpl/placeholders.hpp>
-#include <boost/mpl/apply.hpp>
-#include <boost/lambda/lambda.hpp>
 
 namespace numeric
 {
 namespace linear_problem
 {
   //
-  // Base types definition.
+  // Base common linear problem type definition.
   //
   
+  // Common linear problem constraint inequality sign type.
+  enum inequality_sign_type
+  {
+    inequality_leq = -1, // less or equal
+    inequality_eq  =  0, // equal
+    inequality_geq = +1, // greater or equal
+  };
+
+  // Common linear problem goal function variable sign type.
+  enum variable_sign_type
+  {
+    variable_leq_zero = -1, // less or equal zero
+    variable_any_sign =  0, // any sign
+    variable_geq_zero = +1, // greater or equal zero
+  };
+  
+  inline
+  variable_sign_type dual( inequality_sign_type inequalitySign )
+  {
+    // TODO: Can be optimized using direct values of enumerations.
+    switch(inequalitySign)
+    {
+    case inequality_geq:
+      return variable_geq_zero;
+    case inequality_eq:
+      return variable_any_sign;
+    case inequality_leq:
+      return variable_geq_zero;
+    default:
+      // Impossible case.
+      BOOST_ASSERT(0);
+    }
+  }
+  
+  inline
+  inequality_sign_type dual( variable_sign_type variableSign )
+  {
+    // TODO: Can be optimized using direct values of enumerations.
+    switch(variableSign)
+    {
+    case variable_geq_zero:
+      return inequality_geq;
+    case variable_any_sign:
+      return inequality_eq;
+    case variable_leq_zero:
+      return inequality_leq;
+    default:
+      // Impossible case.
+      BOOST_ASSERT(0);
+    }
+  }
+
   template< class Scalar >
   struct common_linear_problem_traits
   {
-    enum inequality_sign_type
-    {
-      inequality_leq = -1, // less or equal
-      inequality_eq  =  0, // equal
-      inequality_geq = +1, // greater or equal
-    };
-
-    enum variable_sign_type
-    {
-      variable_geq_zero, // greater or equal zero
-      variable_any_sign, // any sign
-    };
+    // TODO: Think about admissible inequation signs. 
+    //   They should correcpond to variable signs types through duality.
     
     // TODO: Separate types.
     typedef Scalar                       scalar_type;
@@ -64,6 +102,8 @@ namespace linear_problem
     typedef typename clp_traits_type::matrix_type matrix_type;
     typedef typename clp_traits_type::variables_signs_vector_type  variables_signs_vector_type;
     typedef typename clp_traits_type::inequality_signs_vector_type inequality_signs_vector_type;
+    
+    // TODO: May be name members line `goalVector', `variablesSigns', `constraintsMatrix' etc?
 
     // Is problem of searching minimum.
     virtual bool                                 min  () const = 0;
@@ -84,7 +124,12 @@ namespace linear_problem
     virtual ~ICommonLinearProblem() {}
   };
   
+  //
+  // Base common linear problem type algorithms.
+  //
+  
   template< class CLPTraits >
+  inline
   bool is_valid( ICommonLinearProblem<CLPTraits> const &commonLP )
   {
     // TODO: Maybe smth. with rank?
@@ -94,16 +139,68 @@ namespace linear_problem
         (commonLP.A().size2() == commonLP.c().size()) && (commonLP.ASign().size() == commonLP.c().size());
   }
   
+  template< class CLPTraits >
+  inline
+  bool variables_count( ICommonLinearProblem<CLPTraits> const &commonLP )
+  {
+    BOOST_ASSERT(is_valid(commonLP));
+    return commonLP.A().size2();
+  }
+  
+  template< class CLPTraits >
+  inline
+  bool constraints_count( ICommonLinearProblem<CLPTraits> const &commonLP )
+  {
+    BOOST_ASSERT(is_valid(commonLP));
+    return commonLP.A().size1();
+  }
+  
+  template< class CLPTraits, class IndexesOut >
+  inline
+  void select_constraints( ICommonLinearProblem<CLPTraits> const &commonLP, 
+                           inequality_sign_type inequalitySign,
+                           IndexesOut idxsOut )
+  {
+    BOOST_CONCEPT_ASSERT((boost::OutputIterator<IndexesOut, size_t>));
+    BOOST_ASSERT(is_valid(commonLP));
+    
+    typedef CLPTraits                             clp_traits_type;
+    typedef typename clp_traits_type::scalar_type scalar_type;
+    typedef basic_range<size_t, long>             range_type;
+    
+    range_type M(0, constraints_count(commonLP));
+    copy_if(M.begin(), M.end(), idxsOut, 
+        boost::bind<bool>(std::equal_to<inequality_sign_type>(), inequalitySign, boost::bind<scalar_type>(commonLP.ASign(), _1)));
+  }
+  
+  template< class CLPTraits, class IndexesOut >
+  inline
+  void select_variables( ICommonLinearProblem<CLPTraits> const &commonLP, 
+                         variable_sign_type variableSign,
+                         IndexesOut idxsOut )
+  {
+    BOOST_CONCEPT_ASSERT((boost::OutputIterator<IndexesOut, size_t>));
+    BOOST_ASSERT(is_valid(commonLP));
+    
+    typedef CLPTraits                             clp_traits_type;
+    typedef typename clp_traits_type::scalar_type scalar_type;
+    typedef basic_range<size_t, long>             range_type;
+    
+    range_type N(0, variables_count(commonLP));
+    copy_if(N.begin(), N.end(), idxsOut, 
+        boost::bind<bool>(std::equal_to<variable_sign_type>(), variableSign, boost::bind<scalar_type>(commonLP.cSign(), _1)));
+  }
+  
   //
   // Generic types definition.
   //
 
-  template< class Scalar >
+  template< class Scalar, class Traits = common_linear_problem_traits<Scalar> >
   struct canonical_linear_problem
-    : public ICommonLinearProblem<common_linear_problem_traits<Scalar> >
+    : public ICommonLinearProblem<Traits>
   {
-    typedef ICommonLinearProblem<common_linear_problem_traits<Scalar> > base_type;
-    typedef typename base_type::clp_traits_type                         clp_traits_type;
+    typedef ICommonLinearProblem<Traits> base_type;
+    typedef Traits                       clp_traits_type;
     
     typedef typename base_type::scalar_type scalar_type;
     typedef typename base_type::vector_type vector_type;
@@ -144,12 +241,12 @@ namespace linear_problem
     vector_type b_;
   };
   
-  template< class Scalar >
+  template< class Scalar, class Traits = common_linear_problem_traits<Scalar> >
   struct common_linear_problem 
-    : public ICommonLinearProblem<common_linear_problem_traits<Scalar> >
+    : public ICommonLinearProblem<Traits>
   {
-    typedef ICommonLinearProblem<common_linear_problem_traits<Scalar> > base_type;
-    typedef typename base_type::clp_traits_type                         clp_traits_type;
+    typedef ICommonLinearProblem<Traits> base_type;
+    typedef Traits                       clp_traits_type;
     
     typedef typename base_type::scalar_type scalar_type;
     typedef typename base_type::vector_type vector_type;
@@ -183,154 +280,6 @@ namespace linear_problem
     inequality_signs_vector_type ASign_;
     vector_type                  b_;
   };
-  
-  //
-  // Utility functions.
-  // 
-  
-  // TODO: Use placeholder from boost::mpl.
-  template< class S >
-  struct converter_type
-  {
-    typedef boost::function<vector<S>( vector<S> const & )> type;
-  };
-  
-  template< class S >
-  struct lambda_vector
-  {
-  public:
-    typedef S                                                    scalar_type;
-    typedef vector<scalar_type>                                  vector_type;
-    typedef boost::function<scalar_type ( vector_type const & )> coordinate_function_type;
-    typedef std::vector<coordinate_function_type>                coordinate_functions_type;
-    
-  public:
-    lambda_vector( size_t inputSize, size_t outputSize )
-      : inputSize_ (inputSize)
-      , outputSize_(outputSize)
-    {
-      BOOST_ASSERT(inputSize > 0 && outputSize > 0);
-      functions_.resize(outputSize);
-      std::fill(functions_.begin(), functions_.end(), boost::lambda::_1 * 0);
-    }
-    
-    vector_type operator()( vector_type const &v )
-    {
-      BOOST_ASSERT(v.size() == inputSize_);
-      
-      vector_type result(outputSize_);
-      for (size_t r = 0; r < outputSize_; ++r) // TODO: Use algorithm.
-        result[r] = functions_[r](v);
-      
-      return result;
-    }
-    
-    void setCoordinateFunction( size_t r, coordinate_function_type function )
-    {
-      BOOST_ASSERT(r < functions_.size());
-      functions_[r] = function;
-    }
-    
-  private:    
-    coordinate_functions_type functions_;
-
-    size_t inputSize_;
-    size_t outputSize_;
-  };
-  
-  template< class S, template< class > class CLPTraits >
-  inline
-  typename converter_type<S>::type
-    to_canonical( ICommonLinearProblem<CLPTraits<S> > const &commonLP, 
-                  canonical_linear_problem<S>               &canonicalLP )
-  {
-    typedef S                                  scalar_type;
-    typedef vector<scalar_type>                vector_type;
-    typedef matrix<scalar_type>                matrix_type;
-    typedef basic_range<size_t, long>          range_type;
-    typedef zero_matrix<scalar_type>           zero_matrix_type;
-    typedef zero_vector<scalar_type>           zero_vector_type;
-    typedef common_linear_problem<scalar_type> common_linear_problem_type;
-    typedef lambda_vector<scalar_type>         convertion_function_type;
-    
-    BOOST_ASSERT(is_valid(commonLP));
-    
-    // For details on transformations here see 
-    //   Л.В. Петухов, Г.А. Серегин 
-    //   "Методы решения задач выпуклого программирования", 
-    //   учебное пособие, Ленинград 1991,
-    //   pages 45-48.
-    
-    // Calculating how much additional variables will be needed.
-    range_type const M(0, commonLP.A().size1());
-    range_type const N(0, commonLP.A().size2());
-    size_t const anySignVars = std::count(commonLP.cSign().begin(), commonLP.cSign().end(), common_linear_problem_type::variable_any_sign);
-    size_t const neALimits   = commonLP.ASign().size() - std::count(commonLP.ASign().begin(), commonLP.ASign().end(), common_linear_problem_type::inequality_eq);
-    
-    // Resizing canonical linear problem for result dimensions and filling with zeroes.
-    canonicalLP.A.assign(zero_matrix_type(M.size(), N.size() + anySignVars + neALimits));
-    canonicalLP.b.assign(zero_vector_type(M.size()));
-    canonicalLP.c.assign(zero_vector_type(N.size() + anySignVars + neALimits));
-    
-    // Setting known part of result.
-    submatrix(canonicalLP.A(), M.begin(), M.end(), N.begin(), N.end()) = commonLP.A();
-    canonicalLP.b()                                                    = commonLP.b();
-    subvector(canonicalLP.c(), N.begin(), N.end())                     = commonLP.c();
-    
-    // Converting maximum search problem to minimum search problem.
-    if (!commonLP.min())
-      canonicalLP.c() *= -1;
-    
-    // Converting less or equal limits to greater or equal limits.
-    for (size_t r = 0; r < M.size(); ++r)
-      if (commonLP.ASign()(r) == common_linear_problem_type::inequality_leq)
-      {
-        row(commonLP.A(), r) = -matrix_row_type(commonLP.A(), r);
-        commonLP.b()(r)      = -commonLP.b()(r);
-      }
-    
-    // Converting any sign variables to pair of non negative variables
-    //   and filling convertion function.
-    convertion_function_type conv(N.size() + anySignVars + neALimits, N.size());
-    size_t nextAdditionalVar = N.size();
-    for (size_t c = 0; c < N.size(); ++c)
-    {
-      if (commonLP.cSign()(c) == common_linear_problem_type::variable_geq_zero)
-      {
-        conv.setCoordinateFunction(c, boost::lambda::_1(c));
-      }
-      else if (commonLP.cSign()(c) == common_linear_problem_type::variable_any_sign)
-      {
-        canonicalLP.c()(nextAdditionalVar) = -canonicalLP.c()(c);
-        column(canonicalLP.A(), nextAdditionalVar) = -column(canonicalLP.A(), c);
-        
-        conv.setCoordinateFunction(c, boost::lambda::_1(c) - boost::lambda::_1(nextAdditionalVar));
-        
-        ++nextAdditionalVar;
-      }
-      else
-      {
-        // Impossible case.
-        BOOST_ASSERT(0);
-      }
-    }
-    BOOST_ASSERT(nextAdditionalVar == N.size() + anySignVars);
-    
-    // Converting greater or equal limits to equal limits.
-    for (size_t r = 0; r < M.size(); ++r)
-    {
-      if (commonLP.ASign()(r) != common_linear_problem_type::inequality_eq)
-      {
-        // Found greater or equal limit (less or equal was converted to greater or equal before).
-        canonicalLP.A()(r, ++nextAdditionalVar) = -1;
-      }
-    }
-    BOOST_ASSERT(nextAdditionalVar == N.size() + anySignVars + neALimits);
-    
-    BOOST_ASSERT(is_valid(canonicalLP));
-    
-    return conv;
-  }
 } // End of namespace 'linear_problem'.
 } // End of namespace 'numeric'.
 

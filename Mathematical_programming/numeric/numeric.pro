@@ -16,5 +16,7 @@ HEADERS = combination.hpp \
     lipschitz_constant.hpp \
     barrier_method.hpp \
     linear_problem.hpp \
-    kelley_cutting_plane.hpp
+    kelley_cutting_plane.hpp \
+    linear_problem_algs.hpp \
+    linear_problem_algs.hpp
 linear_problem.hppkelley_cutting_plane.hpp

@@ -28,6 +28,8 @@
 
 #include <boost/numeric/ublas/detail/concepts.hpp>
 
+#include <boost/bind.hpp>
+
 namespace numeric
 {
   namespace ublas = boost::numeric::ublas;
@@ -47,12 +49,13 @@ namespace numeric
   
   using ublas::prod;
   using ublas::inner_prod;
+  using ublas::trans;
   
   using ublas::basic_range;
 
   // TODO: Move boost stuff to separate file.
   template< class OP, class E > 
-  BOOST_UBLAS_INLINE
+  inline
   typename ublas::vector_unary_traits<E, OP>::result_type
       apply_to_all( ublas::vector_expression<E> const &e, OP const &op = OP() ) 
   {
@@ -61,7 +64,7 @@ namespace numeric
   }
   
   template <class OP, class E>
-  BOOST_UBLAS_INLINE
+  inline
   typename ublas::matrix_unary1_traits<E, OP>::result_type
       apply_to_all( ublas::matrix_expression<E> const & e, OP const &op = OP() )
   {
@@ -90,6 +93,7 @@ namespace numeric
   
   // Some people says, that copy_if was dropped from the STL by accident.
   template< class SrcFwdIterator, class DstOutIterator, class Pred >
+  inline
   DstOutIterator copy_if( SrcFwdIterator first, SrcFwdIterator beyond, DstOutIterator res, Pred Pr )
   {
     while (first != beyond)
@@ -103,12 +107,14 @@ namespace numeric
   }
   
   template< typename T, int size >
+  inline
   size_t array_size( T (&)[size] ) 
   { 
     return size; 
   };
   
   template< class T >
+  inline
   T & make_min( T &a, T const &b )
   {
     if (a > b) a = b;
@@ -116,6 +122,7 @@ namespace numeric
   }
   
   template< class T >
+  inline
   T & make_max( T &a, T const &b )
   {
     if (a < b) a = b;
@@ -123,12 +130,14 @@ namespace numeric
   }
   
   template< class T >
+  inline
   T abs( T const &v )
   {
     return v < 0 ? -v : v;
   }
 
   template< class T >
+  inline
   T sqr( T const &x )
   {
     return x * x;
@@ -193,6 +202,72 @@ namespace numeric
     template< class T >
     bool operator()( T const & ) const { return false; }
   };
+  
+  template< class S > inline bool equal        ( S a, S b, S eps = 0 ) { return abs(a - b) <= eps; }
+  template< class S > inline bool greater      ( S a, S b, S eps = 0 ) { return a - b >  -eps; }
+  template< class S > inline bool greater_equal( S a, S b, S eps = 0 ) { return a - b >= -eps; }
+  template< class S > inline bool less         ( S a, S b, S eps = 0 ) { return a - b <  +eps; }
+  template< class S > inline bool less_equal   ( S a, S b, S eps = 0 ) { return a - b <= +eps; }
+  
+  template< class S >
+  inline
+  bool by_component_equal( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0 )
+  {
+    BOOST_ASSERT(a.size() == b.size());
+    for (size_t i = 0; i < a.size(); ++i)
+      if (!equal(a(i), b(i), eps))
+        return false;
+        
+    return true;
+  }
+  
+  template< class S >
+  inline
+  bool by_component_less( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0 )
+  {
+    BOOST_ASSERT(a.size() == b.size());
+    for (size_t i = 0; i < a.size(); ++i)
+      if (!less(a(i), b(i), eps))
+        return false;
+        
+    return true;
+  }
+  
+  template< class S >
+  inline
+  bool by_component_less_equal( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0 )
+  {
+    BOOST_ASSERT(a.size() == b.size());
+    for (size_t i = 0; i < a.size(); ++i)
+      if (!less_equal(a(i), b(i), eps))
+        return false;
+        
+    return true;
+  }
+  
+  template< class S >
+  inline
+  bool by_component_greater( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0 )
+  {
+    BOOST_ASSERT(a.size() == b.size());
+    for (size_t i = 0; i < a.size(); ++i)
+      if (!greater(a(i), b(i), eps))
+        return false;
+        
+    return true;
+  }
+  
+  template< class S >
+  inline
+  bool by_component_greater_equal( vector_expression<S> const &a, vector_expression<S> const &b, S eps = 0 )
+  {
+    BOOST_ASSERT(a.size() == b.size());
+    for (size_t i = 0; i < a.size(); ++i)
+      if (!greater_equal(a(i), b(i), eps))
+        return false;
+        
+    return true;
+  }
 } // End of namespace 'numeric'.
 
 #endif // NUMERIC_NUMERIC_COMMON_HPP
