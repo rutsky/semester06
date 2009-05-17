@@ -79,11 +79,11 @@ namespace kelley_cutting_plane
 
     // Filling initial common linear problem.
     {
-      commonLP.min = true;
+      commonLP.min() = true;
       
-      commonLP.c.assign(c);
-      commonLP.cSign.resize(n);
-      std::fill(commonLP.cSign.begin(), commonLP.cSign.end(), common_linear_problem_type::any_sign);
+      commonLP.c().assign(c);
+      commonLP.cSign().resize(n);
+      std::fill(commonLP.cSign().begin(), commonLP.cSign().end(), common_linear_problem_type::clp_traits_type::variable_any_sign);
       
       matrix_type A = zero_matrix(2 * n, n);
       vector_type b(2 * n);
@@ -95,10 +95,10 @@ namespace kelley_cutting_plane
         b(2 * i + 1)    = startLimitHi(i);
       }
       
-      commonLP.A.assign(A);
-      commonLP.b.assign(A);
-      commonLP.ASign.resize(2 * n);
-      std::fill(commonLP.ASign.begin(), commonLP.ASign.end(), common_linear_problem_type::leq);
+      commonLP.A().assign(A);
+      commonLP.b().assign(A);
+      commonLP.ASign().resize(2 * n);
+      std::fill(commonLP.ASign().begin(), commonLP.ASign().end(), common_linear_problem_type::clp_traits_type::inequation_leq);
     }
     
     size_t nIterations(0);
@@ -112,7 +112,7 @@ namespace kelley_cutting_plane
       // Solving linear problem.
       vector_type canonicalResultVec;
       simplex::simplex_result_type const result = 
-          solve_augment(canonicalLP.A, canonicalLP.b, canonicalLP.c, canonicalResultVec);
+          solve_augment(canonicalLP.A(), canonicalLP.b(), canonicalLP.c(), canonicalResultVec);
       BOOST_ASSERT(result == simplex::srt_min_found); // FIXME: Handle other cases.
       
       vector_type const commonResult = conv(canonicalResultVec);
@@ -130,24 +130,24 @@ namespace kelley_cutting_plane
           // grad g[r](commonResult) * x <= grad g[r](commonResult) * commonResult - g[r](commonResult).
           
           size_t const newRow = commonLP.b.size() + 1;
-          BOOST_ASSERT(commonLP.ASign.size() == newRow - 1);
-          BOOST_ASSERT(commonLP.A.size1() == newRow - 1);
-          BOOST_ASSERT(commonLP.A.size2() == n);
+          BOOST_ASSERT(commonLP.ASign().size() == newRow - 1);
+          BOOST_ASSERT(commonLP.A().size1()    == newRow - 1);
+          BOOST_ASSERT(commonLP.A().size2()    == n);
           
-          commonLP.b.resize(newRow);
-          commonLP.A.resize(newRow, n);
-          commonLP.ASign.resize(newRow, n);
+          commonLP.b().resize(newRow);
+          commonLP.A().resize(newRow, n);
+          commonLP.ASign().resize(newRow, n);
           
-          commonLP.ASign(newRow) = common_linear_problem_type::leq;
+          commonLP.ASign()(newRow) = common_linear_problem_type::leq;
           
           vector_type const grGrad = gGrad[r](commonResult);
           BOOST_ASSERT(!scalar_traits_type::eq(norm_2(grGrad), 0)); // FIXME: I think this is possible case.
-          row(commonLP.A, newRow) = grGrad;
+          row(commonLP.A(), newRow) = grGrad;
           
-          commonLP.b(newRow) = inner_prod(grGrad, commonResult) - gr;
+          commonLP.b()(newRow) = inner_prod(grGrad, commonResult) - gr;
           
           // Assert that builded limit cuts previosly founded minimum point.
-          BOOST_ASSERT(inner_prod(row(commonLP.A, newRow), commonResult) > commonLP.b(newRow));
+          BOOST_ASSERT(inner_prod(row(commonLP.A(), newRow), commonResult) > commonLP.b()(newRow));
           
           BOOST_ASSERT(commonLP.valid());
         }
