@@ -256,7 +256,7 @@ namespace simplex
     // Filling 'Nkp'.
     // Using strict check without precision. Not good.
     copy_if(N.begin(), N.end(), std::back_inserter(Nkp), 
-        boost::bind<bool>(std::logical_not<bool>(), boost::bind<bool>(eq_zero_functor<value_type>(0.0), boost::bind<value_type>(basicV, _1)))); 
+        boost::bind<bool>(std::logical_not<bool>(), boost::bind<bool>(eq_zero_functor<value_type>(), boost::bind<value_type>(basicV, _1)))); 
     BOOST_ASSERT(Nkp.size() > 0);
     BOOST_ASSERT(Nkp.size() <= M.size());
     BOOST_ASSERT(std::adjacent_find(Nkp.begin(), Nkp.end(), std::greater<size_type>()) == Nkp.end());
@@ -386,7 +386,7 @@ namespace simplex
             vector_subvector<vector_type> uNk(subvector(u, Nk.begin(), Nk.end()));
             typename vector_subvector<vector_type>::const_iterator iuIt = std::find_if(
                 uNk.begin(), uNk.end(),
-                boost::bind<bool>(sg_functor<value_type>(0.), _1, 0.)); // Strict check: u <= 0.
+                boost::bind<bool>(sg_functor<value_type>(), _1, 0.)); // Check with precision. Some errors may occur due to this.
             
             if (iuIt == uNk.end())
             {
@@ -396,7 +396,7 @@ namespace simplex
             else
             {
               // Found u[iu] > 0.
-              BOOST_ASSERT(*iuIt > 0.);
+              BOOST_ASSERT((*iuIt > 0.) && sg(*iuIt, 0));
               
               bool canCalculateNextBasicV(false);
               
@@ -420,14 +420,19 @@ namespace simplex
                 for (size_t ri = 0; ri < Nk.size(); ++ri)
                 {
                   size_t const r = Nk[ri];
-                  if (u[r] > 0.) // strict check
+                  if (sg(u[r], 0)) // not strict check
                   {
-                    static value_type const maxTheta = 1e10;
+                    static value_type const maxTheta = infinity<value_type>();
                     
                     value_type const theta = basicV(r) / u(r);
                     
                     if (theta < maxTheta && (!minTheta || theta < minTheta->second))
                       minTheta = std::make_pair(r, theta);
+                  }
+                  else if (u[r] > 0 && eq_zero(u[r]))
+                  {
+                    // Adjusting u[r] to zero, needed for cases when basic vector has near zero components.
+                    u[r] = adjust(u[r]);
                   }
                 }
                 
