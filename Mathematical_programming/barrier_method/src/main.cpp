@@ -6,11 +6,6 @@
  * 04.05.2009
  */
 
-#ifdef USING_QT_CREATOR
-// Only for debugging in Qt Creator.
-#include </opt/qtcreator-1.1.0/share/qtcreator/gdbmacros/gdbmacros.cpp>
-#endif // USING_QT_CREATOR
-
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -34,7 +29,7 @@ int main()
   typedef scalar_type (*function_type            )( vector_type const & );
   typedef vector_type (*function_grad_type       )( vector_type const & );
   typedef matrix_type (*function_inv_hessian_type)( vector_type const & );
-  typedef scalar_type (*scalar_norm_type  )( scalar_type const & );
+  typedef scalar_type (*scalar_norm_type  )( scalar_type );
   typedef scalar_type (*vector_norm_type  )( numeric::ublas::vector_expression<vector_type> const & );
   
   typedef numeric::barrier_method::PointDebugInfo<scalar_type> points_debug_info_type;
@@ -42,7 +37,7 @@ int main()
   function_type             const f                  = &function::function<vector_type>;
   function_grad_type        const df                 = &function::functionGrad<vector_type>;
   scalar_type               const preferredPrecision = function::preferredPrecision;
-  scalar_norm_type          const sNorm              = &numeric::abs<scalar_type>;
+  scalar_norm_type          const sNorm              = &xmath::abs<scalar_type>;
   vector_norm_type          const vNorm              = &numeric::ublas::norm_2<vector_type>;
 
   vector_type startPoint(2);

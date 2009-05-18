@@ -9,6 +9,10 @@
 // STL stuff.
 #include <cstdlib>
 
+#include <algorithm>
+#include <iterator>
+#include <functional>
+
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -24,6 +28,8 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
+#include <boost/function.hpp>
+#include <boost/lambda/lambda.hpp>
 
 #include <boost/numeric/ublas/traits.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -40,6 +46,4 @@
 
 #include <boost/numeric/ublas/detail/concepts.hpp>
 
-// Only for debugging in Qt Creator.
-#include </opt/qtcreator-1.1.0/share/qtcreator/gdbmacros/gdbmacros.cpp>
 #endif
