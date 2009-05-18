@@ -138,7 +138,7 @@ namespace numeric
                                    char const *format )
   {
     ostr << start;
-    for (size_t r = 1; r < v().size(); ++r)
+    for (size_t r = 0; r < v().size(); ++r)
     {
       if (r != 0)
         ostr << delimiter;
