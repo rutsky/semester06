@@ -26,6 +26,7 @@ namespace xmath
     typedef S scalar_type;
     
     static S epsilon();
+    static S infinity();
   };
   
   template<> struct scalar_traits<int>
@@ -34,14 +35,17 @@ namespace xmath
   };
   template<> struct scalar_traits<float>
   {
-    static float  epsilon() { return 1e-8f; }
+    static float  epsilon()  { return 1e-8f; }
+    static float  infinity() { return 1e+8f; }
   };
   template<> struct scalar_traits<double>
   {
-    static double epsilon() { return 1e-10; }
+    static double epsilon()  { return 1e-10; }
+    static double infinity() { return 1e+10; }
   };
   
-  template< class S > S epsilon() { return scalar_traits<S>::epsilon(); }
+  template< class S > S epsilon()  { return scalar_traits<S>::epsilon();  }
+  template< class S > S infinity() { return scalar_traits<S>::infinity(); }
   
   // TODO: Use true C++ magic.
   // Fuzzy greater or equal.
