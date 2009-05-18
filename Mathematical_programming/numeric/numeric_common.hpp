@@ -31,6 +31,7 @@
 #include <boost/bind.hpp>
 
 #include "xmath.hpp"
+#include "xmath_boost.hpp"
 
 namespace numeric
 {
