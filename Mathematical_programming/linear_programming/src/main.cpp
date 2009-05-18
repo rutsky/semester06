@@ -103,15 +103,6 @@ int main()
     is >> min >> c >> b >> A >> variablesSigns >> constraintsSigns;
     
     {
-      /*
-      std::cout << "min:\n" << min << "\n";
-      std::cout << "c:\n" << c << "\n";
-      std::cout << "b:\n" << b << "\n";
-      std::cout << "A:\n" << A << "\n";
-      std::cout << "variablesSigns:\n" << variablesSigns << "\n";
-      std::cout << "constraintsSigns:\n" << constraintsSigns << "\n";
-      */
-      
       common_linear_problem_type directLP;
       directLP.min()   = min;
       directLP.c()     = c;
