@@ -442,7 +442,7 @@ namespace simplex
                 BOOST_ASSERT(eq_zero(nextBasicV[minTheta->first]));
                 // Adjusting new basic vector.
                 //nextBasicV = apply_to_all<functor::adjust>(nextBasicV);
-                std::cout << "Before adjusting nextBasicV:\n  " << nextBasicV << std::endl;
+                //std::cout << "Before adjusting nextBasicV:\n  " << nextBasicV << std::endl;
                 nextBasicV = apply_to_all<functor::adjust<value_type> >(nextBasicV);
                 
                 //std::cout << "==basicV:" << basicV << "\n==minTeta:" << minTeta.get() << "\n==u:" << u << "\n==newBasicV:" << nextBasicV << std::endl; // debug
@@ -456,6 +456,7 @@ namespace simplex
                       boost::bind<bool>(std::logical_not<bool>(), boost::bind<bool>(eq_zero_functor<value_type>(0.0), boost::bind<value_type>(nextBasicV, _1)))); 
                   
                   // debug
+                  /*
                   std::cout << "u:\n" << u << std::endl;
                   std::cout << "basicV:\n" << basicV << std::endl;
                   std::cout << "nextBasicV:\n" << nextBasicV << std::endl;
@@ -476,6 +477,7 @@ namespace simplex
                   std::cout << "Nkp1: ";
                   std::copy(Nkp1.begin(), Nkp1.end(), std::ostream_iterator<size_t>(std::cout, " "));
                   std::cout << "\n";
+                  */
                   // end of debug
 
                   // Nkp1 = Nkp - {minTheta->first} + {jk}
@@ -488,9 +490,11 @@ namespace simplex
                   std::set_symmetric_difference(Nkp.begin(), Nkp.end(), Nkp1.begin(), Nkp1.end(), std::back_inserter(diff));
                   
                   // debug
+                  /*
                   std::cout << "diff: ";
                   std::copy(diff.begin(), diff.end(), std::ostream_iterator<size_t>(std::cout, " "));
                   std::cout << "\n";
+                  */
                   // end of debug
                   
                   BOOST_ASSERT(diff.size() >= 2);
@@ -533,7 +537,7 @@ namespace simplex
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<VectorType>));
     
     // debug
-    std::cout << "solve_augment_with_basic_vector()\n" << "  A:" << A << "\n  b:" << b << "\n  c:" << c << "\n  basic:" << basicV << std::endl; 
+    //std::cout << "solve_augment_with_basic_vector()\n" << "  A:" << A << "\n  b:" << b << "\n  c:" << c << "\n  basic:" << basicV << std::endl; 
     // end of debug
 
     typedef typename MatrixType::value_type value_type;
