@@ -124,22 +124,22 @@ int main()
       std::cout << "Direct problem:\n";
       numeric::output_common_linear_problem(std::cout, directLP);
       
-      canonical_linear_problem_type directCanonical;
-      to_canonical(directLP, directCanonical);
+      canonical_linear_problem_type directCanonicalLP;
+      to_canonical(directLP, directCanonicalLP);
       
       std::cout << "Direct problem in canonical form:\n";
-      numeric::output_common_linear_problem(std::cout, directCanonical);
+      numeric::output_common_linear_problem(std::cout, directCanonicalLP);
       
       std::cout << "Dual problem:\n";
       common_linear_problem_type dualLP;
       construct_dual(directLP, dualLP);
       numeric::output_common_linear_problem(std::cout, dualLP);
       
-      canonical_linear_problem_type dualCanonical;
-      to_canonical(dualLP, dualCanonical);
+      canonical_linear_problem_type dualCanonicalLP;
+      to_canonical(dualLP, dualCanonicalLP);
       
       std::cout << "Dual problem in canonical form:\n";
-      numeric::output_common_linear_problem(std::cout, dualCanonical);
+      numeric::output_common_linear_problem(std::cout, dualCanonicalLP);
       
       {
         // Outputting problems to files.
@@ -149,26 +149,40 @@ int main()
         numeric::output_as_octave_source(*ofs, directLP);
         
         ofs.reset(new std::ofstream("output/lp_direct_canonical.m"));
-        numeric::output_as_octave_source(*ofs, directCanonical);
+        numeric::output_as_octave_source(*ofs, directCanonicalLP);
         
         ofs.reset(new std::ofstream("output/lp_dual.m"));
         numeric::output_as_octave_source(*ofs, dualLP);
         
         ofs.reset(new std::ofstream("output/lp_dual_canonical.m"));
-        numeric::output_as_octave_source(*ofs, dualCanonical);
+        numeric::output_as_octave_source(*ofs, dualCanonicalLP);
       }
       
       vector_type directResultV;
       numeric::simplex::simplex_result_type const directResult = 
           numeric::linear_problem::solve_by_simplex(directLP, directResultV);
-      std::cout << "Direct problem solution: " << directResultV << " (result=" << static_cast<int>(directResult) << ")\n";
+      std::cout << "Direct problem solution: \n  " << directResultV << 
+          " (result=" << static_cast<int>(directResult) << ")\n";
+      
+      vector_type directCanonicalResultV;
+      numeric::simplex::simplex_result_type const directCanonicalResult = 
+          numeric::linear_problem::solve_by_simplex(directCanonicalLP, directCanonicalResultV);
+      std::cout << "Canonical direct problem solution: \n  " << directCanonicalResultV << 
+          " (result=" << static_cast<int>(directCanonicalResult) << ")\n";
       
       vector_type dualResultV;
       numeric::simplex::simplex_result_type const dualResult = 
           numeric::linear_problem::solve_by_simplex(dualLP, dualResultV);
-      std::cout << "Direct problem solution: " << dualResultV << " (result=" << static_cast<int>(dualResult) << ")\n";
+      std::cout << "Dual problem solution: \n  " << dualResultV << 
+          " (result=" << static_cast<int>(dualResult) << ")\n";
       
-      //BOOST_ASSERT(numeric::linear_problem::check_linear_problem_solving_correctness(commonLP));
+      vector_type dualCanonicalResultV;
+      numeric::simplex::simplex_result_type const dualCanonicalResult = 
+          numeric::linear_problem::solve_by_simplex(dualCanonicalLP, dualCanonicalResultV);
+      std::cout << "Canonical dual problem solution: \n  " << dualCanonicalResultV << 
+          " (result=" << static_cast<int>(dualCanonicalResult) << ")\n";
+      
+      BOOST_ASSERT(numeric::linear_problem::check_linear_problem_solving_correctness(directLP));
     }
     
     {
