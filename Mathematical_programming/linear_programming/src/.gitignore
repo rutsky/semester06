@@ -2,3 +2,7 @@
 lp_problem.pro.user
 lp_problem
 .build/
+Makefile
+# TODO: These files must not be generated.
+Makefile.Debug
+Makefile.Release
