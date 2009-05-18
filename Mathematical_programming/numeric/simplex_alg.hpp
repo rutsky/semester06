@@ -38,6 +38,7 @@ namespace simplex
   // TODO: Move implementation lower.
   // TODO: Code may be overgeneralized.
   // TODO: Rename `value_type' by `scalar_type'.
+  // TODO: Replace `basis' by `basic'.
   
   // Types of linear programming solving results.
   enum simplex_result_type
@@ -104,7 +105,7 @@ namespace simplex
       
       range_container_type Nkp;
       copy_if(N.begin(), N.end(), std::back_inserter(Nkp), 
-          boost::bind<bool>(std::logical_not<bool>(), boost::bind<bool>(eq_zero_functor<value_type>(), boost::bind<value_type>(x, _1))));
+          boost::bind<bool>(std::logical_not<bool>(), boost::bind<bool>(eq_zero_functor<value_type>(0.), boost::bind<value_type>(x, _1))));
       BOOST_ASSERT(Nkp.size() > 0);
       BOOST_ASSERT(Nkp.size() <= M.size());
 
@@ -253,8 +254,9 @@ namespace simplex
     range_container_type Nkp, Nk;
     
     // Filling 'Nkp'.
+    // Using strict check without precision. Not good.
     copy_if(N.begin(), N.end(), std::back_inserter(Nkp), 
-        boost::bind<bool>(std::logical_not<bool>(), boost::bind<bool>(eq_zero_functor<value_type>(), boost::bind<value_type>(basicV, _1))));
+        boost::bind<bool>(std::logical_not<bool>(), boost::bind<bool>(eq_zero_functor<value_type>(0.0), boost::bind<value_type>(basicV, _1)))); 
     BOOST_ASSERT(Nkp.size() > 0);
     BOOST_ASSERT(Nkp.size() <= M.size());
     BOOST_ASSERT(std::adjacent_find(Nkp.begin(), Nkp.end(), std::greater<size_type>()) == Nkp.end());
@@ -360,7 +362,7 @@ namespace simplex
           vector_subvector<vector_type> dLk(subvector(d, Lk.begin(), Lk.end()));
           typename vector_subvector<vector_type>::const_iterator jkIt = std::find_if(
               dLk.begin(), dLk.end(),
-              boost::bind<bool>(sl_functor<value_type>(), _1, 0.));
+              boost::bind<bool>(sl_functor<value_type>(), _1, 0.)); // Check with precision. If vector satisfies this, than it will satisfy optimal point criteria.
           
           if (jkIt == dLk.end())
           {
@@ -384,7 +386,7 @@ namespace simplex
             vector_subvector<vector_type> uNk(subvector(u, Nk.begin(), Nk.end()));
             typename vector_subvector<vector_type>::const_iterator iuIt = std::find_if(
                 uNk.begin(), uNk.end(),
-                boost::bind<bool>(sg_functor<value_type>(), _1, 0.));
+                boost::bind<bool>(sg_functor<value_type>(0.), _1, 0.)); // Strict check: u <= 0.
             
             if (iuIt == uNk.end())
             {
@@ -394,7 +396,7 @@ namespace simplex
             else
             {
               // Found u[iu] > 0.
-              BOOST_ASSERT(sg(*iuIt, 0.));
+              BOOST_ASSERT(*iuIt > 0.);
               
               bool canCalculateNextBasicV(false);
               
@@ -411,30 +413,85 @@ namespace simplex
               if (canCalculateNextBasicV)
               {
                 // Basic vector is not singular or u[Nkz] <= 0.
+                // Now we need to find `theta' so that one coordinate of new basis vector will become zero, 
+                // and one coordinate to `theta'.
                 
-                boost::optional<value_type> minTeta;
+                boost::optional<std::pair<size_t, value_type> > minTheta;
                 for (size_t ri = 0; ri < Nk.size(); ++ri)
                 {
                   size_t const r = Nk[ri];
-                  if (sg(u[r], 0.))
+                  if (u[r] > 0.) // strict check
                   {
-                    value_type const teta = basicV(r) / u(r);
+                    static value_type const maxTheta = 1e10;
                     
-                    if (!minTeta || teta < minTeta.get())
-                      minTeta = teta;
-                  }
-                  else if (eq_zero(u[r]) && u[r] > 0.)
-                  {
-                    // Adjusting u[r] to zero if it is positive and almost zero (to prevent cases when x[r] is near zero too).
-                    u[r] = 0.;
+                    value_type const theta = basicV(r) / u(r);
+                    
+                    if (theta < maxTheta && (!minTheta || theta < minTheta->second))
+                      minTheta = std::make_pair(r, theta);
                   }
                 }
                 
                 // Finally constructing next basic vector.
-                BOOST_ASSERT(minTeta);
-                nextBasicV = basicV - minTeta.get() * u;
+                BOOST_VERIFY(minTheta);
+                nextBasicV = basicV - minTheta->second * u;
+                BOOST_ASSERT(eq_zero(nextBasicV[minTheta->first]));
+                // Adjusting new basic vector.
+                //nextBasicV = apply_to_all<functor::adjust>(nextBasicV);
+                std::cout << "Before adjusting nextBasicV:\n  " << nextBasicV << std::endl;
+                nextBasicV = apply_to_all<functor::adjust<value_type> >(nextBasicV);
+                
                 //std::cout << "==basicV:" << basicV << "\n==minTeta:" << minTeta.get() << "\n==u:" << u << "\n==newBasicV:" << nextBasicV << std::endl; // debug
                 
+                { 
+                  // Debug: Checking new basis vector 'Nkp'.
+                  
+                  range_container_type Nkp1;
+                  
+                  copy_if(N.begin(), N.end(), std::back_inserter(Nkp1), 
+                      boost::bind<bool>(std::logical_not<bool>(), boost::bind<bool>(eq_zero_functor<value_type>(0.0), boost::bind<value_type>(nextBasicV, _1)))); 
+                  
+                  // debug
+                  std::cout << "u:\n" << u << std::endl;
+                  std::cout << "basicV:\n" << basicV << std::endl;
+                  std::cout << "nextBasicV:\n" << nextBasicV << std::endl;
+                  std::cout << "ik=" << minTheta->first << ", theta=" << minTheta->second << ", jk=" << jk << std::endl;
+                  
+                  std::cout << "Nkp:  ";
+                  std::copy(Nkp.begin(), Nkp.end(), std::ostream_iterator<size_t>(std::cout, " "));
+                  std::cout << "\n";
+              
+                  std::cout << "Nkz:  ";
+                  std::copy(Nkz.begin(), Nkz.end(), std::ostream_iterator<size_t>(std::cout, " "));
+                  std::cout << "\n";
+              
+                  std::cout << "Nk:  ";
+                  std::copy(Nk.begin(), Nk.end(), std::ostream_iterator<size_t>(std::cout, " "));
+                  std::cout << "\n";
+                  
+                  std::cout << "Nkp1: ";
+                  std::copy(Nkp1.begin(), Nkp1.end(), std::ostream_iterator<size_t>(std::cout, " "));
+                  std::cout << "\n";
+                  // end of debug
+
+                  // Nkp1 = Nkp - {minTheta->first} + {jk}
+                  BOOST_ASSERT(std::find(Nkp.begin(),  Nkp.end(),  jk)              == Nkp.end());
+                  BOOST_ASSERT(std::find(Nkp.begin(),  Nkp.end(),  minTheta->first) != Nkp.end());
+                  BOOST_ASSERT(std::find(Nkp1.begin(), Nkp1.end(), jk)              != Nkp1.end());
+                  BOOST_ASSERT(std::find(Nkp1.begin(), Nkp1.end(), minTheta->first) == Nkp1.end());
+                  
+                  range_container_type diff;
+                  std::set_symmetric_difference(Nkp.begin(), Nkp.end(), Nkp1.begin(), Nkp1.end(), std::back_inserter(diff));
+                  
+                  // debug
+                  std::cout << "diff: ";
+                  std::copy(diff.begin(), diff.end(), std::ostream_iterator<size_t>(std::cout, " "));
+                  std::cout << "\n";
+                  // end of debug
+                  
+                  BOOST_ASSERT(diff.size() >= 2);
+                  // End of debug.
+                }
+
                 BOOST_ASSERT(basicV.size() == nextBasicV.size() && basicV.size() == c.size()); // debug
                 // Asserting that next basic vector not increases goal function.
                 BOOST_ASSERT(std::inner_product(c.begin(), c.end(), basicV.begin(), 0.) >= 
@@ -469,6 +526,10 @@ namespace simplex
     // TODO: Assert that value types in all input is compatible, different types for different vectors.
     BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<MatrixType>));
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<VectorType>));
+    
+    // debug
+    std::cout << "solve_augment_with_basic_vector()\n" << "  A:" << A << "\n  b:" << b << "\n  c:" << c << "\n  basic:" << basicV << std::endl; 
+    // end of debug
 
     typedef typename MatrixType::value_type value_type;
     typedef ublas::vector<value_type>       vector_type;
