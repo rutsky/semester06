@@ -146,7 +146,7 @@ namespace barrier_method
     
     // TODO: Use boost::lambda instead.
     template< class S >
-    struct ConstrainPredicate
+    struct ConstraintPredicate
     {
     public:
       typedef S                                                        scalar_type;
@@ -158,7 +158,7 @@ namespace barrier_method
       
     public:
       template< class LimitFuncIterator >
-      ConstrainPredicate( LimitFuncIterator limitFuncBegin, LimitFuncIterator limitFuncEnd )
+      ConstraintPredicate( LimitFuncIterator limitFuncBegin, LimitFuncIterator limitFuncEnd )
         : limitFunctions_(limitFuncBegin, limitFuncEnd)
       {
         // TODO: Assertions on input types.
@@ -245,18 +245,18 @@ namespace barrier_method
     typedef boost::function<vector_type( vector_type )> function_gradient_type;
     typedef AdditionalFunction        <scalar_type>     additional_function_type;
     typedef AdditionalFunctionGradient<scalar_type>     additional_function_gradient_type;
-    typedef ConstrainPredicate<scalar_type>             constrain_predicate_type;
+    typedef ConstraintPredicate<scalar_type>            constraint_predicate_type;
     typedef PointDebugInfo<scalar_type>                 points_debug_info_type;
     
     additional_function_type          additionalFunc    (function,     gBegin, gEnd);
     additional_function_gradient_type additionalFuncGrad(functionGrad, gBegin, gEnd, gGradBegin, gGradEnd);
-    constrain_predicate_type          constrainPred     (gBegin, gEnd);
+    constraint_predicate_type         constraintPred    (gBegin, gEnd);
     
     // Initializing
     vector_type x  = startPoint;
     scalar_type mu = startMu;
     
-    BOOST_ASSERT(constrainPred(x)); // TODO: Rename `constrain' by `constraint'.
+    BOOST_ASSERT(constraintPred(x));
     
     mu /= beta;
     points_debug_info_type pdi(x, mu, function(x), (additionalFunc(mu, x) - function(x)) / mu);
@@ -280,7 +280,7 @@ namespace barrier_method
                x, 
                gradientDescentPrecision, gradientDescentStep, 
                newx,
-               constrainPred, DummyOutputIterator());
+               constraintPred, DummyOutputIterator());
       BOOST_ASSERT(result == result); // TODO: Handle result states.
 
       // debug

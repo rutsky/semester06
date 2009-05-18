@@ -34,7 +34,7 @@ namespace gradient_descent
     gd_inf_function,        // Failure, function value is infimum.
   };
   
-  template< class Func, class FuncGrad, class V, class ConstrainPredicate, class PointsOut >
+  template< class Func, class FuncGrad, class V, class ConstraintPredicate, class PointsOut >
   inline
   gradient_descent_result
     find_min( Func function, FuncGrad functionGrad, 
@@ -42,7 +42,7 @@ namespace gradient_descent
               typename V::value_type precision,
               typename V::value_type step,
               V &result,
-              ConstrainPredicate constrainPred,
+              ConstraintPredicate constraintPred,
               PointsOut          pointsOut )
   {
     // TODO: Now we assume that vector's coordinates and function values are same scalar types.
@@ -62,7 +62,7 @@ namespace gradient_descent
     
     // Setting current point to start point.
     vector_type x = startPoint;
-    BOOST_ASSERT(constrainPred(x));
+    BOOST_ASSERT(constraintPred(x));
     
     *pointsOut++ = x;
     
@@ -115,8 +115,8 @@ namespace gradient_descent
         nextX = s0 + dir * step * section;
         if (ublas::norm_2(x - nextX) < precision)
         {
-          // Next point is equal to current (with precision and constrain), seems found minimum.
-          std::cout << "GD exit by constrain: " << s0 << "; " << (s1 - s0) << " ; " << grad << std::endl; // debug
+          // Next point is equal to current (with precision and constraint), seems found minimum.
+          std::cout << "GD exit by constraint: " << s0 << "; " << (s1 - s0) << " ; " << grad << std::endl; // debug
           result = x;
           return gd_close_point;
         }
@@ -132,7 +132,7 @@ namespace gradient_descent
         }
         
         // Decreasing search step if point is not admissible.
-        if (!constrainPred(nextX)) // TODO: Do not rerund constrain predicate for same point.
+        if (!constraintPred(nextX)) // TODO: Do not rerund constraint predicate for same point.
           step /= 2.;
         
         if (step <= precision)
@@ -141,7 +141,7 @@ namespace gradient_descent
           std::cout << "gd_step_too_small: " << x << ", step=" << step << ", prec=" << precision << std::endl; // debug
           return gd_step_too_small;
         }
-      } while (!constrainPred(nextX));
+      } while (!constraintPred(nextX));
 
       // Moving to next point.
       x = nextX;
