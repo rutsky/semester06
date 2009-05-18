@@ -141,6 +141,23 @@ int main()
       std::cout << "Dual problem in canonical form:\n";
       numeric::output_common_linear_problem(std::cout, dualCanonical);
       
+      {
+        // Outputting problems to files.
+        boost::scoped_ptr<std::ofstream> ofs;
+      
+        ofs.reset(new std::ofstream("output/lp_direct.m"));
+        numeric::output_as_octave_source(*ofs, directLP);
+        
+        ofs.reset(new std::ofstream("output/lp_direct_canonical.m"));
+        numeric::output_as_octave_source(*ofs, directCanonical);
+        
+        ofs.reset(new std::ofstream("output/lp_dual.m"));
+        numeric::output_as_octave_source(*ofs, dualLP);
+        
+        ofs.reset(new std::ofstream("output/lp_dual_canonical.m"));
+        numeric::output_as_octave_source(*ofs, dualCanonical);
+      }
+      
       vector_type directResultV;
       numeric::simplex::simplex_result_type const directResult = 
           numeric::linear_problem::solve_by_simplex(directLP, directResultV);
