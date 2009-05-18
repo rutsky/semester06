@@ -64,40 +64,40 @@ namespace linear_problem
     BOOST_ASSERT(N1.size() + N2.size() + N3.size() == N.size());
     
     // TODO: Comment this.
-    if (!by_component_greater_equal(subvector(y, M1.begin(), M1.end()), scalar_vector_type(M1.size(), 0), eps))
+    if (!by_component_greater_equal(subvector(y, M1.begin(), M1.end()), scalar_vector_type(M1.size(), 0.), eps))
       return false;
-    if (!by_component_less_equal(subvector(y, M3.begin(), M3.end()), scalar_vector_type(M3.size(), 0), eps))
+    if (!by_component_less_equal(subvector(y, M3.begin(), M3.end()), scalar_vector_type(M3.size(), 0.), eps))
       return false;
     
     if (!by_component_greater_equal(
           subvector(commonLP.c(), N1.begin(), N1.end()) - prod(y, submatrix(commonLP.A(), M.begin(), M.end(), N1.begin(), N1.end())),
-          scalar_vector_type(N1.size(), 0), eps))
+          scalar_vector_type(N1.size(), 0.), eps))
       return false;
     if (!by_component_less_equal(
           subvector(commonLP.c(), N3.begin(), N3.end()) - prod(y, submatrix(commonLP.A(), M.begin(), M.end(), N3.begin(), N3.end())),
-          scalar_vector_type(N3.size(), 0), eps))
+          scalar_vector_type(N3.size(), 0.), eps))
       return false;
     
     if (!by_component_equal(
           subvector(commonLP.c(), N2.begin(), N2.end()) - prod(y, submatrix(commonLP.A(), M.begin(), M.end(), N2.begin(), N2.end())),
-          scalar_vector_type(N2.size(), 0), eps))
+          scalar_vector_type(N2.size(), 0.), eps))
       return false;
     
-    if (!equal(prod(subvector(y, M1.begin(), M1.end()), 
-                    prod(submatrix(commonLP.A(), M1.begin(), M1.end(), N.begin(), N.end()), x - 
-                          subvector(commonLP.b(), M1.begin(), M1.end()))), 
-               0, eps))
+    if (!equal(inner_prod(vector_type(subvector(y, M1.begin(), M1.end())), 
+                          vector_type(prod(submatrix(commonLP.A(), M1.begin(), M1.end(), N.begin(), N.end()), x) - 
+                               subvector(commonLP.b(), M1.begin(), M1.end()))), 
+               0., eps))
       return false;
-    if (!equal(prod(subvector(y, M3.begin(), M3.end()), 
-                    prod(submatrix(commonLP.A(), M3.begin(), M3.end(), N.begin(), N.end()), x - 
-                          subvector(commonLP.b(), M3.begin(), M3.end()))), 
-               0, eps))
+    if (!equal(inner_prod(vector_type(subvector(y, M3.begin(), M3.end())), 
+                          vector_type(prod(submatrix(commonLP.A(), M3.begin(), M3.end(), N.begin(), N.end()), x) - 
+                               subvector(commonLP.b(), M3.begin(), M3.end()))), 
+               0., eps))
       return false;
     
-    if (!equal(prod(subvector(commonLP.c(), N1.begin(), N1.end()) - 
-                    prod(y, submatrix(commonLP.A(), M.begin(), M.end(), N1.begin(), N1.end())), 
-                    subvector(x, N1.begin(), N1.end())), 
-               0, eps))
+    if (!equal(inner_prod(vector_type(subvector(commonLP.c(), N1.begin(), N1.end()) - 
+                                      vector_type(prod(y, submatrix(commonLP.A(), M.begin(), M.end(), N1.begin(), N1.end())))), 
+                          vector_type(subvector(x, N1.begin(), N1.end()))), 
+               0., eps))
       return false;
     
     return true;
@@ -122,18 +122,18 @@ namespace linear_problem
     
     dualLP.min() = !commonLP.min();
     
-    dualLP.c().assign(commonLP.b());
+    dualLP.c() = commonLP.b();
     dualLP.cSign().resize(constraints_count(commonLP));
     std::transform(commonLP.ASign().begin(), commonLP.ASign().end(), 
                    dualLP.cSign().begin(), (inequality_to_variable_function_type)&dual);
     
-    dualLP.A().assign(trans(commonLP.A()));
+    dualLP.A() = trans(commonLP.A());
     
     dualLP.ASign().resize(variables_count(commonLP));
     std::transform(commonLP.cSign().begin(), commonLP.cSign().end(), 
                    dualLP.ASign().begin(), (variable_to_inequality_function_type)&dual);
     
-    dualLP.b().assign(commonLP.c());
+    dualLP.b() = commonLP.c();
     
     BOOST_ASSERT(is_valid(dualLP));
   }

@@ -76,7 +76,6 @@ namespace simplex
       typedef typename MatrixType::value_type         value_type;
       typedef vector<value_type>               vector_type;
       typedef matrix<value_type>               matrix_type;
-      typedef scalar_traits<value_type>        scalar_traits_type;
       typedef basic_range<size_t, long>        range_type;
       typedef std::vector<size_t>                     range_container_type;
       typedef linear_independent_vectors<vector_type> li_vectors_type;
@@ -96,31 +95,36 @@ namespace simplex
       
       range_container_type Nkp;
       copy_if(N.begin(), N.end(), std::back_inserter(Nkp), 
-          boost::bind<bool>(std::logical_not<bool>(), boost::bind<bool>(&scalar_traits_type::equals, 0., boost::bind<value_type>(x, _1))));
+          boost::bind<bool>(std::logical_not<bool>(), boost::bind<bool>(eq_zero_functor<value_type>(), boost::bind<value_type>(x, _1))));
       BOOST_ASSERT(Nkp.size() > 0);
       BOOST_ASSERT(Nkp.size() <= M.size());
+
+      // debug
+      std::cout << "   Nkp: ";
+      std::copy(Nkp.begin(), Nkp.end(), std::ostream_iterator<size_t>(std::cout, " "));
+      std::cout << "\n";
+
+      std:: cout << "   A:" << A << std::endl;
+      std:: cout << "   x:" << x << std::endl;
+      std:: cout << "   b:" << b << std::endl;
+      // end of debug
       
       li_vectors_type basicVectorLICols;
       BOOST_ASSERT(is_linear_independent(matrix_columns_begin(submatrix(A, M.begin(), M.end(), Nkp.begin(), Nkp.end())),
                                          matrix_columns_end  (submatrix(A, M.begin(), M.end(), Nkp.begin(), Nkp.end()))));
       
-      std:: cout << "   A:" << A << std::endl; // debug
-      std:: cout << "   x:" << x << std::endl; // debug
-      std:: cout << "   b:" << b << std::endl; // debug
       // Asserting that basic vector lies in set of admissible points.
       for (size_t r = 0; r < M.size(); ++r)
       {
-        matrix_row<matrix_type const> rowA(A, r);
-        value_type const result2 = std::inner_product(row(A, r).begin(), row(A, r).end(), x.begin(), 0.);
-        value_type const result = std::inner_product(rowA.begin(), rowA.end(), x.begin(), 0.);
-        std::copy(rowA.begin(), rowA.end(), std::ostream_iterator<value_type>(std::cout, ", ")); std::cout << std::endl; // debug
-        copy_n(x.begin(), std::distance(rowA.begin(), rowA.end()), std::ostream_iterator<value_type>(std::cout, ", ")); std::cout << std::endl; // debug
-        std::cout << "rowA=" << rowA << std::endl; // debug
-        std::cout << "result:" << result << ", result2:" << result2 << ", b[r]:" << b[r] << std::endl; // debug
-        std::cout << "  (" << r << ") result - b[r] = " << result - b[r] << std::endl; // debug
-        // TODO: Precision.
-        //BOOST_ASSERT(scalar_traits_type::equals(result, b[r]));
-        BOOST_ASSERT(equal_zero(result - b[r], 1e-10)); // TODO
+        //matrix_row<matrix_type const> rowA(A, r);
+        value_type const result = std::inner_product(row(A, r).begin(), row(A, r).end(), x.begin(), 0.);
+        //value_type const result2 = std::inner_product(rowA.begin(), rowA.end(), x.begin(), 0.);
+        //std::copy(rowA.begin(), rowA.end(), std::ostream_iterator<value_type>(std::cout, ", ")); std::cout << std::endl; // debug
+        //copy_n(x.begin(), std::distance(rowA.begin(), rowA.end()), std::ostream_iterator<value_type>(std::cout, ", ")); std::cout << std::endl; // debug
+        //std::cout << "rowA=" << rowA << std::endl; // debug
+        //std::cout << "result:" << result << ", result2:" << result2 << ", b[r]:" << b[r] << std::endl; // debug
+        //std::cout << "  (" << r << ") result - b[r] = " << result - b[r] << std::endl; // debug
+        BOOST_ASSERT(eq_zero(result - b[r]));
       }
       
       return true;
@@ -141,7 +145,6 @@ namespace simplex
     typedef typename VectorType::value_type    value_type;
     typedef ublas::vector<value_type>          vector_type;
     typedef ublas::matrix<value_type>          matrix_type;
-    typedef ublas::scalar_traits<value_type>   scalar_traits_type;
     typedef ublas::scalar_vector<value_type>   scalar_vector_type;
     typedef ublas::basic_range<size_t, long>   range_type;
     typedef ublas::identity_matrix<value_type> identity_matrix_type;
@@ -191,7 +194,7 @@ namespace simplex
     
     std::cout << "Support problem v: " << newResultV << "\n"; // debug
     std::cout << "mod v: " << ublas::vector_norm_inf<vector_type>::apply(ublas::project(newResultV, ublas::range(N.size(), N.size() + M.size()))) << "\n"; // debug
-    if (scalar_traits_type::equals(ublas::vector_norm_inf<vector_type>::apply(ublas::project(newResultV, ublas::range(N.size(), N.size() + M.size()))), 0))
+    if (eq_zero(ublas::vector_norm_inf<vector_type>::apply(ublas::project(newResultV, ublas::range(N.size(), N.size() + M.size())))))
     {
       // Found basic vector.
       basicV = ublas::project(newResultV, ublas::range(0, N.size()));
@@ -220,7 +223,6 @@ namespace simplex
     typedef ublas::vector<value_type>               vector_type;
     typedef ublas::matrix<value_type>               matrix_type;
     typedef typename vector_type::size_type         size_type;
-    typedef ublas::scalar_traits<value_type>        scalar_traits_type;
     typedef ublas::basic_range<size_t, long>        range_type;
     typedef std::vector<size_type>                  range_container_type;
     typedef linear_independent_vectors<vector_type> li_vectors_type;
@@ -241,11 +243,11 @@ namespace simplex
     
     BOOST_ASSERT(assert_basic_vector(A, b, basicV));
         
-    range_container_type Nkp, Nkz, Nk, Lk;
+    range_container_type Nkp, Nk;
     
     // Filling 'Nkp'.
     copy_if(N.begin(), N.end(), std::back_inserter(Nkp), 
-        boost::bind<bool>(std::logical_not<bool>(), boost::bind<bool>(&scalar_traits_type::equals, 0., boost::bind<value_type>(basicV, _1))));
+        boost::bind<bool>(std::logical_not<bool>(), boost::bind<bool>(eq_zero_functor<value_type>(), boost::bind<value_type>(basicV, _1))));
     BOOST_ASSERT(Nkp.size() > 0);
     BOOST_ASSERT(Nkp.size() <= M.size());
     BOOST_ASSERT(std::adjacent_find(Nkp.begin(), Nkp.end(), std::greater<size_type>()) == Nkp.end());
@@ -270,8 +272,26 @@ namespace simplex
           // Basis was found.
           foundBasis = true;
           
+          range_container_type Nkz, Lk;
+          
           // Filling 'Nkz'.
           std::set_difference(Nk.begin(), Nk.end(), Nkp.begin(), Nkp.end(), std::back_inserter(Nkz));
+          /*
+          { // debug
+            std::cout << ">>Nk: ";
+            std::copy(Nk.begin(), Nk.end(), std::ostream_iterator<size_t>(std::cout, " "));
+            std::cout << "\n";
+            
+            std::cout << ">>Nkp: ";
+            std::copy(Nkp.begin(), Nkp.end(), std::ostream_iterator<size_t>(std::cout, " "));
+            std::cout << "\n";
+
+
+            std::cout << ">>Nkz: ";
+            std::copy(Nkz.begin(), Nkz.end(), std::ostream_iterator<size_t>(std::cout, " "));
+            std::cout << "\n";
+          } // end of debug
+          */
           BOOST_ASSERT(std::adjacent_find(Nkz.begin(), Nkz.end(), std::greater<size_type>()) == Nkz.end());
           
           // Filling 'Lk'.
@@ -316,22 +336,13 @@ namespace simplex
           std::cout << "zero m: " << 
               ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size()) << std::endl; // debug
           // end of debug
-          /*
-          // TODO: Precision.
-          BOOST_ASSERT(
-            scalar_traits_type::equals(
-              ublas::matrix_norm_inf<matrix_type>::apply(ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size())),
-              0.));
-           */
-          BOOST_ASSERT(equal_zero(ublas::matrix_norm_inf<matrix_type>::apply(ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size())), 1e-10)); // TODO
+          BOOST_ASSERT(eq_zero(ublas::matrix_norm_inf<matrix_type>::apply(ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size()))));
           
           // Calculating 'd' vector.
           vector_type d(M.size());
           d = c - ublas::prod(ublas::trans(A), vector_type(ublas::prod(ublas::trans(BNk), subvector(c, Nk.begin(), Nk.end()))));
           
-          // TODO: Precision.
-          //BOOST_ASSERT(scalar_traits_type::equals(ublas::vector_norm_inf<matrix_type>::apply(subvector(d, Nk.begin(), Nk.end())), 0.));
-          BOOST_ASSERT(equal_zero(ublas::vector_norm_inf<matrix_type>::apply(subvector(d, Nk.begin(), Nk.end())), 1e-10)); // TODO
+          BOOST_ASSERT(eq_zero(ublas::vector_norm_inf<matrix_type>::apply(subvector(d, Nk.begin(), Nk.end()))));
           
           std::cout << "d: " << d << "\n"; // debug
           
@@ -393,7 +404,7 @@ namespace simplex
                 for (size_t ri = 0; ri < Nk.size(); ++ri)
                 {
                   size_t const r = Nk[ri];
-                  if (u[r] > 0. && !scalar_traits_type::equals(u[r], 0.))
+                  if (!le(u[r], 0.))
                   {
                     value_type const teta = basicV(r) / u(r);
                     
@@ -502,7 +513,6 @@ namespace simplex
     typedef typename MatrixType::value_type         value_type;
     typedef ublas::vector<value_type>               vector_type;
     typedef ublas::matrix<value_type>               matrix_type;
-    typedef ublas::scalar_traits<value_type>        scalar_traits_type;
     typedef ublas::basic_range<size_t, long>        range_type;
     typedef std::vector<size_t>                     range_container_type;
     typedef linear_independent_vectors<vector_type> li_vectors_type;

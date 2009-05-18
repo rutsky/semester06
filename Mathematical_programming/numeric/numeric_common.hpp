@@ -38,8 +38,6 @@ namespace numeric
   
   namespace ublas = boost::numeric::ublas;
   
-  using ublas::scalar_traits;
-  
   using ublas::vector;
   using ublas::vector_expression;
   using ublas::zero_vector;

@@ -43,6 +43,7 @@ namespace xmath
   
   template< class S > S epsilon() { return scalar_traits<S>::epsilon(); }
   
+  // TODO: Use true C++ magic.
   template< class S1, class S2, class S3 >
   inline bool ge_impl( S1 a, S2 b, S3 eps )                            { return a - b >= -eps;      }
   inline bool ge( double a, double b, double eps = epsilon<double>() ) { return ge_impl(a, b, eps); }
@@ -86,6 +87,30 @@ namespace xmath
   inline double adjust( double val, double eps = epsilon<double>() ) { return eq_zero(val, eps) ? 0.  : val; }
   inline float  adjust( float  val, float  eps = epsilon<float> () ) { return eq_zero(val, eps) ? 0.f : val; }
   inline int    adjust( int    val, int    eps = epsilon<int>   () ) { return eq_zero(val, eps) ? 0   : val; }
+  
+  template< class S >
+  inline boost::function<bool( S, S )> ge_functor( S eps = epsilon<S>() )
+  { 
+    return boost::bind<bool>((bool(*)( S, S, S ))&ge, _1, _2, eps); 
+  }
+  
+  template< class S >
+  inline boost::function<bool( S, S )> le_functor( S eps = epsilon<S>() )
+  { 
+    return boost::bind<bool>((bool(*)( S, S, S ))&le, _1, _2, eps); 
+  }
+  
+  template< class S >
+  inline boost::function<bool( S, S )> eq_functor( S eps = epsilon<S>() )
+  { 
+    return boost::bind<bool>((bool(*)( S, S, S ))&eq, _1, _2, eps); 
+  }
+
+  template< class S >
+  inline boost::function<bool( S )> eq_zero_functor( S eps = epsilon<S>() )
+  { 
+    return boost::bind<bool>((bool(*)( S, S ))&eq_zero, _1, eps); 
+  }
   
   template< typename T, int size >
   inline size_t array_size( T (&)[size] ) { return size; }

@@ -123,6 +123,8 @@ int main()
       numeric::simplex::simplex_result_type const result = 
           numeric::linear_problem::solve_by_simplex(commonLP, resultV);
       std::cout << "Solution: " << resultV << " (result=" << static_cast<int>(result) << ")\n";
+      
+      BOOST_ASSERT(numeric::linear_problem::check_linear_problem_solving_correctness(commonLP));
     }
     
     {
