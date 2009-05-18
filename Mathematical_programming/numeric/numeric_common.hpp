@@ -197,6 +197,7 @@ namespace numeric
     bool operator()( T const & ) const { return false; }
   };
   
+  // TODO: Use xmath.hpp implementation.
   template< class S > inline bool equal        ( S a, S b, S eps = 0. ) { return abs(a - b) <= eps; }
   template< class S > inline bool greater      ( S a, S b, S eps = 0. ) { return a - b >  -eps; }
   template< class S > inline bool greater_equal( S a, S b, S eps = 0. ) { return a - b >= -eps; }
