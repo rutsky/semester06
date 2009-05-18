@@ -149,6 +149,7 @@ namespace numeric
     return ostr;
   }
   
+  // TODO: Rename to smth. like `output_octave'.
   template< class OutStream, class E >
   OutStream &output_matrix_octave( OutStream &ostr, matrix_expression<E> const &m, char const *format = "%1$g" )
   {
