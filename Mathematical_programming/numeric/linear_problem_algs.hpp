@@ -115,8 +115,8 @@ namespace linear_problem
     typedef S                                  scalar_type;
     typedef CLPTraits<S>                       clp_traits_type;
     
-    typedef variable_sign_type   (*inequality_to_variable_function_type)( inequality_sign_type );
-    typedef inequality_sign_type (*variable_to_inequality_function_type)( variable_sign_type   );
+    typedef variable_sign_type   (*inequality_to_variable_function_type)( bool, inequality_sign_type );
+    typedef inequality_sign_type (*variable_to_inequality_function_type)( bool, variable_sign_type   );
     
     BOOST_ASSERT(is_valid(commonLP));
     
@@ -125,13 +125,15 @@ namespace linear_problem
     dualLP.c() = commonLP.b();
     dualLP.cSign().resize(constraints_count(commonLP));
     std::transform(commonLP.ASign().begin(), commonLP.ASign().end(), 
-                   dualLP.cSign().begin(), (inequality_to_variable_function_type)&dual);
+                   dualLP.cSign().begin(), 
+                   boost::bind((inequality_to_variable_function_type)&dual, commonLP.min(), _1));
     
     dualLP.A() = trans(commonLP.A());
     
     dualLP.ASign().resize(variables_count(commonLP));
     std::transform(commonLP.cSign().begin(), commonLP.cSign().end(), 
-                   dualLP.ASign().begin(), (variable_to_inequality_function_type)&dual);
+                   dualLP.ASign().begin(), 
+                   boost::bind((variable_to_inequality_function_type)&dual, commonLP.min(), _1));
     
     dualLP.b() = commonLP.c();
     

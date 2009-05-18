@@ -44,17 +44,23 @@ namespace linear_problem
   };
   
   inline
-  variable_sign_type dual( inequality_sign_type inequalitySign )
+  variable_sign_type dual( bool directProblemMin, inequality_sign_type inequalitySign )
   {
     // TODO: Can be optimized using direct values of enumerations.
     switch(inequalitySign)
     {
     case inequality_geq:
-      return variable_geq_zero;
+      if (directProblemMin)
+        return variable_geq_zero;
+      else
+        return variable_leq_zero;
     case inequality_eq:
       return variable_any_sign;
     case inequality_leq:
-      return variable_geq_zero;
+      if (directProblemMin)
+        return variable_leq_zero;
+      else
+        return variable_geq_zero;
     default:
       // Impossible case.
       BOOST_ASSERT(0);
@@ -62,17 +68,23 @@ namespace linear_problem
   }
   
   inline
-  inequality_sign_type dual( variable_sign_type variableSign )
+  inequality_sign_type dual( bool directProblemMin, variable_sign_type variableSign )
   {
     // TODO: Can be optimized using direct values of enumerations.
     switch(variableSign)
     {
     case variable_geq_zero:
-      return inequality_geq;
+      if (directProblemMin)
+        return inequality_leq;
+      else
+        return inequality_geq;
     case variable_any_sign:
       return inequality_eq;
     case variable_leq_zero:
-      return inequality_leq;
+      if (directProblemMin)
+        return inequality_geq;
+      else
+        return inequality_leq;
     default:
       // Impossible case.
       BOOST_ASSERT(0);
