@@ -1,10 +1,9 @@
 # Ignoring Qt Creator stuff.
 barrier_method.pro.user
 barrier_method
+.build/
 Makefile
+# TODO: These files must not be generated.
 Makefile.Debug
 Makefile.Release
-qtc-gdbmacros/
-debug/
-release/
-*.o
+
