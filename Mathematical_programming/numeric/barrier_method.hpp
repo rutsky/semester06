@@ -55,7 +55,6 @@ namespace barrier_method
         scalar_type result(0.0);
         
         result += function_(x);
-        //std::cout << "  F (" << x << ") = " << result << " + ";// debug
         for (size_t i = 0; i < limitFunctions_.size(); ++i)
         {
           scalar_type const denominator = limitFunctions_[i](x);
@@ -73,9 +72,7 @@ namespace barrier_method
           {
             result += -mu / denominator;
           }
-          //std::cout << -mu / denominator << " + ";// debug
         }
-        //std::cout << " == " << result << std::endl;// debug
           
         return result;
       }
