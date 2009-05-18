@@ -228,26 +228,33 @@ namespace numeric
     output_vector_octave(ostr, commonLP.b(), format);
     ostr << "';\n";
     
-    vector_type lb(n);
-    for (size_t i = 0; i < n; ++i)
+    vector_type lb(n), ub(n);
+    for (size_t c = 0; c < n; ++c)
     {
-      if (commonLP.cSign()(i) == linear_problem::variable_geq_zero)
-        lb(i) = 0;
-      else
-        lb(i) = infinity<scalar_type>();
+      switch (commonLP.cSign()(c))
+      {
+      case linear_problem::variable_leq_zero:
+        lb(c) = -infinity<scalar_type>();
+        ub(c) = 0.;
+        break;
+      case linear_problem::variable_any_sign:
+        lb(c) = -infinity<scalar_type>();
+        ub(c) = +infinity<scalar_type>();
+        break;
+      case linear_problem::variable_geq_zero:
+        lb(c) = 0.;
+        ub(c) = +infinity<scalar_type>();
+        break;
+      default:
+        // Impossible case.
+        BOOST_ASSERT(0);
+      }
     }
+    
     ostr << "lb" << namesSuffix << " = ";
     output_vector_octave(ostr, lb, format);
     ostr << "';\n";
     
-    vector_type ub(n);
-    for (size_t c = 0; c < n; ++c)
-    {
-      if (commonLP.cSign()(c) == linear_problem::variable_leq_zero)
-        lb(c) = 0;
-      else
-        lb(c) = -infinity<scalar_type>();
-    }
     ostr << "ub" << namesSuffix << " = ";
     output_vector_octave(ostr, ub, format);
     ostr << "';\n";
