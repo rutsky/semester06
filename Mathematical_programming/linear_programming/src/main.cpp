@@ -89,7 +89,8 @@ int main()
   typedef numeric::vector<scalar_type> vector_type;
   typedef numeric::matrix<scalar_type> matrix_type;
   
-  typedef numeric::linear_problem::common_linear_problem<scalar_type> common_linear_problem_type;
+  typedef numeric::linear_problem::common_linear_problem<scalar_type>    common_linear_problem_type;
+  typedef numeric::linear_problem::canonical_linear_problem<scalar_type> canonical_linear_problem_type;
   
   //if (0)
   {
@@ -102,29 +103,55 @@ int main()
     is >> min >> c >> b >> A >> variablesSigns >> constraintsSigns;
     
     {
+      /*
       std::cout << "min:\n" << min << "\n";
       std::cout << "c:\n" << c << "\n";
       std::cout << "b:\n" << b << "\n";
       std::cout << "A:\n" << A << "\n";
       std::cout << "variablesSigns:\n" << variablesSigns << "\n";
       std::cout << "constraintsSigns:\n" << constraintsSigns << "\n";
+      */
       
-      common_linear_problem_type commonLP;
-      commonLP.min()   = min;
-      commonLP.c()     = c;
-      commonLP.cSign() = convert_to_variable_signs<numeric::linear_problem::common_linear_problem_traits<scalar_type>, vector_type>(variablesSigns);
-      commonLP.A()     = A;
-      commonLP.ASign() = convert_to_inequality_signs<numeric::linear_problem::common_linear_problem_traits<scalar_type>, vector_type>(constraintsSigns);
-      commonLP.b()     = b;
+      common_linear_problem_type directLP;
+      directLP.min()   = min;
+      directLP.c()     = c;
+      directLP.cSign() = convert_to_variable_signs<numeric::linear_problem::common_linear_problem_traits<scalar_type>, vector_type>(variablesSigns);
+      directLP.A()     = A;
+      directLP.ASign() = convert_to_inequality_signs<numeric::linear_problem::common_linear_problem_traits<scalar_type>, vector_type>(constraintsSigns);
+      directLP.b()     = b;
+      BOOST_ASSERT(numeric::linear_problem::assert_valid(directLP));
       
-      BOOST_ASSERT(numeric::linear_problem::assert_valid(commonLP));
-  
-      vector_type resultV;
-      numeric::simplex::simplex_result_type const result = 
-          numeric::linear_problem::solve_by_simplex(commonLP, resultV);
-      std::cout << "Solution: " << resultV << " (result=" << static_cast<int>(result) << ")\n";
+      std::cout << "Direct problem:\n";
+      numeric::output_common_linear_problem(std::cout, directLP);
       
-      BOOST_ASSERT(numeric::linear_problem::check_linear_problem_solving_correctness(commonLP));
+      canonical_linear_problem_type directCanonical;
+      to_canonical(directLP, directCanonical);
+      
+      std::cout << "Direct problem in canonical form:\n";
+      numeric::output_common_linear_problem(std::cout, directCanonical);
+      
+      std::cout << "Dual problem:\n";
+      common_linear_problem_type dualLP;
+      construct_dual(directLP, dualLP);
+      numeric::output_common_linear_problem(std::cout, dualLP);
+      
+      canonical_linear_problem_type dualCanonical;
+      to_canonical(dualLP, dualCanonical);
+      
+      std::cout << "Dual problem in canonical form:\n";
+      numeric::output_common_linear_problem(std::cout, dualCanonical);
+      
+      vector_type directResultV;
+      numeric::simplex::simplex_result_type const directResult = 
+          numeric::linear_problem::solve_by_simplex(directLP, directResultV);
+      std::cout << "Direct problem solution: " << directResultV << " (result=" << static_cast<int>(directResult) << ")\n";
+      
+      vector_type dualResultV;
+      numeric::simplex::simplex_result_type const dualResult = 
+          numeric::linear_problem::solve_by_simplex(dualLP, dualResultV);
+      std::cout << "Direct problem solution: " << dualResultV << " (result=" << static_cast<int>(dualResult) << ")\n";
+      
+      //BOOST_ASSERT(numeric::linear_problem::check_linear_problem_solving_correctness(commonLP));
     }
     
     {

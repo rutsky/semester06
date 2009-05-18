@@ -280,7 +280,7 @@ namespace linear_problem
       cSign_ = scalar_vector<variable_sign_type>(c_.size(), variable_geq_zero);
       BOOST_ASSERT(cSign_.size() == c_.size());
       
-      ASign_ = scalar_vector<inequality_sign_type>(A_.size1(), inequality_leq);
+      ASign_ = scalar_vector<inequality_sign_type>(A_.size1(), inequality_eq);
       BOOST_ASSERT(ASign_.size() == A_.size1());
       
       BOOST_ASSERT(assert_valid(*this));

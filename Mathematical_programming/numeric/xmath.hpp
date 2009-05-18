@@ -44,6 +44,7 @@ namespace xmath
   template< class S > S epsilon() { return scalar_traits<S>::epsilon(); }
   
   // TODO: Use true C++ magic.
+  // Fuzzy greater or equal.
   template< class S1, class S2, class S3 >
   inline bool ge_impl( S1 a, S2 b, S3 eps )                            { return a - b >= -eps;      }
   inline bool ge( double a, double b, double eps = epsilon<double>() ) { return ge_impl(a, b, eps); }
@@ -56,6 +57,20 @@ namespace xmath
   inline bool ge( int    a, float  b, float  eps = epsilon<float> () ) { return ge_impl(a, b, eps); }
   inline bool ge( int    a, int    b, int    eps = epsilon<int>   () ) { return ge_impl(a, b, eps); }
   
+  // Fuzzy strong greater.
+  template< class S1, class S2, class S3 >
+  inline bool sg_impl( S1 a, S2 b, S3 eps )                            { return a - b > eps;        }
+  inline bool sg( double a, double b, double eps = epsilon<double>() ) { return sg_impl(a, b, eps); }
+  inline bool sg( double a, float  b, double eps = epsilon<double>() ) { return sg_impl(a, b, eps); }
+  inline bool sg( double a, int    b, double eps = epsilon<double>() ) { return sg_impl(a, b, eps); }
+  inline bool sg( float  a, double b, double eps = epsilon<double>() ) { return sg_impl(a, b, eps); }
+  inline bool sg( float  a, float  b, float  eps = epsilon<float> () ) { return sg_impl(a, b, eps); }
+  inline bool sg( float  a, int    b, float  eps = epsilon<float> () ) { return sg_impl(a, b, eps); }
+  inline bool sg( int    a, double b, double eps = epsilon<double>() ) { return sg_impl(a, b, eps); }
+  inline bool sg( int    a, float  b, float  eps = epsilon<float> () ) { return sg_impl(a, b, eps); }
+  inline bool sg( int    a, int    b, int    eps = epsilon<int>   () ) { return sg_impl(a, b, eps); }
+
+  // Fuzzy less or equal.
   template< class S1, class S2, class S3 >
   inline bool le_impl( S1 a, S2 b, S3 eps )                            { return a - b <= eps;       }
   inline bool le( double a, double b, double eps = epsilon<double>() ) { return le_impl(a, b, eps); }
@@ -68,6 +83,20 @@ namespace xmath
   inline bool le( int    a, float  b, float  eps = epsilon<float> () ) { return le_impl(a, b, eps); }
   inline bool le( int    a, int    b, int    eps = epsilon<int>   () ) { return le_impl(a, b, eps); }
   
+  // Fuzzy strong less.
+  template< class S1, class S2, class S3 >
+  inline bool sl_impl( S1 a, S2 b, S3 eps )                            { return a - b < -eps;       }
+  inline bool sl( double a, double b, double eps = epsilon<double>() ) { return sl_impl(a, b, eps); }
+  inline bool sl( double a, float  b, double eps = epsilon<double>() ) { return sl_impl(a, b, eps); }
+  inline bool sl( double a, int    b, double eps = epsilon<double>() ) { return sl_impl(a, b, eps); }
+  inline bool sl( float  a, double b, double eps = epsilon<double>() ) { return sl_impl(a, b, eps); }
+  inline bool sl( float  a, float  b, float  eps = epsilon<float> () ) { return sl_impl(a, b, eps); }
+  inline bool sl( float  a, int    b, float  eps = epsilon<float> () ) { return sl_impl(a, b, eps); }
+  inline bool sl( int    a, double b, double eps = epsilon<double>() ) { return sl_impl(a, b, eps); }
+  inline bool sl( int    a, float  b, float  eps = epsilon<float> () ) { return sl_impl(a, b, eps); }
+  inline bool sl( int    a, int    b, int    eps = epsilon<int>   () ) { return sl_impl(a, b, eps); }
+  
+  // Fuzzy equal.
   template< class S1, class S2, class S3 >
   inline bool eq_impl( S1 a, S2 b, S3 eps )                            { return abs(a - b) <= eps;  }
   inline bool eq( double a, double b, double eps = epsilon<double>() ) { return eq_impl(a, b, eps); }
@@ -80,6 +109,7 @@ namespace xmath
   inline bool eq( int    a, float  b, float  eps = epsilon<float> () ) { return eq_impl(a, b, eps); }
   inline bool eq( int    a, int    b, int    eps = epsilon<int>   () ) { return eq_impl(a, b, eps); }
   
+  // Fuzzy equal zero.
   inline bool eq_zero( double a, double eps = epsilon<double>() ) { return eq(a, 0.,  eps); }
   inline bool eq_zero( float  a, float  eps = epsilon<float> () ) { return eq(a, 0.f, eps); }
   inline bool eq_zero( int    a, int    eps = epsilon<int>   () ) { return eq(a, 0,   eps); }
@@ -95,9 +125,21 @@ namespace xmath
   }
   
   template< class S >
+  inline boost::function<bool( S, S )> sg_functor( S eps = epsilon<S>() )
+  { 
+    return boost::bind<bool>((bool(*)( S, S, S ))&sg, _1, _2, eps); 
+  }
+  
+  template< class S >
   inline boost::function<bool( S, S )> le_functor( S eps = epsilon<S>() )
   { 
     return boost::bind<bool>((bool(*)( S, S, S ))&le, _1, _2, eps); 
+  }
+
+  template< class S >
+  inline boost::function<bool( S, S )> sl_functor( S eps = epsilon<S>() )
+  { 
+    return boost::bind<bool>((bool(*)( S, S, S ))&sl, _1, _2, eps); 
   }
   
   template< class S >
