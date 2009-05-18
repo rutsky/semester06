@@ -61,7 +61,7 @@ namespace numeric
   template< class OP, class E > 
   inline
   typename ublas::vector_unary_traits<E, OP>::result_type
-      apply_to_all( ublas::vector_expression<E> const &e, OP const &op = OP() ) 
+      apply_to_all( ublas::vector_expression<E> const &e ) 
   {
     typedef typename ublas::vector_unary_traits<E, OP>::expression_type expression_type;
     return expression_type(e());
@@ -70,7 +70,7 @@ namespace numeric
   template <class OP, class E>
   inline
   typename ublas::matrix_unary1_traits<E, OP>::result_type
-      apply_to_all( ublas::matrix_expression<E> const & e, OP const &op = OP() )
+      apply_to_all( ublas::matrix_expression<E> const & e )
   {
     typedef typename ublas::matrix_unary1_traits<E, OP>::expression_type expression_type;
     return expression_type(e());
@@ -91,6 +91,23 @@ namespace numeric
       static result_type apply( const value_type &x )
       {
         return ublas::type_traits<T>::type_abs(x);
+      }
+    };
+    
+    template< class T >
+    class adjust
+    {
+    public:
+      typedef T value_type;
+      typedef T result_type;
+      
+      adjust()
+      {}
+      
+      static result_type apply( const value_type &x )
+      {
+        // TODO
+        return xmath::adjust(x);
       }
     };
   } // End of namespace 'functor'.
