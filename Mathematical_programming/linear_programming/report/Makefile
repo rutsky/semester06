@@ -3,20 +3,22 @@
 # Vladimir Rutsky <altsysrq@gmail.com>
 # 22.03.2009
 
-SOURCE  = linear_programming_problem
-DEPENDENCY = matrix_A.tex vector_b.tex vector_c.tex
+SOURCES = linear_programming_problem lp_only_source
+DEPENDENCY = data/* matrix_A.tex vector_b.tex vector_c.tex
 TEX2PDF = pdflatex
 
-all: $(SOURCE).pdf
+PDF_TARGETS := $(foreach A,$(SOURCES),$(A).pdf)
 
-$(SOURCE).pdf: $(SOURCE).tex $(DEPENDENCY)
-	$(TEX2PDF) $(SOURCE).tex
+pdf: $(PDF_TARGETS)
+
+all: pdf
+
+%.pdf: %.tex $(DEPENDENCY)
+	$(TEX2PDF) $(basename $@).tex
 
 clean:
 	rm -f *~
-	rm -f *.aux
-	rm -f *.dvi
-	rm -f $(SOURCE).log
+	rm -f $(foreach A,$(SOURCES),$(A).aux $(A).dvi $(A).tex.backup $(A).log)
 
 distclean: clean
-	rm -f $(SOURCE).pdf
+	rm -f $(PDF_TARGETS)
