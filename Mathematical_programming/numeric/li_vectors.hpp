@@ -16,6 +16,7 @@
 
 namespace numeric
 {
+  // TODO: Check is inserting of zero vectors is handled.
   template< class VectorType >
   class linear_independent_vectors
   {
