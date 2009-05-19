@@ -83,7 +83,7 @@ typename CLPTraits::inequality_signs_vector_type
 }
 
 // The main program function.
-int main()
+int main( int argc, char *argv[] )
 {
   typedef double                       scalar_type;
   typedef numeric::vector<scalar_type> vector_type;
@@ -94,7 +94,11 @@ int main()
   
   //if (0)
   {
-    std::ifstream is("../data/mine.in");
+    char const *inputFileName = "data/mine.in";
+    if (argc > 1)
+      inputFileName = argv[1];
+      
+    std::ifstream is(inputFileName);
     
     bool min;
     vector_type c, b, variablesSigns, constraintsSigns;
