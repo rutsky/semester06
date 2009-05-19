@@ -96,8 +96,10 @@ namespace simplex
       BOOST_ASSERT(N.size() > 0);
       BOOST_ASSERT(M.size() > 0);
       
-      BOOST_ASSERT(M.size() < N.size());
-      BOOST_ASSERT(is_linear_independent(matrix_rows_begin(A), matrix_rows_end(A)));
+      // TODO:
+      //BOOST_ASSERT(M.size() < N.size());
+      //BOOST_ASSERT(is_linear_independent(matrix_rows_begin(A), matrix_rows_end(A)));
+      
       BOOST_ASSERT(x.size() == N.size());
       BOOST_ASSERT(b.size() == M.size());
 
@@ -537,13 +539,14 @@ namespace simplex
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<VectorType>));
     
     // debug
-    //std::cout << "solve_augment_with_basic_vector()\n" << "  A:" << A << "\n  b:" << b << "\n  c:" << c << "\n  basic:" << basicV << std::endl; 
+    std::cout << "solve_augment_with_basic_vector()\n" << "  A:" << A << "\n  b:" << b << "\n  c:" << c << "\n  basic:" << basicV << std::endl; 
     // end of debug
 
     typedef typename MatrixType::value_type value_type;
     typedef ublas::vector<value_type>       vector_type;
     
     vector_type curBasicV = basicV;
+    BOOST_ASSERT(assert_basic_vector(A, b, curBasicV));
     
     while (true)
     {
@@ -583,7 +586,7 @@ namespace simplex
   }
     
   // Solves linear programming problem described in augment form:
-  //   min (c^T * x), where x: x >= 0, A * x = b,
+  //   min (c^T * x), where x: x >= 0, A * x = b
   template< class MatrixType, class VectorType >
   inline 
   simplex_result_type solve_augment( MatrixType const &A, VectorType const &b, VectorType const &c, 
@@ -610,17 +613,102 @@ namespace simplex
     BOOST_ASSERT(N.size() > 0);
     BOOST_ASSERT(M.size() > 0);
     
-    // BOOST_ASSERT(M.size() < N.size()); // TODO: Think about what input matrices are valid.
-    BOOST_ASSERT(is_linear_independent(matrix_rows_begin(A), matrix_rows_end(A)));
-    BOOST_ASSERT(c.size()       == N.size());
-    BOOST_ASSERT(b.size()       == M.size());
+    // Removing linear dependent constraints.
+    matrix_type newA(M.size(), N.size());
+    vector_type newb(M.size());
+    size_t nextAddingRow = 0;
+    
+    li_vectors_type liARows;
+    
+    for (size_t r = 0; r < M.size(); ++r)
+    {
+      matrix_row<MatrixType const> ARow(A, r);
+      value_type const bval = b(r);
+      
+      if (eq_zero(norm_2(ARow)))
+      {
+        // Omitting zero rows.
+        BOOST_ASSERT(eq_zero(b(r))); // TODO: Handle as incorrect input return state.
+        continue;
+      }
+      
+      if (liARows.is_independent(ARow))
+      {
+        // Adding linear independent constraint to result matrix.
+        row(newA, nextAddingRow) = ARow;
+        newb(nextAddingRow) = bval;
+        ++nextAddingRow;
+      }
+      else
+      {
+        // Omitting linear dependent constraints.
+        // FIXME: Must be checked is absolute terms is correspondent!
+      }
+    }
+    
+    newA.resize(nextAddingRow, N.size(), true);
+    newb.resize(nextAddingRow, true);
+    
+    if (newA.size1() == newA.size2())
+    {
+      // Linear program problem is well defined system of linear equations.
+      size_t const size = newA.size1();
+      
+      matrix_type invNewA(size, size);
+      BOOST_VERIFY(invert_matrix(newA, invNewA)); // TODO: Handle zero determinant case.
+      
+      resultV = prod(invNewA, newb);
+      BOOST_ASSERT(assert_basic_vector(newA, newb, resultV));
+      BOOST_ASSERT(assert_basic_vector(A, b, resultV));
+      
+      return srt_min_found;
+    }
+    else
+      return solve_li_augment(newA, newb, c, resultV);
+  }
 
+  // Solves linear programming problem described in augment form:
+  //   min (c^T * x), where x: x >= 0, A * x = b and rank(A) is equal to number of columns.
+  template< class MatrixType, class VectorType >
+  inline 
+  simplex_result_type solve_li_augment( MatrixType const &A, VectorType const &b, VectorType const &c, 
+                                        VectorType &resultV )
+  {
+    // TODO: Assert that value types in all input is compatible, different types for different vectors.
+    BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<MatrixType>));
+    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<VectorType>));
+    
+    // debug
+    //std::cout << "solve_augment()\n" << "  A:" << A << "\n  b:" << b << "\n  c:" << c << std::endl; 
+    // end of debug
+    
+    typedef typename MatrixType::value_type         value_type;
+    typedef ublas::vector<value_type>               vector_type;
+    typedef ublas::matrix<value_type>               matrix_type;
+    typedef ublas::basic_range<size_t, long>        range_type;
+    typedef std::vector<size_t>                     range_container_type;
+    typedef linear_independent_vectors<vector_type> li_vectors_type;
+    
+    range_type const N(0, A.size2()), M(0, A.size1());
+    
+    // TODO
+    BOOST_ASSERT(N.size() > 0);
+    BOOST_ASSERT(M.size() > 0);
+    
+    BOOST_ASSERT(M.size() < N.size());
+    BOOST_ASSERT(is_linear_independent(matrix_rows_begin(A), matrix_rows_end(A)));
+    
+    BOOST_ASSERT(c.size() == N.size());
+    BOOST_ASSERT(b.size() == M.size());
+
+    // Searching first basic vector using artificial basis.
     vector_type firstBasicV(N.size());
     first_basic_vector_result_type const result = find_first_basic_vector(A, b, c, firstBasicV);
     
     if (result == fbrt_found)
     {
       BOOST_ASSERT(assert_basic_vector(A, b, firstBasicV));
+      // Solving linear programming problem starting from founded basic vector.
       return solve_augment_with_basic_vector(A, b, c, firstBasicV, resultV);
     }
     else
