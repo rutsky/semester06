@@ -81,8 +81,6 @@ namespace kelley_cutting_plane
       BOOST_ASSERT(result == simplex::srt_min_found); // FIXME: Handle other cases.
       BOOST_ASSERT(linear_problem::check_linear_problem_solving_correctness(commonLP));
       
-      std::cout << nIterations << ") x: " << commonResult << std::endl;
-      
       // Adding new limits to common linear problem according to elements that satisfies g_i(x) > 0.
       bool isInside(true);
       for (size_t r = 0; r < n; ++r)
