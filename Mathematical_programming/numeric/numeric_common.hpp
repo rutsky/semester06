@@ -48,6 +48,7 @@ namespace numeric
   using ublas::matrix_expression;
   using ublas::zero_matrix;
   using ublas::identity_matrix;
+  using ublas::scalar_matrix;
   using ublas::row;
   using ublas::matrix_row;
   using ublas::column;
@@ -276,6 +277,34 @@ namespace numeric
         
     return true;
   }
+  
+  // Changes vector size on the fly.
+  template< class Vector >
+  struct vector_resizer
+  {
+    vector_resizer()
+      : size_(0)
+    {}
+    
+    vector_resizer( size_t toSize )
+      : size_(toSize)
+    {}
+    
+    vector_resizer( vector_resizer const &vr )
+      : size_(vr.size_)
+    {}
+    
+    template< class V >
+    Vector operator () ( vector_expression<V> const &v )
+    {
+      Vector result = v;
+      result.resize(size_, true);
+      return result;
+    }
+    
+  private:
+    size_t size_;
+  };
 } // End of namespace 'numeric'.
 
 #endif // NUMERIC_NUMERIC_COMMON_HPP

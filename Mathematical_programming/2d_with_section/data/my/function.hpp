@@ -21,11 +21,14 @@ namespace function
   double const precisions[]       = { 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6 };
   double const step               = 30; // TODO: what is this?
   
+  // Function minimum lower bound (for Kelley's convex cutting plane algorithm).
+  double const minimumLowerBound = -1e4;
+  
   // Minimum search start point (admissible point).
   double const startX    = -20;
   double const startY    = -20;
   
-  // Lipschitz constant.
+  // Lipschitz constant calculation parameters.
   double const lipschitzStepX = 1e-3;
   double const lipschitzStepY = 1e-3;
   double const loLipschitzX = -30;
@@ -78,51 +81,9 @@ namespace function
     return grad;
   }
   
-  // Function Hessian value.
-  template< class V >
-  ublas::matrix<typename V::value_type> 
-    functionHessian( V const &x )
-  {
-    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V>));
-
-    typedef typename V::value_type     scalar_type;
-    typedef ublas::vector<scalar_type> vector_type;
-    typedef ublas::matrix<scalar_type> matrix_type;
-  
-    BOOST_ASSERT(x.size() == 2);
-    
-    matrix_type hessian(2, 2);
-    
-    hessian(0, 0) = 2; hessian(0, 1) = 0;
-    hessian(1, 0) = 0; hessian(1, 1) = 2;
-    
-    return hessian;
-  }
-
-  // Function inverse Hessian value.
-  template< class V >
-  ublas::matrix<typename V::value_type> 
-    functionInvHessian( V const &x )
-  {
-    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V>));
-
-    typedef typename V::value_type     scalar_type;
-    typedef ublas::vector<scalar_type> vector_type;
-    typedef ublas::matrix<scalar_type> matrix_type;
-  
-    BOOST_ASSERT(x.size() == 2);
-    
-    matrix_type hessian(2, 2);
-    
-    hessian(0, 0) = 0.5; hessian(0, 1) = 0;
-    hessian(1, 0) = 0;   hessian(1, 1) = 0.5;
-    
-    return hessian;
-  }
-  
-  // TODO: Use single class for all constrain functions.
+  // TODO: Use single class for all constraint functions.
   template< class S >
-  S limitFunc1( ublas::vector<S> const &x ) // TODO: Rename to 'constrain...'
+  S limitFunc1( ublas::vector<S> const &x ) // TODO: Rename to 'constraint...'
   {
     BOOST_ASSERT(x.size() == 2);
 

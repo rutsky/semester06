@@ -610,7 +610,7 @@ namespace simplex
     BOOST_ASSERT(N.size() > 0);
     BOOST_ASSERT(M.size() > 0);
     
-    BOOST_ASSERT(M.size() < N.size());
+    // BOOST_ASSERT(M.size() < N.size()); // TODO: Think about what input matrices are valid.
     BOOST_ASSERT(is_linear_independent(matrix_rows_begin(A), matrix_rows_end(A)));
     BOOST_ASSERT(c.size()       == N.size());
     BOOST_ASSERT(b.size()       == M.size());

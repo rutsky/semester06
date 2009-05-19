@@ -35,17 +35,15 @@ namespace kelley_cutting_plane
   // Initial constraints and problem formalization is stored in common linear problem structure,
   // which is expanded by new constraints along algorithm run.
   // TODO: Handle more cases, return value should be enumeration of different exit statuses.
-  template< class V, class FuncIterator, class GradFuncIterator, class Traits >
+  template< class S, class CLPTraits, class FuncIterator, class GradFuncIterator >
   inline 
-  vector<typename V::value_type> 
-    find_min( V const &c, 
-              FuncIterator     funcBegin,     FuncIterator     funcEnd,
-              GradFuncIterator gradFuncBegin, GradFuncIterator gradFuncEnd,
-              linear_problem::ICommonLinearProblem<Traits> &commonLP )
+  vector<S> 
+    find_min( FuncIterator     funcBegin,     FuncIterator         funcEnd,
+              GradFuncIterator gradFuncBegin, GradFuncIterator     gradFuncEnd,
+              linear_problem::common_linear_problem<S, CLPTraits> &commonLP )
   {
-    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V>));
-
-    typedef typename V::value_type                      scalar_type;
+    typedef CLPTraits                                   clp_traits;
+    typedef S                                           scalar_type;
     typedef vector<scalar_type>                         vector_type;
     typedef matrix<scalar_type>                         matrix_type;
     typedef zero_matrix<scalar_type>                    zero_matrix;
@@ -97,27 +95,31 @@ namespace kelley_cutting_plane
           // or 
           // grad g[r](commonResult) * x <= grad g[r](commonResult) * commonResult - g[r](commonResult).
           
-          size_t const newRow = commonLP.b.size() + 1;
-          BOOST_ASSERT(commonLP.ASign().size() == newRow - 1);
-          BOOST_ASSERT(commonLP.A().size1()    == newRow - 1);
+          size_t const newRows = commonLP.b().size() + 1;
+          BOOST_ASSERT(commonLP.ASign().size() == newRows - 1);
+          BOOST_ASSERT(commonLP.A().size1()    == newRows - 1);
           BOOST_ASSERT(commonLP.A().size2()    == n);
           
-          commonLP.b().resize(newRow);
-          commonLP.A().resize(newRow, n);
-          commonLP.ASign().resize(newRow, n);
+          commonLP.b().resize(newRows, true);
+          commonLP.A().resize(newRows, n, true);
+          commonLP.ASign().resize(newRows, true);
           
-          commonLP.ASign()(newRow) = common_linear_problem_type::leq;
+          commonLP.ASign()(newRows - 1) = linear_problem::inequality_leq;
           
           vector_type const grGrad = gGrad[r](commonResult);
-          BOOST_ASSERT(!scalar_traits_type::eq(norm_2(grGrad), 0)); // FIXME: I think this is possible case.
-          row(commonLP.A(), newRow) = grGrad;
+          BOOST_ASSERT(!eq_zero(norm_2(grGrad))); // FIXME: I think this is possible case.
+          row(commonLP.A(), newRows - 1) = grGrad;
           
-          commonLP.b()(newRow) = inner_prod(grGrad, commonResult) - gr;
+          commonLP.b()(newRows - 1) = inner_prod(grGrad, commonResult) - gr;
           
           // Assert that builded constraint cuts previosly founded minimum point.
-          BOOST_ASSERT(inner_prod(row(commonLP.A(), newRow), commonResult) > commonLP.b()(newRow));
+          BOOST_ASSERT(inner_prod(row(commonLP.A(), newRows - 1), commonResult) > commonLP.b()(newRows - 1));
           
-          BOOST_ASSERT(commonLP.valid());
+          BOOST_ASSERT(linear_problem::assert_valid(commonLP));
+          
+          // debug
+          output_common_linear_problem(std::cout, commonLP);
+          // end of debug.
         }
       }
       
