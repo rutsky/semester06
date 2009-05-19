@@ -327,6 +327,11 @@ namespace linear_problem
     canonical_linear_problem_type canonicalLP;
     converter_type conv = to_canonical(commonLP, canonicalLP);
     
+    // debug
+    //output_common_linear_problem(std::cout, commonLP);
+    //output_common_linear_problem(std::cout, canonicalLP);
+    // end of debug
+    
     // Solving linear problem.
     vector_type canonicalResultVec;
     simplex::simplex_result_type const simplexResult = 
@@ -398,6 +403,21 @@ namespace linear_problem
     scalar_type const eps = 1e-6; // TODO
     if (!is_solution(commonLP, directResultVec, dualResultVec, eps))
     {
+      // debug
+      std::cout << ">>> Simplex alg failed!\n";
+      std::cout << "      direct:\n";
+      output_common_linear_problem(std::cout, commonLP);
+      std::cout << "      dual:\n";
+      output_common_linear_problem(std::cout, dualLP);
+      
+      {
+        std::ofstream directDump("__direct.m");
+        output_as_octave_source(directDump, commonLP);
+        std::ofstream dualDump("__dual.m");
+        output_as_octave_source(dualDump, dualLP);
+      }
+      // end of debug
+      
       BOOST_ASSERT(0); // debug
       return false;
     }
