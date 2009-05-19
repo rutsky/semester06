@@ -177,13 +177,13 @@ namespace numeric
   
   template< class OutStream, class CLPTraits >
   inline
-  void output_common_linear_problem( OutStream &ostr, linear_problem::ICommonLinearProblem<CLPTraits> const &commonLP )
+  void output_common_linear_problem( OutStream &ostr, 
+                                     linear_problem::ICommonLinearProblem<CLPTraits> const &commonLP,
+                                     char const *format = "%1$6g" )
   {
     BOOST_ASSERT(linear_problem::is_valid(commonLP));
     
     size_t const m = linear_problem::constraints_count(commonLP);
-    
-    char const *format = "%1$6g";
     
     if (commonLP.min())
       ostr << "min    ";
