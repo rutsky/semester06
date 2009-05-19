@@ -539,7 +539,7 @@ namespace simplex
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<VectorType>));
     
     // debug
-    std::cout << "solve_augment_with_basic_vector()\n" << "  A:" << A << "\n  b:" << b << "\n  c:" << c << "\n  basic:" << basicV << std::endl; 
+    //std::cout << "solve_augment_with_basic_vector()\n" << "  A:" << A << "\n  b:" << b << "\n  c:" << c << "\n  basic:" << basicV << std::endl; 
     // end of debug
 
     typedef typename MatrixType::value_type value_type;
@@ -637,6 +637,9 @@ namespace simplex
         // Adding linear independent constraint to result matrix.
         row(newA, nextAddingRow) = ARow;
         newb(nextAddingRow) = bval;
+        
+        liARows.insert(ARow);
+        
         ++nextAddingRow;
       }
       else
@@ -645,6 +648,7 @@ namespace simplex
         // FIXME: Must be checked is absolute terms is correspondent!
       }
     }
+    BOOST_ASSERT(nextAddingRow <= A.size2());
     
     newA.resize(nextAddingRow, N.size(), true);
     newb.resize(nextAddingRow, true);
@@ -664,7 +668,10 @@ namespace simplex
       return srt_min_found;
     }
     else
+    {
+      BOOST_ASSERT(newA.size1() < newA.size2());
       return solve_li_augment(newA, newb, c, resultV);
+    }
   }
 
   // Solves linear programming problem described in augment form:
