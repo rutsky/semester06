@@ -75,13 +75,18 @@ namespace kelley_cutting_plane
     size_t const nMaxIterations(1000); // debug
     while (nIterations < nMaxIterations)
     {
+      // debug
+      std::cout << "=== iteration #" << nIterations + 1 << " ===" << std::endl;
+      output_common_linear_problem(std::cout, commonLP, "%1$8g");
+      // end of debug.
+      
       // Solving linear problem.
       vector_type commonResult;
       simplex::simplex_result_type const result = solve_by_simplex(commonLP, commonResult);
       BOOST_ASSERT(result == simplex::srt_min_found); // FIXME: Handle other cases.
-      BOOST_ASSERT(linear_problem::check_linear_problem_solving_correctness(commonLP));
+      //BOOST_ASSERT(linear_problem::check_linear_problem_solving_correctness(commonLP)); // FIXME
       
-      std::cout << nIterations << ") x: " << commonResult << std::endl;
+      std::cout << "Simplex algorithm gives x = " << commonResult << std::endl;
       
       // Adding new limits to common linear problem according to elements that satisfies g_i(x) > 0.
       bool isInside(true);
@@ -118,10 +123,6 @@ namespace kelley_cutting_plane
           BOOST_ASSERT(inner_prod(row(commonLP.A(), newRows - 1), commonResult) > commonLP.b()(newRows - 1));
           
           BOOST_ASSERT(linear_problem::assert_valid(commonLP));
-          
-          // debug
-          output_common_linear_problem(std::cout, commonLP);
-          // end of debug.
         }
       }
       
@@ -130,6 +131,8 @@ namespace kelley_cutting_plane
         // Founded minimum of linear problem lies inside convex limits, so this is the answer.
         return commonResult;
       }
+      
+      ++nIterations;
     }
     
     BOOST_ASSERT(0); // FIXME: Handle different cases.
