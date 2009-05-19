@@ -84,14 +84,6 @@ namespace simplex
       
       range_type const N(0, A.size2()), M(0, A.size1());
 
-      // debug      
-      /*
-      std:: cout << "   A:" << A << std::endl;
-      std:: cout << "   x:" << x << std::endl;
-      std:: cout << "   b:" << b << std::endl;
-      */
-      // end of debug
-      
       // TODO
       BOOST_ASSERT(N.size() > 0);
       BOOST_ASSERT(M.size() > 0);
@@ -111,14 +103,6 @@ namespace simplex
       BOOST_ASSERT(Nkp.size() > 0);
       BOOST_ASSERT(Nkp.size() <= M.size());
 
-      // debug
-      /*
-      std::cout << "   Nkp: ";
-      std::copy(Nkp.begin(), Nkp.end(), std::ostream_iterator<size_t>(std::cout, " "));
-      std::cout << "\n";
-      */
-      // end of debug
-      
       li_vectors_type basicVectorLICols;
       BOOST_ASSERT(is_linear_independent(matrix_columns_begin(submatrix(A, M.begin(), M.end(), Nkp.begin(), Nkp.end())),
                                          matrix_columns_end  (submatrix(A, M.begin(), M.end(), Nkp.begin(), Nkp.end()))));
@@ -126,14 +110,7 @@ namespace simplex
       // Asserting that basic vector lies in set of admissible points.
       for (size_t r = 0; r < M.size(); ++r)
       {
-        //matrix_row<matrix_type const> rowA(A, r);
         value_type const result = std::inner_product(row(A, r).begin(), row(A, r).end(), x.begin(), 0.);
-        //value_type const result2 = std::inner_product(rowA.begin(), rowA.end(), x.begin(), 0.);
-        //std::copy(rowA.begin(), rowA.end(), std::ostream_iterator<value_type>(std::cout, ", ")); std::cout << std::endl; // debug
-        //copy_n(x.begin(), std::distance(rowA.begin(), rowA.end()), std::ostream_iterator<value_type>(std::cout, ", ")); std::cout << std::endl; // debug
-        //std::cout << "rowA=" << rowA << std::endl; // debug
-        //std::cout << "result:" << result << ", result2:" << result2 << ", b[r]:" << b[r] << std::endl; // debug
-        //std::cout << "  (" << r << ") result - b[r] = " << result - b[r] << std::endl; // debug
         BOOST_ASSERT(eq_zero(result - b[r]));
       }
       
@@ -202,8 +179,6 @@ namespace simplex
     simplex_result_type const result = solve_augment_with_basic_vector(newA, newB, newC, newBasicV, newResultV);
     BOOST_ASSERT(result == srt_min_found); // it always has solution
     
-    //std::cout << "Support problem v: " << newResultV << "\n"; // debug
-    //std::cout << "mod v: " << ublas::vector_norm_inf<vector_type>::apply(ublas::project(newResultV, ublas::range(N.size(), N.size() + M.size()))) << "\n"; // debug
     if (eq_zero(ublas::vector_norm_inf<vector_type>::apply(ublas::project(newResultV, ublas::range(N.size(), N.size() + M.size())))))
     {
       // Found basic vector.
@@ -256,7 +231,7 @@ namespace simplex
     range_container_type Nkp, Nk;
     
     // Filling 'Nkp'.
-    // Using strict check without precision. Not good.
+    // Using check with precision.
     copy_if(N.begin(), N.end(), std::back_inserter(Nkp), 
         boost::bind<bool>(std::logical_not<bool>(), boost::bind<bool>(eq_zero_functor<value_type>(), boost::bind<value_type>(basicV, _1)))); 
     BOOST_ASSERT(Nkp.size() > 0);
@@ -287,22 +262,6 @@ namespace simplex
           
           // Filling 'Nkz'.
           std::set_difference(Nk.begin(), Nk.end(), Nkp.begin(), Nkp.end(), std::back_inserter(Nkz));
-          /*
-          { // debug
-            std::cout << ">>Nk: ";
-            std::copy(Nk.begin(), Nk.end(), std::ostream_iterator<size_t>(std::cout, " "));
-            std::cout << "\n";
-            
-            std::cout << ">>Nkp: ";
-            std::copy(Nkp.begin(), Nkp.end(), std::ostream_iterator<size_t>(std::cout, " "));
-            std::cout << "\n";
-
-
-            std::cout << ">>Nkz: ";
-            std::copy(Nkz.begin(), Nkz.end(), std::ostream_iterator<size_t>(std::cout, " "));
-            std::cout << "\n";
-          } // end of debug
-          */
           BOOST_ASSERT(std::adjacent_find(Nkz.begin(), Nkz.end(), std::greater<size_type>()) == Nkz.end());
           
           // Filling 'Lk'.
@@ -312,45 +271,10 @@ namespace simplex
           BOOST_ASSERT(Nkz.size() + Nkp.size() == M.size());
           BOOST_ASSERT(Lk.size() == N.size() - M.size());
           
-          // debug
-          /*
-          std::cout << "N: ";
-          std::copy(N.begin(), N.end(), std::ostream_iterator<size_t>(std::cout, " "));
-          std::cout << "\n";
-          
-          std::cout << "M: ";
-          std::copy(M.begin(), M.end(), std::ostream_iterator<size_t>(std::cout, " "));
-          std::cout << "\n";
-      
-          std::cout << "Nkp: ";
-          std::copy(Nkp.begin(), Nkp.end(), std::ostream_iterator<size_t>(std::cout, " "));
-          std::cout << "\n";
-      
-          std::cout << "Nkz: ";
-          std::copy(Nkz.begin(), Nkz.end(), std::ostream_iterator<size_t>(std::cout, " "));
-          std::cout << "\n";
-      
-          std::cout << "Nk: ";
-          std::copy(Nk.begin(), Nk.end(), std::ostream_iterator<size_t>(std::cout, " "));
-          std::cout << "\n";
-      
-          std::cout << "Lk: ";
-          std::copy(Lk.begin(), Lk.end(), std::ostream_iterator<size_t>(std::cout, " "));
-          std::cout << "\n";
-          */
-          // end of debug
 
           // Calculating 'A' submatrix inverse.
           matrix_type BNk(M.size(), M.size());
           BOOST_VERIFY(invert_matrix(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk));
-          // debug
-          /*
-          std::cout << "zero m mod: " << 
-              ublas::matrix_norm_inf<matrix_type>::apply(ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size())) << "\n"; // debug
-          std::cout << "zero m: " << 
-              ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size()) << std::endl; // debug
-           */
-          // end of debug
           BOOST_ASSERT(eq_zero(ublas::matrix_norm_inf<matrix_type>::apply(ublas::prod(submatrix(A, M.begin(), M.end(), Nk.begin(), Nk.end()), BNk) - identity_matrix_type(M.size(), M.size()))));
           
           // Calculating 'd' vector.
@@ -358,8 +282,6 @@ namespace simplex
           d = c - ublas::prod(ublas::trans(A), vector_type(ublas::prod(ublas::trans(BNk), subvector(c, Nk.begin(), Nk.end()))));
           
           BOOST_ASSERT(eq_zero(ublas::vector_norm_inf<matrix_type>::apply(subvector(d, Nk.begin(), Nk.end()))));
-          
-          //std::cout << "d: " << d << "\n"; // debug
           
           vector_subvector<vector_type> dLk(subvector(d, Lk.begin(), Lk.end()));
           typename vector_subvector<vector_type>::const_iterator jkIt = std::find_if(
@@ -382,8 +304,6 @@ namespace simplex
             vector_type u(scalar_vector<value_type>(N.size(), 0.));
             subvector(u, Nk.begin(), Nk.end()) = ublas::prod(BNk, ublas::column(A, jk));
             u[jk] = -1;
-            
-            //std::cout << "u: " << u << "\n"; // debug
             
             vector_subvector<vector_type> uNk(subvector(u, Nk.begin(), Nk.end()));
             typename vector_subvector<vector_type>::const_iterator iuIt = std::find_if(
@@ -443,11 +363,7 @@ namespace simplex
                 nextBasicV = basicV - minTheta->second * u;
                 BOOST_ASSERT(eq_zero(nextBasicV[minTheta->first]));
                 // Adjusting new basic vector.
-                //nextBasicV = apply_to_all<functor::adjust>(nextBasicV);
-                //std::cout << "Before adjusting nextBasicV:\n  " << nextBasicV << std::endl;
                 nextBasicV = apply_to_all<functor::adjust<value_type> >(nextBasicV);
-                
-                //std::cout << "==basicV:" << basicV << "\n==minTeta:" << minTeta.get() << "\n==u:" << u << "\n==newBasicV:" << nextBasicV << std::endl; // debug
                 
                 { 
                   // Debug: Checking new basis vector 'Nkp'.
@@ -457,31 +373,6 @@ namespace simplex
                   copy_if(N.begin(), N.end(), std::back_inserter(Nkp1), 
                       boost::bind<bool>(std::logical_not<bool>(), boost::bind<bool>(eq_zero_functor<value_type>(0.0), boost::bind<value_type>(nextBasicV, _1)))); 
                   
-                  // debug
-                  /*
-                  std::cout << "u:\n" << u << std::endl;
-                  std::cout << "basicV:\n" << basicV << std::endl;
-                  std::cout << "nextBasicV:\n" << nextBasicV << std::endl;
-                  std::cout << "ik=" << minTheta->first << ", theta=" << minTheta->second << ", jk=" << jk << std::endl;
-                  
-                  std::cout << "Nkp:  ";
-                  std::copy(Nkp.begin(), Nkp.end(), std::ostream_iterator<size_t>(std::cout, " "));
-                  std::cout << "\n";
-              
-                  std::cout << "Nkz:  ";
-                  std::copy(Nkz.begin(), Nkz.end(), std::ostream_iterator<size_t>(std::cout, " "));
-                  std::cout << "\n";
-              
-                  std::cout << "Nk:  ";
-                  std::copy(Nk.begin(), Nk.end(), std::ostream_iterator<size_t>(std::cout, " "));
-                  std::cout << "\n";
-                  
-                  std::cout << "Nkp1: ";
-                  std::copy(Nkp1.begin(), Nkp1.end(), std::ostream_iterator<size_t>(std::cout, " "));
-                  std::cout << "\n";
-                  */
-                  // end of debug
-
                   // Nkp1 = Nkp - {minTheta->first} + {jk}
                   BOOST_ASSERT(std::find(Nkp.begin(),  Nkp.end(),  jk)              == Nkp.end());
                   BOOST_ASSERT(std::find(Nkp.begin(),  Nkp.end(),  minTheta->first) != Nkp.end());
@@ -490,14 +381,6 @@ namespace simplex
                   
                   range_container_type diff;
                   std::set_symmetric_difference(Nkp.begin(), Nkp.end(), Nkp1.begin(), Nkp1.end(), std::back_inserter(diff));
-                  
-                  // debug
-                  /*
-                  std::cout << "diff: ";
-                  std::copy(diff.begin(), diff.end(), std::ostream_iterator<size_t>(std::cout, " "));
-                  std::cout << "\n";
-                  */
-                  // end of debug
                   
                   BOOST_ASSERT(diff.size() >= 2);
                   // End of debug.
@@ -538,10 +421,6 @@ namespace simplex
     BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<MatrixType>));
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<VectorType>));
     
-    // debug
-    //std::cout << "solve_augment_with_basic_vector()\n" << "  A:" << A << "\n  b:" << b << "\n  c:" << c << "\n  basic:" << basicV << std::endl; 
-    // end of debug
-
     typedef typename MatrixType::value_type value_type;
     typedef ublas::vector<value_type>       vector_type;
     
@@ -595,10 +474,6 @@ namespace simplex
     // TODO: Assert that value types in all input is compatible, different types for different vectors.
     BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<MatrixType>));
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<VectorType>));
-    
-    // debug
-    //std::cout << "solve_augment()\n" << "  A:" << A << "\n  b:" << b << "\n  c:" << c << std::endl; 
-    // end of debug
     
     typedef typename MatrixType::value_type         value_type;
     typedef ublas::vector<value_type>               vector_type;
@@ -684,10 +559,6 @@ namespace simplex
     // TODO: Assert that value types in all input is compatible, different types for different vectors.
     BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<MatrixType>));
     BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<VectorType>));
-    
-    // debug
-    //std::cout << "solve_augment()\n" << "  A:" << A << "\n  b:" << b << "\n  c:" << c << std::endl; 
-    // end of debug
     
     typedef typename MatrixType::value_type         value_type;
     typedef ublas::vector<value_type>               vector_type;
