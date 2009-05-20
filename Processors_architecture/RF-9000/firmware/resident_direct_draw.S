@@ -19,8 +19,15 @@ loop:
         ;LDR     R6, [PC, -8 + (hwIMG_REG_BASE0_addr - $)]
         ;STR     R5, [R6]
         
-        LDR     R4, [PC, -8 + (hwIMG_REG_BASE0_addr - $)]
+        ; Retrieving address of variable which stores adress of frame buffer structure.
+        ;LDR     R4, [PC, -8 + (hwIMG_REG_BASE0_addr - $)]
+        LDR     R4, [PC, -8 + (fwFrameBufferVar_addr - $)]
+        
+        ; Retrieving frame buffer structure address.
         LDR     R5, [R4]
+        
+        ; Loading width, height and actual frame buffer address.
+        LDMIA   R5!, {R8, R9}
 
         ; Loading colors.
         LDR     R0, [PC, -8 + (white_color - $)]
