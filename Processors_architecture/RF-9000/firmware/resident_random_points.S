@@ -24,19 +24,8 @@ loop:
         ; Loading width, height and actual frame buffer address.
         LDMIA   R5!, {R6, R7}
 
-        ; Loading colors.
-        LDR     R0, [PC, -8 + (white_color - $)]
-        LDR     R1, [PC, -8 + (black_color - $)]
-        
-        ; Putting some pixels.
-        STRH    R0, [R5,  0]
-        STRH    R1, [R5,  2]
-        STRH    R0, [R5,  4]
-        STRH    R1, [R5,  6]
-        STRH    R0, [R5,  8]
-        STRH    R1, [R5, 10]
-        STRH    R0, [R5, 12]
-        STRH    R1, [R5, 14]
+        ; Loading last used color.
+        LDR     R4, [PC, -8 + (next_color - $)]                 ; R4 == next drawed pixel color
         
         MOV     R3, R5                                          ; R3 == position in frame buffer
         MOV     R0, 0                                           ; R0 == row number
@@ -47,17 +36,16 @@ loop:
           
           loop_column:
           ;{
-
-            ; Calculating `color'.
-            MUL     R4, R0, R6
-            ADD     R4, R4, R1
-
-            ; Forcing color. DEBUG
-            LDR     R4, [PC, -8 + (some_color - $)]
-
             ; Putting pixel.
             STRH    R4, [R3] ; TODO: increment can be done here.
+            
+            ; Calculating next pixel color.
+            MOV     R9, R4
+            ADD     R4, R4, 37
+            EOR     R9, R9, R4, LSL 12
+            EOR     R4, R9, R9, LSL 20
 
+            ; Shifting position in frame buffer.
             ADD     R3, R3, 2
 
             ADD     R1, R1, 1
@@ -69,6 +57,9 @@ loop:
           CMP     R0, R7
           BLT     loop_row                                        ; end of loop_row
         ;}
+
+        ; Saving last used color.
+        STR     R4, [PC, -8 + (next_color - $)]
         
         ; Calling `SetPopupTimer' -- flushing screen frame buffer.
         MOV     R0, 0
@@ -110,5 +101,7 @@ hwIMG_REG_BASE0_addr         DW     hwIMG_REG_BASE0
 some_color                   DW     0xAAAA
 black_color                  DW     0x0000
 white_color                  DW     0xFFFF
+
+next_color                   DW     0x0000
 
                          ; aligning:  123 123 123 123 123
