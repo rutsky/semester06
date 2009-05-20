@@ -24,9 +24,6 @@ loop:
         ; Loading width, height and actual frame buffer address.
         LDMIA   R5!, {R6, R7}
 
-        ; Loading last used color.
-        LDR     R4, [PC, -8 + (next_color - $)]                 ; R4 == next drawed pixel color
-        
         MOV     R3, R5                                          ; R3 == position in frame buffer
         MOV     R0, 0                                           ; R0 == row number
         
@@ -36,14 +33,25 @@ loop:
           
           loop_column:
           ;{
+            ; Loading color from some memory.
+            LDR     R9, [PC, -8 + (next_color_addr - $)]
+            LDR     R8, [R9]
+            LDR     R4, [R8]
+          
             ; Putting pixel.
             STRH    R4, [R3] ; TODO: increment can be done here.
             
-            ; Calculating next pixel color.
-            ;ADD     R9, R4, R4, LSL 1
-            ADD     R4, R4, 37
-            ;EOR     R9, R9, R4, LSL 13
-            ;EOR     R4, R9, R9, LSL 20
+            ; Saving next color address.
+            ADD     R8, R8, 2
+            LDR     R4, [PC, -8 + (color_end_addr - $)]
+            LDR     R4, [R4]
+            CMP     R8, R4
+            BLT     continue
+              ; Address reached end, resetting it.
+              LDR     R4, [PC, -8 + (color_start_addr - $)]
+              LDR     R8, [R4]
+            continue:
+            STR     R8, [R9]
 
             ; Shifting position in frame buffer.
             ADD     R3, R3, 2
@@ -58,9 +66,6 @@ loop:
           BLT     loop_row                                        ; end of loop_row
         ;}
 
-        ; Saving last used color.
-        STR     R4, [PC, -8 + (next_color - $)]
-        
         ; Calling `SetPopupTimer' -- flushing screen frame buffer.
         MOV     R0, 0
         MOV     LR, PC
@@ -102,6 +107,8 @@ some_color                   DW     0xAAAA
 black_color                  DW     0x0000
 white_color                  DW     0xFFFF
 
-next_color                   DW     0x0000
+next_color_addr              DW     0x20000000
+color_start_addr             DW     0x20000000
+color_end_addr               DW     0x200B0000
 
                          ; aligning:  123 123 123 123 123
