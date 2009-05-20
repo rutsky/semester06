@@ -15,12 +15,7 @@ resident_start:
         
         ; Main loop.
 loop: 
-        ;LDR     R5, [PC, -8 + (fwFrameBufferVar_addr - $)]
-        ;LDR     R6, [PC, -8 + (hwIMG_REG_BASE0_addr - $)]
-        ;STR     R5, [R6]
-        
         ; Retrieving address of variable which stores adress of frame buffer structure.
-        ;LDR     R4, [PC, -8 + (hwIMG_REG_BASE0_addr - $)]
         LDR     R4, [PC, -8 + (fwFrameBufferVar_addr - $)]
         
         ; Retrieving frame buffer structure address.
