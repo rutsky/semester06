@@ -5,6 +5,7 @@
 
   ; Pseudorandom number generator.
   ;   Next = (a * Seed + c) mod b
+  ; Note: high 16 bits of generated number are better than lower 16.
 rand:
         STMFD   SP!, {R1,R2,LR}
         
