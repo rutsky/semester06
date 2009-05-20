@@ -20,7 +20,7 @@
     4c:	e3a01000	mov 	r1, 0x0
     50:	e1a09000	mov 	r9, r0
     54:	ebffffea	bl	0x4
-    58:	e1a04000	mov 	r4, r0
+    58:	e1a04820	mov 	r4, r0 lsr #16
     5c:	e1a00009	mov 	r0, r9
     60:	e1c340b0	strh	r4, [r3, 0x0]
     64:	e2833002	add 	r3,	r3,	0x2
