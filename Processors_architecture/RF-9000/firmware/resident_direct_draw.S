@@ -1,5 +1,5 @@
 ; resident_direct_draw.S
-; Example of direct drawing.
+; Actually it is example on buffered drawing.
 ; Vladimir Rutsky <altsysrq@gmail.com>
 ; 22.04.2009
 
