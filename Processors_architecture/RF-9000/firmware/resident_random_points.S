@@ -36,7 +36,7 @@ loop:
           ;{
             ; Generating color using rand().
             MOV     R9, R0
-            BL      rand
+            BL      rand - $
             MOV     R4, R0
             MOV     R0, R9
           
