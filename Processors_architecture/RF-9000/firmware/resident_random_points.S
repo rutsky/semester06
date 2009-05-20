@@ -3,11 +3,12 @@
 ; Vladimir Rutsky <altsysrq@gmail.com>
 ; 20.05.2009
 
-include 'resident_common.S'
-
     USE32
     format binary
     
+include 'resident_common.S'
+include 'resident_random.S'
+
 resident_start:
         STMFD   SP!, {R0-R11,LR}
         MemOnStack = 0x20
@@ -33,26 +34,15 @@ loop:
           
           loop_column:
           ;{
-            ; Loading color from some memory.
-            LDR     R9, [PC, -8 + (next_color_addr - $)]
-            LDR     R8, [R9]
-            LDR     R4, [R8]
+            ; Generating color using rand().
+            MOV     R9, R0
+            BL      rand
+            MOV     R4, R0
+            MOV     R0, R9
           
             ; Putting pixel.
             STRH    R4, [R3] ; TODO: increment can be done here.
             
-            ; Saving next color address.
-            ADD     R8, R8, 2
-            LDR     R4, [PC, -8 + (color_end_addr - $)]
-            LDR     R4, [R4]
-            CMP     R8, R4
-            BLT     continue
-              ; Address reached end, resetting it.
-              LDR     R4, [PC, -8 + (color_start_addr - $)]
-              LDR     R8, [R4]
-            continue:
-            STR     R8, [R9]
-
             ; Shifting position in frame buffer.
             ADD     R3, R3, 2
 
@@ -106,9 +96,5 @@ hwIMG_REG_BASE0_addr         DW     hwIMG_REG_BASE0
 some_color                   DW     0xAAAA
 black_color                  DW     0x0000
 white_color                  DW     0xFFFF
-
-next_color_addr              DW     0x20010001
-color_start_addr             DW     0x20010001
-color_end_addr               DW     0x200B0000
 
                          ; aligning:  123 123 123 123 123
