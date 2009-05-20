@@ -177,7 +177,8 @@ int main( int argc, char *argv[] )
       std::cout << "Canonical dual problem solution: \n  " << dualCanonicalResultV << 
           " (result=" << static_cast<int>(dualCanonicalResult) << ")\n";
       
-      BOOST_ASSERT(numeric::linear_problem::check_linear_problem_solving_correctness(directLP));
+      //BOOST_ASSERT(numeric::linear_problem::check_linear_problem_solving_correctness(directLP));
+      BOOST_ASSERT(numeric::linear_problem::assert_linear_problem_solving_correctness(directLP));
     }
     
     {
