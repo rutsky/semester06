@@ -22,7 +22,7 @@ loop:
         LDR     R5, [R4]
         
         ; Loading width, height and actual frame buffer address.
-        LDMIA   R5!, {R8, R9}
+        LDMIA   R5!, {R6, R7}
 
         ; Loading colors.
         LDR     R0, [PC, -8 + (white_color - $)]
@@ -37,6 +37,38 @@ loop:
         STRH    R1, [R5, 10]
         STRH    R0, [R5, 12]
         STRH    R1, [R5, 14]
+        
+        MOV     R3, R5                                          ; R3 == position in frame buffer
+        MOV     R0, 0                                           ; R0 == row number
+        
+        loop_row:
+        ;{
+          MOV     R1, 0                                           ; R1 == column number
+          
+          loop_column:
+          ;{
+
+            ; Calculating `color'.
+            MUL     R4, R0, R6
+            ADD     R4, R4, R1
+
+            ; Forcing color. DEBUG
+            LDR     R4, [PC, -8 + (some_color - $)]
+
+            ; Putting pixel.
+            STRH    R4, [R3] ; TODO: increment can be done here.
+
+            ADD     R3, R3, 2
+
+            ADD     R1, R1, 1
+            CMP     R1, R6
+            BLT     loop_column                                     ; end of loop_column
+          ;}
+
+          ADD     R0, R0, 1
+          CMP     R0, R7
+          BLT     loop_row                                        ; end of loop_row
+        ;}
         
         ; Calling `SetPopupTimer' -- flushing screen frame buffer.
         MOV     R0, 0
