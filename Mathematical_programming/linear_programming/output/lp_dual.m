@@ -7,4 +7,4 @@ ctype = "UUUUUU";
 vartype = "CCCC";
 sense = -1;
 
-[xmin, fmin, status, extra] = glpk(c, A, b, lb, ub, ctype, vartype)
+[xmin, fmin, status, extra] = glpk(c, A, b, lb, ub, ctype, vartype, sense)
