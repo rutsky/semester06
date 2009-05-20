@@ -107,8 +107,8 @@ some_color                   DW     0xAAAA
 black_color                  DW     0x0000
 white_color                  DW     0xFFFF
 
-next_color_addr              DW     0x20000000
-color_start_addr             DW     0x20000000
+next_color_addr              DW     0x20010001
+color_start_addr             DW     0x20010001
 color_end_addr               DW     0x200B0000
 
                          ; aligning:  123 123 123 123 123
