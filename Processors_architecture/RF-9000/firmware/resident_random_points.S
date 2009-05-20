@@ -40,10 +40,10 @@ loop:
             STRH    R4, [R3] ; TODO: increment can be done here.
             
             ; Calculating next pixel color.
-            MOV     R9, R4
+            ;ADD     R9, R4, R4, LSL 1
             ADD     R4, R4, 37
-            EOR     R9, R9, R4, LSL 12
-            EOR     R4, R9, R9, LSL 20
+            ;EOR     R9, R9, R4, LSL 13
+            ;EOR     R4, R9, R9, LSL 20
 
             ; Shifting position in frame buffer.
             ADD     R3, R3, 2
