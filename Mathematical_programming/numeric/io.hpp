@@ -286,7 +286,7 @@ namespace numeric
     
     ostr << "\n";
     
-    ostr << "[xmin, fmin, status, extra] = glpk(c, A, b, lb, ub, ctype, vartype)\n";
+    ostr << "[xmin, fmin, status, extra] = glpk(c, A, b, lb, ub, ctype, vartype, sense)\n";
   }
 } // End of namespace 'numeric'.
 
