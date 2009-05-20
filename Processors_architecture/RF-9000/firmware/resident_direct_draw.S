@@ -43,6 +43,12 @@ loop:
         STRH    R0, [R5, 12]
         STRH    R1, [R5, 14]
         
+        ; Trying is something will update real screen.
+        ; Calling `SetPopupTimer'.
+        MOV     R0, 0
+        MOV     LR, PC
+        LDR     PC, [PC, -8 + (fwSetPopupTimerFunc_addr - $)]
+        
         ; Checking keys state.
         STMFD   SP!, {R0-R6}
           ; Calling `CheckYesNoKeys'.
@@ -70,6 +76,7 @@ resident_end:
 
 fwOSSleepFunc_addr           DW     fwOSSleepFunc
 fwCheckYesNoKeysFunc_addr    DW     fwCheckYesNoKeysFunc
+fwSetPopupTimerFunc_addr     DW     fwSetPopupTimerFunc
 
 fwFrameBufferVar_addr        DW     fwFrameBufferVarAddr
 hwIMG_REG_BASE0_addr         DW     hwIMG_REG_BASE0
