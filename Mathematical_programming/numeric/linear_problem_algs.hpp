@@ -257,6 +257,7 @@ namespace linear_problem
     {
       BOOST_ASSERT(inputSize > 0 && outputSize > 0);
       differencies_.resize(outputSize);
+      scales_.resize(outputSize);
     }
     
     vector_type operator()( vector_type const &v )
@@ -265,13 +266,20 @@ namespace linear_problem
       
       vector_type result(outputSize_);
       for (size_t r = 0; r < outputSize_; ++r) // TODO: Use algorithm.
+      {
         if (differencies_[r])
+        {
           result[r] = v(differencies_[r]->first) - v(differencies_[r]->second);
+        }
         else
         {
           BOOST_ASSERT(v.size() > r); // Fail!
           result[r] = v(r);
         }
+        
+        if (scales_[r])
+          result[r] *= scales_[r].get();
+      }
       
       return result;
     }
@@ -289,9 +297,18 @@ namespace linear_problem
         differencies_[rOutput].reset();
     }
     
-  private:    
+    // output(r) = -input*(r).
+    // Applies to result of other convetion function.
+    void setScaleCoordinateFunction( size_t rOutput, scalar_type scale )
+    {
+      BOOST_ASSERT(rOutput < scales_.size());
+      scales_[rOutput] = scale;
+    }
+    
+  private:
     // TODO: Use boost::lambda.
     std::vector<boost::optional<std::pair<size_t, size_t> > > differencies_;
+    std::vector<boost::optional<scalar_type> >                scales_;
 
     size_t inputSize_;
     size_t outputSize_;
@@ -350,6 +367,9 @@ namespace linear_problem
         row(canonicalLPA, r) = -row(canonicalLPA, r);
         canonicalLPb(r)      = -canonicalLPb(r);
       }
+
+    // Starting filling convertion function.
+    convertion_function_type conv(N.size() + anySignVars + neAConstraints, N.size());
     
     // Converting less or equal zero variables to greater or equal zero variables.
     for (size_t c = 0; c < N.size(); ++c)
@@ -357,11 +377,11 @@ namespace linear_problem
       {
         column(canonicalLPA, c) = -column(canonicalLPA, c);
         canonicalLPc(c)         = -canonicalLPc(c);
+        conv.setScaleCoordinateFunction(c, scalar_type(-1.));
       }
     
     // Converting any sign variables to pair of non negative variables
     //   and filling convertion function.
-    convertion_function_type conv(N.size() + anySignVars + neAConstraints, N.size());
     size_t nextAdditionalVar = N.size();
     for (size_t c = 0; c < N.size(); ++c)
     {
