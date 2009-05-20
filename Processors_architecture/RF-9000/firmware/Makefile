@@ -7,7 +7,8 @@ FASMARM     = fasmarm
 ARM_DISASS  = ../arm_disass/arm_disass
 ASM_TARGETS = jump func nop version_hook fw_version_inj \
   resident_return resident_draw resident_text resident_clear_screen \
-  fw_clear_screen resident_draw2 resident_wait_key resident_direct_draw
+  fw_clear_screen resident_draw2 resident_wait_key resident_direct_draw \
+  resident_random_points
 
 BIN_TARGETS := $(foreach A,$(ASM_TARGETS),$(A).bin)
 
