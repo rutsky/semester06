@@ -5,7 +5,12 @@
 
     USE32
     format binary
-    
+
+; Entry point.
+entry_point:
+        B       resident_start
+; Enf of entry function
+
 include 'resident_common.S'
 include 'resident_random.S'
 
@@ -36,7 +41,7 @@ loop:
           ;{
             ; Generating color using rand().
             MOV     R9, R0
-            BL      rand - $
+            BL      rand
             MOV     R4, R0
             MOV     R0, R9
           
@@ -62,7 +67,7 @@ loop:
         LDR     PC, [PC, -8 + (fwSetPopupTimerFunc_addr - $)]
         
         ; Checking keys state.
-        STMFD   SP!, {R0-R6}
+        STMFD   SP!, {R0-R7}
           ; Calling `CheckYesNoKeys'.
           MOV     LR, PC
           LDR     PC, [PC, -8 + (fwCheckYesNoKeysFunc_addr - $)]
@@ -73,7 +78,7 @@ loop:
           MOV     R0, 1
           MOV     LR, PC
           LDR     PC, [PC, -8 + (fwOSSleepFunc_addr - $)]
-        LDMFD   SP!, {R0-R6}
+        LDMFD   SP!, {R0-R7}
         ; End of keys state checking
         
         ; Exiting if key was pressed.
