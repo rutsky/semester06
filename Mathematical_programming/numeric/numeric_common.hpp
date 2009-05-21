@@ -41,6 +41,7 @@ namespace numeric
   
   using ublas::vector;
   using ublas::vector_expression;
+  using ublas::vector_reference;
   using ublas::zero_vector;
   using ublas::scalar_vector;
   
