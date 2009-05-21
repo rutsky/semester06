@@ -645,7 +645,8 @@ namespace simplex
       else
       {
         // Omitting linear dependent constraints.
-        // FIXME: Must be checked is absolute terms is correspondent!
+        // FIXME: Must be checked is constant terms is correspondent,
+        // and if not -- return that admissible points set is empty.
       }
     }
     BOOST_ASSERT(nextAddingRow <= A.size2());
