@@ -84,7 +84,7 @@ namespace kelley_cutting_plane
       vector_type commonResult;
       simplex::simplex_result_type const result = solve_by_simplex(commonLP, commonResult);
       BOOST_ASSERT(result == simplex::srt_min_found); // FIXME: Handle other cases.
-      //BOOST_ASSERT(linear_problem::check_linear_problem_solving_correctness(commonLP)); // FIXME
+      BOOST_ASSERT(linear_problem::assert_linear_problem_solving_correctness(commonLP)); // TODO, debug
       
       std::cout << "Simplex algorithm gives x = " << commonResult << std::endl;
       
