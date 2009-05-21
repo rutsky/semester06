@@ -126,13 +126,13 @@ namespace linear_problem
     // Signs of variables.
     virtual variables_signs_vector_type  const & cSign() const = 0;
     
-    // Matrix of constaints.
+    // Matrix of constaints coefficients.
     virtual matrix_type                  const & A    () const = 0;
     // Signs of constaints.
     // TODO: Must be in plural form.
     virtual inequality_signs_vector_type const & ASign() const = 0;
     
-    // Constraints absolute terms.
+    // Constraints constant terms.
     virtual vector_type                  const & b    () const = 0;
 
     virtual ~ICommonLinearProblem() {}
