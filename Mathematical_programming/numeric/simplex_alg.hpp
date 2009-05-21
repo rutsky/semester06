@@ -618,7 +618,7 @@ namespace simplex
     vector_type newb(M.size());
     size_t nextAddingRow = 0;
     
-    li_vectors_type liARows;
+    li_vectors_type liARows, liARowsWithConstantTerm;
     
     for (size_t r = 0; r < M.size(); ++r)
     {
@@ -627,26 +627,46 @@ namespace simplex
       
       if (eq_zero(norm_2(ARow)))
       {
-        // Omitting zero rows.
-        BOOST_ASSERT(eq_zero(b(r))); // TODO: Handle as incorrect input return state.
-        continue;
+        // Handling case when coefficient vector is zero.
+        
+        if (!eq_zero(b(r)))
+        {
+          // Constraints are incosistent. Set of admissible points is empty.
+          return srt_none;
+        }
+        else
+        {
+          // Omitting zero rows.
+          continue;
+        }
       }
+      
+      vector_type extendedRow = paste(ARow, bval);
       
       if (liARows.is_independent(ARow))
       {
         // Adding linear independent constraint to result matrix.
         row(newA, nextAddingRow) = ARow;
-        newb(nextAddingRow) = bval;
+        newb(nextAddingRow)      = bval;
         
-        liARows.insert(ARow);
+        BOOST_VERIFY(liARows.insert(ARow));
+        BOOST_VERIFY(liARowsWithConstantTerm.insert(extendedRow));
         
         ++nextAddingRow;
       }
       else
       {
-        // Omitting linear dependent constraints.
-        // FIXME: Must be checked is constant terms is correspondent,
-        // and if not -- return that admissible points set is empty.
+        // Constraint coefficients vector is linearly dependent from previous coefficients rows.
+        
+        if (liARowsWithConstantTerm.is_independent(extendedRow))
+        {
+          // Constraints are incosistent. Set of admissible points is empty.
+          return srt_none;
+        }
+        else
+        {
+          // Omitting linear dependent constraints.
+        }
       }
     }
     BOOST_ASSERT(nextAddingRow <= A.size2());
