@@ -56,8 +56,6 @@ namespace numeric
                       RowsForwardIterator rowsBegin, RowsForwardIterator rowsEnd )
       : data_       (data)
     {
-      BOOST_ASSERT(rowsBegin != rowsEnd);
-      
       rowsIndices_.assign(rowsBegin, rowsEnd);
       
       // debug
