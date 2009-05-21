@@ -100,11 +100,25 @@ int main( int argc, char *argv[] )
       
     std::ifstream is(inputFileName);
     
+    if (!is)
+    {
+      // Failed to open input file.
+      std::cerr << "Failed to open `" << inputFileName << "' file." << std::endl;
+      return 1;
+    }
+    
     bool min;
     vector_type c, b, variablesSigns, constraintsSigns;
     matrix_type A;
     
     is >> min >> c >> b >> A >> variablesSigns >> constraintsSigns;
+    
+    if (!is)
+    {
+      // Failed to read something.
+      std::cerr << "Failed to read input data from `" << inputFileName << "' file." << std::endl;
+      return 2;
+    }
     
     {
       common_linear_problem_type directLP;
