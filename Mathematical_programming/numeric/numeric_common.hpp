@@ -47,6 +47,7 @@ namespace numeric
   
   using ublas::matrix;
   using ublas::matrix_expression;
+  using ublas::matrix_reference;
   using ublas::zero_matrix;
   using ublas::identity_matrix;
   using ublas::scalar_matrix;

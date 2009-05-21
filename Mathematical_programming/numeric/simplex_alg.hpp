@@ -39,6 +39,7 @@ namespace simplex
   // TODO: Code may be overgeneralized.
   // TODO: Rename `value_type' by `scalar_type'.
   // TODO: Replace `basis' by `basic'.
+  // TODO: Pass to functions `vector_expression's and remove most of concept asserts related to it.
   
   // Types of linear programming solving results.
   enum simplex_result_type
@@ -584,6 +585,94 @@ namespace simplex
     BOOST_ASSERT(0);
     return srt_none; 
   }
+  
+  // Returns true is system is consistent, false otherwise.
+  template< class M1, class E1, class M2, class E2 >
+  bool remove_li_dependent_constraints( matrix_expression<M1> const &A,   vector_expression<E1> const &b,
+  //                                      matrix_reference <M2>       &liA, vector_reference <E2>       &lib )
+                                        matrix_expression<M2>       &liA, vector_expression<E2>       &lib )
+  {
+    typedef typename M1::value_type                 scalar_type; // TODO: Use type with most precision.
+    typedef vector<scalar_type>                     vector_type;
+    typedef matrix<scalar_type>                     matrix_type;
+    typedef linear_independent_vectors<vector_type> li_vectors_type;
+
+    size_t const n = A().size2(), m = A().size1();
+    
+    BOOST_ASSERT(b().size() == m);
+    
+    if (n == 0 || m == 0)
+    {
+      // Empty set of constraints. It is consistent.
+      return true;
+    }
+      
+    BOOST_ASSERT(n > 0);
+    BOOST_ASSERT(m > 0);
+    
+    // Removing linear dependent constraints.
+    liA().resize(m, n);
+    lib().resize(m);
+    size_t nextAddingRow = 0;
+    
+    li_vectors_type liARows, liARowsWithConstantTerm;
+    
+    for (size_t r = 0; r < m; ++r)
+    {
+      matrix_row<matrix_type const> ARow(A(), r);
+      scalar_type const bval = b()(r);
+      
+      if (eq_zero(norm_2(ARow)))
+      {
+        // Handling case when coefficient vector is zero.
+        
+        if (!eq_zero(bval))
+        {
+          // Constraints are incosistent. Set of admissible points is empty.
+          return false;
+        }
+        else
+        {
+          // Omitting zero rows.
+          continue;
+        }
+      }
+      
+      vector_type extendedRow = paste(ARow, bval);
+      
+      if (liARows.is_independent(ARow))
+      {
+        // Adding linear independent constraint to result matrix.
+        row(liA(), nextAddingRow) = ARow;
+        lib()(nextAddingRow)      = bval;
+        
+        BOOST_VERIFY(liARows.insert(ARow));
+        BOOST_VERIFY(liARowsWithConstantTerm.insert(extendedRow));
+        
+        ++nextAddingRow;
+      }
+      else
+      {
+        // Constraint coefficients vector is linearly dependent from previous coefficients rows.
+        
+        if (liARowsWithConstantTerm.is_independent(extendedRow))
+        {
+          // Constraints are incosistent. Set of admissible points is empty.
+          return false;
+        }
+        else
+        {
+          // Omitting linear dependent constraints.
+        }
+      }
+    }
+    BOOST_ASSERT(nextAddingRow <= A().size2());
+
+    liA().resize(nextAddingRow, n, true);
+    lib().resize(nextAddingRow, true);
+    
+    return true;
+  }
     
   // Solves linear programming problem described in augment form:
   //   min (c^T * x), where x: x >= 0, A * x = b
@@ -607,72 +696,23 @@ namespace simplex
     typedef std::vector<size_t>                     range_container_type;
     typedef linear_independent_vectors<vector_type> li_vectors_type;
     
-    range_type const N(0, A.size2()), M(0, A.size1());
+    BOOST_ASSERT(A.size1() == b.size());
+    BOOST_ASSERT(A.size2() == c.size());
     
-    // TODO
-    BOOST_ASSERT(N.size() > 0);
-    BOOST_ASSERT(M.size() > 0);
+    size_t const n = A.size2(), m = A.size1();
     
     // Removing linear dependent constraints.
-    matrix_type newA(M.size(), N.size());
-    vector_type newb(M.size());
-    size_t nextAddingRow = 0;
-    
-    li_vectors_type liARows, liARowsWithConstantTerm;
-    
-    for (size_t r = 0; r < M.size(); ++r)
+    matrix_type newA(m, n);
+    vector_type newb(m);
+    //bool remove_li_dependent_constraints( matrix_expression<M1> const &A,   vector_expression<E1> const &b,
+    //                                      matrix_reference <M2>       &liA, vector_reference <E2>       &lib )
+    if (!remove_li_dependent_constraints<matrix_type, vector_type, matrix_type, vector_type>(A, b, newA, newb))
     {
-      matrix_row<MatrixType const> ARow(A, r);
-      value_type const bval = b(r);
-      
-      if (eq_zero(norm_2(ARow)))
-      {
-        // Handling case when coefficient vector is zero.
-        
-        if (!eq_zero(b(r)))
-        {
-          // Constraints are incosistent. Set of admissible points is empty.
-          return srt_none;
-        }
-        else
-        {
-          // Omitting zero rows.
-          continue;
-        }
-      }
-      
-      vector_type extendedRow = paste(ARow, bval);
-      
-      if (liARows.is_independent(ARow))
-      {
-        // Adding linear independent constraint to result matrix.
-        row(newA, nextAddingRow) = ARow;
-        newb(nextAddingRow)      = bval;
-        
-        BOOST_VERIFY(liARows.insert(ARow));
-        BOOST_VERIFY(liARowsWithConstantTerm.insert(extendedRow));
-        
-        ++nextAddingRow;
-      }
-      else
-      {
-        // Constraint coefficients vector is linearly dependent from previous coefficients rows.
-        
-        if (liARowsWithConstantTerm.is_independent(extendedRow))
-        {
-          // Constraints are incosistent. Set of admissible points is empty.
-          return srt_none;
-        }
-        else
-        {
-          // Omitting linear dependent constraints.
-        }
-      }
+      // Constraints are incossistent. Set of admissible points is empty.
+      return srt_none;
     }
-    BOOST_ASSERT(nextAddingRow <= A.size2());
     
-    newA.resize(nextAddingRow, N.size(), true);
-    newb.resize(nextAddingRow, true);
+    BOOST_ASSERT(newA.size1() <= newA.size2());
     
     if (newA.size1() == newA.size2())
     {
