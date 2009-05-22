@@ -24,7 +24,7 @@ namespace numeric
 {
   // Matrix inversion routine.
   // Uses lu_factorize and lu_substitute in uBLAS to invert a matrix.
-  // Note: inverse matrix argument size should match input argument size.
+  // FIXME: Note: inverse matrix argument size should match input argument size.
   template< class M1, class M2 >
   inline
   bool invert_matrix( M1 const &input, M2 &inverse )
