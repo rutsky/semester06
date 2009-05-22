@@ -24,5 +24,7 @@
 #include "simplex_alg.hpp"
 #include "linear_problem_algs.hpp"
 #include "kelley_cutting_plane.hpp"
+#include "lp_simplex.hpp"
+#include "lp_brute_force.hpp"
 
 #endif // NUMERIC_NUMERIC_HPP

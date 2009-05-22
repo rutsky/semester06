@@ -24,7 +24,7 @@
 #include <boost/lambda/bind.hpp>
 
 #include "linear_problem.hpp"
-#include "subvector.hpp"
+#include "vector_ops.hpp"
 #include "simplex_alg.hpp"
 
 namespace numeric
@@ -33,21 +33,20 @@ namespace linear_problem
 {
   // Checks is provided solution of direct linear problem `x' and
   // solution of dual linear problem `y' satifies linear problem solution criteria.
-  template< class V, class CLPTraits >
+  template< class E1, class E2, class CLPTraits >
   bool is_solution( ICommonLinearProblem<CLPTraits> const &commonLP, 
-                    V const &x, V const &y,
-                    typename V::value_type eps )
+                    vector_expression<E1> const &x, vector_expression<E2> const &y )
   {
     // TODO: Not sure about correctness of function formulation.
-    // TODO: Get default epsilon value from some traits.
-    
-    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V>));
     
     typedef CLPTraits                             clp_traits_type;
     typedef typename clp_traits_type::scalar_type scalar_type;
     typedef vector<scalar_type>                   vector_type;
     typedef scalar_vector<scalar_type>            scalar_vector_type;
     typedef basic_range<size_t, long>             basic_range_type;
+    
+    // TODO: Get default epsilon value from some traits.
+    scalar_type const eps = epsilon<scalar_type>();
     
     basic_range_type M(0, constraints_count(commonLP)), N(0, variables_count(commonLP));
     
@@ -64,39 +63,39 @@ namespace linear_problem
     BOOST_ASSERT(N1.size() + N2.size() + N3.size() == N.size());
     
     // TODO: Comment this.
-    if (!M1.empty() && !by_component_greater_equal(subvector(y, M1.begin(), M1.end()), scalar_vector_type(M1.size(), 0.), eps))
+    if (!M1.empty() && !by_component_greater_equal(subvector(y(), M1.begin(), M1.end()), scalar_vector_type(M1.size(), 0.), eps))
       return false;
-    if (!M3.empty() && !by_component_less_equal(subvector(y, M3.begin(), M3.end()), scalar_vector_type(M3.size(), 0.), eps))
+    if (!M3.empty() && !by_component_less_equal(subvector(y(), M3.begin(), M3.end()), scalar_vector_type(M3.size(), 0.), eps))
       return false;
     
     if (!N1.empty() && !by_component_greater_equal(
-          subvector(commonLP.c(), N1.begin(), N1.end()) - prod(y, submatrix(commonLP.A(), M.begin(), M.end(), N1.begin(), N1.end())),
+          subvector(commonLP.c(), N1.begin(), N1.end()) - prod(y(), submatrix(commonLP.A(), M.begin(), M.end(), N1.begin(), N1.end())),
           scalar_vector_type(N1.size(), 0.), eps))
       return false;
     if (!N3.empty() && !by_component_less_equal(
-          subvector(commonLP.c(), N3.begin(), N3.end()) - prod(y, submatrix(commonLP.A(), M.begin(), M.end(), N3.begin(), N3.end())),
+          subvector(commonLP.c(), N3.begin(), N3.end()) - prod(y(), submatrix(commonLP.A(), M.begin(), M.end(), N3.begin(), N3.end())),
           scalar_vector_type(N3.size(), 0.), eps))
       return false;
     
     if (!N2.empty() && !by_component_equal(
-          subvector(commonLP.c(), N2.begin(), N2.end()) - prod(y, submatrix(commonLP.A(), M.begin(), M.end(), N2.begin(), N2.end())),
+          subvector(commonLP.c(), N2.begin(), N2.end()) - prod(y(), submatrix(commonLP.A(), M.begin(), M.end(), N2.begin(), N2.end())),
           scalar_vector_type(N2.size(), 0.), eps))
       return false;
     
-    if (!M1.empty() && !equal(inner_prod(vector_type(subvector(y, M1.begin(), M1.end())), 
-                                         vector_type(prod(submatrix(commonLP.A(), M1.begin(), M1.end(), N.begin(), N.end()), x) - 
+    if (!M1.empty() && !equal(inner_prod(vector_type(subvector(y(), M1.begin(), M1.end())), 
+                                         vector_type(prod(submatrix(commonLP.A(), M1.begin(), M1.end(), N.begin(), N.end()), x()) - 
                                                      subvector(commonLP.b(), M1.begin(), M1.end()))), 
                               0., eps))
       return false;
-    if (!M3.empty() && !equal(inner_prod(vector_type(subvector(y, M3.begin(), M3.end())), 
-                                         vector_type(prod(submatrix(commonLP.A(), M3.begin(), M3.end(), N.begin(), N.end()), x) - 
+    if (!M3.empty() && !equal(inner_prod(vector_type(subvector(y(), M3.begin(), M3.end())), 
+                                         vector_type(prod(submatrix(commonLP.A(), M3.begin(), M3.end(), N.begin(), N.end()), x()) - 
                                                      subvector(commonLP.b(), M3.begin(), M3.end()))), 
                               0., eps))
       return false;
     
     if (!N1.empty() && !equal(inner_prod(vector_type(subvector(commonLP.c(), N1.begin(), N1.end()) - 
                                                      vector_type(prod(y, submatrix(commonLP.A(), M.begin(), M.end(), N1.begin(), N1.end())))), 
-                                         vector_type(subvector(x, N1.begin(), N1.end()))), 
+                                         vector_type(subvector(x(), N1.begin(), N1.end()))), 
                               0., eps))
       return false;
     
@@ -317,8 +316,8 @@ namespace linear_problem
   template< class S, template< class > class CLPTraits >
   inline
   typename converter_template_type<S>::type
-    to_canonical( ICommonLinearProblem<CLPTraits<S> > const &commonLP, 
-                  canonical_linear_problem<S>               &canonicalLP )
+    to_canonical( ICommonLinearProblem<CLPTraits<S> > const  &commonLP, 
+                  canonical_linear_problem<S, CLPTraits<S> > &canonicalLP )
   {
     typedef S                                  scalar_type;
     typedef CLPTraits<S>                       clp_traits_type;
@@ -425,125 +424,48 @@ namespace linear_problem
     return conv;
   }
   
-  template< class V, class CLPTraits >
-  simplex::simplex_result_type solve_by_simplex( ICommonLinearProblem<CLPTraits> const &commonLP, 
-                                                 V &result )
+  // Returns true if constraints consistent, false otherwise.
+  template< class S, template< class > class CLPTraits >
+  bool remove_dependent_constraints( canonical_linear_problem<S, CLPTraits<S> > const &canonicalLP,
+                                     canonical_linear_problem<S, CLPTraits<S> >       &liCanonicalLP )
   {
-    BOOST_CONCEPT_ASSERT((ublas::VectorExpressionConcept<V>));
-    
-    typedef CLPTraits                             clp_traits_type;
-    typedef typename CLPTraits::scalar_type       scalar_type;
-    typedef vector<scalar_type>                   vector_type;
-    
-    typedef common_linear_problem   <scalar_type, clp_traits_type> common_linear_problem_type;
-    typedef canonical_linear_problem<scalar_type, clp_traits_type> canonical_linear_problem_type;
-    typedef typename converter_template_type <scalar_type>::type   converter_type;
-
-    // Converting linear problem to canonical form.
-    canonical_linear_problem_type canonicalLP;
-    converter_type conv = to_canonical(commonLP, canonicalLP);
-    
-    // debug
-    //output_common_linear_problem(std::cout, commonLP);
-    //output_common_linear_problem(std::cout, canonicalLP);
-    // end of debug
-    
-    // Solving linear problem.
-    vector_type canonicalResultVec;
-    simplex::simplex_result_type const simplexResult = 
-        simplex::solve_augment(canonicalLP.A(), canonicalLP.b(), canonicalLP.c(), canonicalResultVec);
-    
-    if (simplexResult == simplex::srt_min_found)
-      result = conv(canonicalResultVec);
-    
-    return simplexResult;
+    liCanonicalLP.c() = canonicalLP.c();
+    bool const result = simplex::remove_dependent_constraints(canonicalLP.A(), canonicalLP.b(), liCanonicalLP.A(), liCanonicalLP.b());
+    liCanonicalLP.update();
+    return result;
   }
   
-  template< class CLPTraits >
-  bool check_linear_problem_solving_correctness( ICommonLinearProblem<CLPTraits> const &commonLP )
+  bool is_result_status_correct( simplex::simplex_result_type direct, simplex::simplex_result_type dual )
   {
-    typedef CLPTraits                             clp_traits_type;
-    typedef typename CLPTraits::scalar_type       scalar_type;
-    typedef vector<scalar_type>                   vector_type;
-    
-    typedef common_linear_problem<scalar_type, clp_traits_type> common_linear_problem_type;
-    
-    // Solving direct linear problem.
-    vector_type directResultVec;
-    simplex::simplex_result_type const directSimplexResult = solve_by_simplex(commonLP, directResultVec);
-    BOOST_ASSERT(directSimplexResult != simplex::srt_loop); // TODO: Not implemented bahavior.
-    
-    // Constructing dual linear problem.
-    common_linear_problem_type dualLP;
-    construct_dual(commonLP, dualLP);
-    
-    // Solving dual linear problem.
-    vector_type dualResultVec;
-    simplex::simplex_result_type const dualSimplexResult = solve_by_simplex(dualLP, dualResultVec);
-    BOOST_ASSERT(dualSimplexResult != simplex::srt_loop); // TODO: Not implemented bahavior.
-    
-    // Checking corresponsibility of results.
-    switch (directSimplexResult)
+    switch (direct)
     {
     case simplex::srt_min_found:
-      if (dualSimplexResult != simplex::srt_min_found)
-      {
-        BOOST_ASSERT(0); // debug
+      if (dual != simplex::srt_min_found)
         return false;
-      }
-      break;
+      return true;
     case simplex::srt_not_limited:
-      if (dualSimplexResult != simplex::srt_none)
-      {
-        BOOST_ASSERT(0); // debug
+      if (dual != simplex::srt_none)
         return false;
-      }
-      break;
+      return true;
     case simplex::srt_none:
-      if (dualSimplexResult != simplex::srt_not_limited)
-      {
-        BOOST_ASSERT(0); // debug
+      if (dual != simplex::srt_not_limited)
         return false;
-      }
-      break;
+      return true;
     case simplex::srt_loop:
-      // TODO: Not implemented bahavior.
+      // TODO: Not implemented behavior.
       BOOST_ASSERT(0); // debug
-      return false;      
+      return true;
     default:
       // Impossible case.
       BOOST_ASSERT(0);
-    }
-    
-    // Checking result values corresponsibility.
-    scalar_type const eps = 1e-6; // TODO
-    if (!is_solution(commonLP, directResultVec, dualResultVec, eps))
-    {
-      // debug
-      std::cout << ">>> Simplex alg failed!\n";
-      std::cout << "      direct:\n";
-      output_common_linear_problem(std::cout, commonLP);
-      std::cout << "      dual:\n";
-      output_common_linear_problem(std::cout, dualLP);
-      
-      {
-        std::ofstream directDump("__direct.m");
-        output_as_octave_source(directDump, commonLP);
-        std::ofstream dualDump("__dual.m");
-        output_as_octave_source(dualDump, dualLP);
-      }
-      // end of debug
-      
-      BOOST_ASSERT(0); // debug
       return false;
     }
-
-    return true;
   }
   
-  // Debug version
-  template< class CLPTraits >
-  bool assert_linear_problem_solving_correctness( ICommonLinearProblem<CLPTraits> const &commonLP )
+  template< class CLPTraits, class E1, class E2 >
+  bool is_lp_solution_correct( ICommonLinearProblem<CLPTraits> const &commonLP,
+                               simplex::simplex_result_type directResult, vector_expression<E1> const &x,
+                               simplex::simplex_result_type dualResult,   vector_expression<E2> const &y )
   {
     typedef CLPTraits                             clp_traits_type;
     typedef typename CLPTraits::scalar_type       scalar_type;
@@ -551,73 +473,31 @@ namespace linear_problem
     
     typedef common_linear_problem<scalar_type, clp_traits_type> common_linear_problem_type;
     
-    // Solving direct linear problem.
-    vector_type directResultVec;
-    simplex::simplex_result_type const directSimplexResult = solve_by_simplex(commonLP, directResultVec);
-    BOOST_ASSERT(directSimplexResult != simplex::srt_loop); // TODO: Not implemented bahavior.
-    
-    // Constructing dual linear problem.
-    common_linear_problem_type dualLP;
-    construct_dual(commonLP, dualLP);
-    
-    // Solving dual linear problem.
-    vector_type dualResultVec;
-    simplex::simplex_result_type const dualSimplexResult = solve_by_simplex(dualLP, dualResultVec);
-    BOOST_ASSERT(dualSimplexResult != simplex::srt_loop); // TODO: Not implemented bahavior.
+    bool failed = false;
     
     // Checking corresponsibility of results.
-    switch (directSimplexResult)
-    {
-    case simplex::srt_min_found:
-      if (dualSimplexResult != simplex::srt_min_found)
-      {
-        BOOST_ASSERT(0); // debug
-        return false;
-      }
-      break;
-    case simplex::srt_not_limited:
-      if (dualSimplexResult != simplex::srt_none)
-      {
-        BOOST_ASSERT(0); // debug
-        return false;
-      }
-      break;
-    case simplex::srt_none:
-      if (dualSimplexResult != simplex::srt_not_limited)
-      {
-        BOOST_ASSERT(0); // debug
-        return false;
-      }
-      break;
-    case simplex::srt_loop:
-      // TODO: Not implemented bahavior.
-      BOOST_ASSERT(0); // debug
-      return false;      
-    default:
-      // Impossible case.
-      BOOST_ASSERT(0);
-    }
+    if (!is_result_status_correct(directResult, dualResult))
+      failed = true;
     
     // Checking result values corresponsibility.
-    scalar_type const eps = 1e-6; // TODO
-    if (!assert_is_solution(commonLP, directResultVec, dualResultVec, eps))
+    if (!failed && !is_solution(commonLP, x, y))
+      failed = true;
+    
+    if (failed)
     {
       // debug
-      std::cout << ">>> Simplex alg failed!\n";
-      std::cout << "      direct:\n";
+      std::cout << ">>> Solution is incorrect! <<<\n";
+      std::cout << "      problem:\n";
       output_common_linear_problem(std::cout, commonLP);
-      std::cout << "      dual:\n";
-      output_common_linear_problem(std::cout, dualLP);
+      std::cout << "      direct solution: " << x << "\n";
+      std::cout << "      dual   solution: " << y << "\n";
       
       {
-        std::ofstream directDump("__direct.m");
+        std::ofstream directDump("__problem.m");
         output_as_octave_source(directDump, commonLP);
-        std::ofstream dualDump("__dual.m");
-        output_as_octave_source(dualDump, dualLP);
       }
       // end of debug
       
-      BOOST_ASSERT(0); // debug
       return false;
     }
 

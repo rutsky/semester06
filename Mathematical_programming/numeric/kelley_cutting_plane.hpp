@@ -10,15 +10,15 @@
 
 #include "numeric_common.hpp"
 
-#include "linear_problem.hpp"
-#include "linear_problem_algs.hpp"
-#include "simplex_alg.hpp"
-
 #include <vector>
 
 #include <boost/assert.hpp>
 #include <boost/concept/assert.hpp>
 #include <boost/concept_check.hpp>
+
+#include "linear_problem.hpp"
+#include "linear_problem_algs.hpp"
+#include "lp_simplex.hpp"
 
 namespace numeric
 {
@@ -84,7 +84,7 @@ namespace kelley_cutting_plane
       vector_type commonResult;
       simplex::simplex_result_type const result = solve_by_simplex(commonLP, commonResult);
       BOOST_ASSERT(result == simplex::srt_min_found); // FIXME: Handle other cases.
-      BOOST_ASSERT(linear_problem::assert_linear_problem_solving_correctness(commonLP)); // TODO, debug
+      BOOST_ASSERT(linear_problem::is_simplex_solving_correct(commonLP)); // TODO, debug
       
       std::cout << "Simplex algorithm gives x = " << commonResult << std::endl;
       

@@ -12,7 +12,6 @@
 #include <iterator>
 #include <algorithm>
 
-#include <boost/tuple/tuple.hpp>
 #include <boost/scoped_ptr.hpp>
 
 #include "numeric/numeric.hpp"
@@ -167,32 +166,69 @@ int main( int argc, char *argv[] )
         numeric::output_as_octave_source(*ofs, dualCanonicalLP);
       }
       
-      vector_type directResultV;
-      numeric::simplex::simplex_result_type const directResult = 
-          numeric::linear_problem::solve_by_simplex(directLP, directResultV);
-      std::cout << "Direct problem solution: \n  " << directResultV << 
-          " (result=" << static_cast<int>(directResult) << ")\n";
+      {
+        // Solving problems by simplex method.
+        
+        std::cout << " === Simplex Method === " << std::endl;
+        
+        vector_type directResultV;
+        numeric::simplex::simplex_result_type const directResult = 
+            numeric::linear_problem::solve_by_simplex(directLP, directResultV);
+        std::cout << "Direct problem solution: \n  " << directResultV << 
+            " (result=" << static_cast<int>(directResult) << ")\n";
+        
+        vector_type directCanonicalResultV;
+        numeric::simplex::simplex_result_type const directCanonicalResult = 
+            numeric::linear_problem::solve_by_simplex(directCanonicalLP, directCanonicalResultV);
+        std::cout << "Canonical direct problem solution: \n  " << directCanonicalResultV << 
+            " (result=" << static_cast<int>(directCanonicalResult) << ")\n";
+        
+        vector_type dualResultV;
+        numeric::simplex::simplex_result_type const dualResult = 
+            numeric::linear_problem::solve_by_simplex(dualLP, dualResultV);
+        std::cout << "Dual problem solution: \n  " << dualResultV << 
+            " (result=" << static_cast<int>(dualResult) << ")\n";
+        
+        vector_type dualCanonicalResultV;
+        numeric::simplex::simplex_result_type const dualCanonicalResult = 
+            numeric::linear_problem::solve_by_simplex(dualCanonicalLP, dualCanonicalResultV);
+        std::cout << "Canonical dual problem solution: \n  " << dualCanonicalResultV << 
+            " (result=" << static_cast<int>(dualCanonicalResult) << ")\n";
+        
+        BOOST_ASSERT(numeric::linear_problem::is_simplex_solving_correct(directLP));
+      }
       
-      vector_type directCanonicalResultV;
-      numeric::simplex::simplex_result_type const directCanonicalResult = 
-          numeric::linear_problem::solve_by_simplex(directCanonicalLP, directCanonicalResultV);
-      std::cout << "Canonical direct problem solution: \n  " << directCanonicalResultV << 
-          " (result=" << static_cast<int>(directCanonicalResult) << ")\n";
-      
-      vector_type dualResultV;
-      numeric::simplex::simplex_result_type const dualResult = 
-          numeric::linear_problem::solve_by_simplex(dualLP, dualResultV);
-      std::cout << "Dual problem solution: \n  " << dualResultV << 
-          " (result=" << static_cast<int>(dualResult) << ")\n";
-      
-      vector_type dualCanonicalResultV;
-      numeric::simplex::simplex_result_type const dualCanonicalResult = 
-          numeric::linear_problem::solve_by_simplex(dualCanonicalLP, dualCanonicalResultV);
-      std::cout << "Canonical dual problem solution: \n  " << dualCanonicalResultV << 
-          " (result=" << static_cast<int>(dualCanonicalResult) << ")\n";
-      
-      //BOOST_ASSERT(numeric::linear_problem::check_linear_problem_solving_correctness(directLP));
-      BOOST_ASSERT(numeric::linear_problem::assert_linear_problem_solving_correctness(directLP));
+      {
+        // Solving problems by brute force.
+        
+        std::cout << " === Brute Force === " << std::endl;
+        
+        vector_type directResultV;
+        numeric::simplex::simplex_result_type const directResult = 
+            numeric::linear_problem::solve_by_brute_force(directLP, directResultV);
+        std::cout << "Direct problem solution: \n  " << directResultV << 
+            " (result=" << static_cast<int>(directResult) << ")\n";
+        
+        vector_type directCanonicalResultV;
+        numeric::simplex::simplex_result_type const directCanonicalResult = 
+            numeric::linear_problem::solve_by_brute_force(directCanonicalLP, directCanonicalResultV);
+        std::cout << "Canonical direct problem solution: \n  " << directCanonicalResultV << 
+            " (result=" << static_cast<int>(directCanonicalResult) << ")\n";
+        
+        vector_type dualResultV;
+        numeric::simplex::simplex_result_type const dualResult = 
+            numeric::linear_problem::solve_by_brute_force(dualLP, dualResultV);
+        std::cout << "Dual problem solution: \n  " << dualResultV << 
+            " (result=" << static_cast<int>(dualResult) << ")\n";
+        
+        vector_type dualCanonicalResultV;
+        numeric::simplex::simplex_result_type const dualCanonicalResult = 
+            numeric::linear_problem::solve_by_brute_force(dualCanonicalLP, dualCanonicalResultV);
+        std::cout << "Canonical dual problem solution: \n  " << dualCanonicalResultV << 
+            " (result=" << static_cast<int>(dualCanonicalResult) << ")\n";
+        
+        BOOST_ASSERT(numeric::linear_problem::is_brute_force_solving_correct(directLP));
+      }
     }
     
     {

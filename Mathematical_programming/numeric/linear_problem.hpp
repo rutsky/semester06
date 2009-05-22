@@ -260,7 +260,7 @@ namespace linear_problem
       , A_(A)
       , b_(b)
     {
-      init();
+      update();
     }
     
     explicit canonical_linear_problem( canonical_linear_problem const &other )
@@ -268,7 +268,7 @@ namespace linear_problem
       , A_(other.A_)
       , b_(other.b_)
     {
-      init();
+      update();
     }
     
     bool                                 min  () const { return true; }
@@ -286,8 +286,7 @@ namespace linear_problem
     vector_type                  const & b    () const { return b_; }
     vector_type                        & b    ()       { return b_; }
     
-  protected:
-    void init()
+    void update() const
     {
       cSign_ = scalar_vector<variable_sign_type>(c_.size(), variable_geq_zero);
       BOOST_ASSERT(cSign_.size() == c_.size());
@@ -304,8 +303,8 @@ namespace linear_problem
     vector_type b_;
     
     // TODO!
-    variables_signs_vector_type  cSign_;
-    inequality_signs_vector_type ASign_;
+    mutable variables_signs_vector_type  cSign_;
+    mutable inequality_signs_vector_type ASign_;
   };
   
   template< class Scalar, class Traits = common_linear_problem_traits<Scalar> >

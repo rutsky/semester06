@@ -21,5 +21,9 @@ HEADERS = combination.hpp \
     linear_problem_algs.hpp \
     xmath.hpp \
     xmath_boost.hpp \
-    vector_ops.hpp
+    vector_ops.hpp \
+    matrix_ops.hpp \
+    lp_brute_force.hpp \
+    linear_system.hpp \
+    lp_simplex.hpp
 linear_problem.hppkelley_cutting_plane.hpp
