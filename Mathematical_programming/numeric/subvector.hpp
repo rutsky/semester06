@@ -448,11 +448,13 @@ namespace numeric
 
   // Generic projections.
   template< class VectorType, class RowsForwardIterator >
+  inline
   vector_subvector<VectorType>             subvector( VectorType &data, RowsForwardIterator first, RowsForwardIterator beyond )
   {
     return vector_subvector<VectorType>(data, first, beyond);
   }
   template< class VectorType, class RowsForwardIterator >
+  inline
   vector_subvector<VectorType const> const subvector( VectorType const &data, RowsForwardIterator first, RowsForwardIterator beyond )
   {
     return vector_subvector<VectorType const>(data, first, beyond);
