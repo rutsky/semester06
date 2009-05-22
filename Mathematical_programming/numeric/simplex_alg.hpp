@@ -26,9 +26,9 @@
 
 #include "li_vectors.hpp"
 #include "iterator.hpp"
-#include "submatrix.hpp"
-#include "subvector.hpp"
-#include "invert_matrix.hpp"
+#include "matrix_ops.hpp"
+#include "vector_ops.hpp"
+#include "linear_system.hpp"
 #include "combination.hpp"
 
 namespace numeric
@@ -588,9 +588,8 @@ namespace simplex
   
   // Returns true is system is consistent, false otherwise.
   template< class M1, class E1, class M2, class E2 >
-  bool remove_li_dependent_constraints( matrix_expression<M1> const &A,   vector_expression<E1> const &b,
-  //                                      matrix_reference <M2>       &liA, vector_reference <E2>       &lib )
-                                        matrix_expression<M2>       &liA, vector_expression<E2>       &lib )
+  bool remove_dependent_constraints( matrix_expression<M1> const &A,   vector_expression<E1> const &b,
+                                     matrix_expression<M2>       &liA, vector_expression<E2>       &lib )
   {
     typedef typename M1::value_type                 scalar_type; // TODO: Use type with most precision.
     typedef vector<scalar_type>                     vector_type;
@@ -704,9 +703,7 @@ namespace simplex
     // Removing linear dependent constraints.
     matrix_type newA(m, n);
     vector_type newb(m);
-    //bool remove_li_dependent_constraints( matrix_expression<M1> const &A,   vector_expression<E1> const &b,
-    //                                      matrix_reference <M2>       &liA, vector_reference <E2>       &lib )
-    if (!remove_li_dependent_constraints<matrix_type, vector_type, matrix_type, vector_type>(A, b, newA, newb))
+    if (!remove_dependent_constraints<matrix_type, vector_type, matrix_type, vector_type>(A, b, newA, newb))
     {
       // Constraints are incossistent. Set of admissible points is empty.
       return srt_none;
@@ -717,12 +714,10 @@ namespace simplex
     if (newA.size1() == newA.size2())
     {
       // Linear program problem is well defined system of linear equations.
-      size_t const size = newA.size1();
       
-      matrix_type invNewA(size, size);
-      BOOST_VERIFY(invert_matrix(newA, invNewA)); // TODO: Handle zero determinant case.
-      
-      resultV = prod(invNewA, newb);
+      BOOST_VERIFY(linear_system::solve(newA, newb, resultV));
+      BOOST_ASSERT(eq_zero(norm_inf(prod(newA, resultV) - newb)));
+
       BOOST_ASSERT(assert_basic_vector(newA, newb, resultV));
       BOOST_ASSERT(assert_basic_vector(A, b, resultV));
       
