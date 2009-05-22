@@ -54,6 +54,9 @@ namespace numeric
   using ublas::row;
   using ublas::matrix_row;
   using ublas::column;
+
+  using ublas::norm_inf;
+  using ublas::norm_2;
   
   using ublas::prod;
   using ublas::inner_prod;
