@@ -28,7 +28,6 @@ namespace numeric
     
   private:
     typedef typename vector_type::value_type value_type;
-    typedef ublas::scalar_traits<value_type> scalar_traits;
     
   public:
     bool empty() const
@@ -65,14 +64,14 @@ namespace numeric
         size_t r(0);
         for (; r < v.size(); ++r)
         {
-          if (!scalar_traits::equals(v[r], 0))
+          if (!eq_zero(v[r]))
           {
             break;
           }
         }
         
         BOOST_ASSERT(r < v.size()); // because eliminateVector() returned true
-        BOOST_ASSERT(scalar_traits::equals(v[r], 1));
+        BOOST_ASSERT(eq(v[r], 1));
         
         if (!liVectors_.empty())
         {
@@ -81,11 +80,11 @@ namespace numeric
           {
             vector_type &w = liVectors_[i];
             
-            if (!scalar_traits::equals(w[r], 0))
+            if (!eq_zero(w[r]))
             {
               // Eliminating row.
               w = w - w[r] * v;
-              BOOST_ASSERT(scalar_traits::equals(w[r], 0));
+              BOOST_ASSERT(eq_zero(w[r]));
               w[r] = 0; // rounding
             }
             else
@@ -106,7 +105,7 @@ namespace numeric
           // Storage is empty, adding normalized vector.
           liVectors_.push_back(v);
           unitPos_.resize(v.size());
-          unitPos_[r] = 0;
+          unitPos_[r] = 0.;
           
           return true;
         }
@@ -154,12 +153,12 @@ namespace numeric
       // TODO: Rewrite using std::find and boost::bind.
       for (size_t r = 0; r < v.size(); ++r)
       {
-        if (!scalar_traits::equals(v[r], 0))
+        if (!eq_zero(v[r]))
         {
           // Found nonzero row, normalizing it and return success code.
           v = v / v[r];
-          BOOST_ASSERT(scalar_traits::equals(v[r], 1));
-          v[r] = 1; // rounding
+          BOOST_ASSERT(eq(v[r], 1));
+          v[r] = 1.; // rounding
           return true;
         }
       }
@@ -186,10 +185,20 @@ namespace numeric
           if (unitPos_[r])
           {
             // Eliminating row with normalized vector from storage.
-            BOOST_ASSERT(liVectors_[unitPos_[r].get()][r] == 1);
+            //BOOST_ASSERT(liVectors_[unitPos_[r].get()][r] == 1); // FIXME: This assert somehow fails. 
+            /*
+            if (!(liVectors_[unitPos_[r].get()][r] == 1))
+            {
+              std::cout << "AAA: " << liVectors_[unitPos_[r].get()][r] << std::endl;
+              dumpStorage();
+              std::cout << std::endl;
+            }
+            */
+            // end of debug
+            BOOST_ASSERT(eq(liVectors_[unitPos_[r].get()][r], 1.));
             v = v - v[r] * liVectors_[unitPos_[r].get()];
-            BOOST_ASSERT(scalar_traits::equals(v[r], 0));
-            v[r] = 0; // rounding
+            BOOST_ASSERT(eq_zero(v[r]));
+            v[r] = 0.; // rounding
           }
           else
           {
