@@ -14,3 +14,7 @@ for f in *.in; do # TODO: not working if there is not `*.in' files.
     exit 1
   fi
 done
+
+echo
+echo
+echo "All tests successfully passed!"
