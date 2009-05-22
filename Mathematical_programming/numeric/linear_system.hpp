@@ -46,7 +46,7 @@ namespace linear_system
     
     x() = prod(invA, b());
     
-    BOOST_ASSERT(eq_zero(norm_inf(vector_type(prod(A(), x()) - b()))));
+    BOOST_ASSERT(eq_zero(norm_inf(vector_type(prod(A(), x()) - b())), 1e-4)); // TODO: Precision.
     
     return true;
   }
