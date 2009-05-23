@@ -3,7 +3,7 @@
 # Vladimir Rutsky <altsysrq@gmail.com>
 # 22.03.2009
 
-SOURCES = scholarship_reform
+SOURCES = ed_system_reform
 DEPENDENCY = 
 TEX2PDF = pdflatex
 
