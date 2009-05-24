@@ -95,7 +95,7 @@ namespace linear_problem
   struct common_linear_problem_traits
   {
     // TODO: Think about admissible inequation signs. 
-    //   They should correcpond to variable signs types through duality.
+    //   They should correspond to variable signs types through duality.
     
     // TODO: Separate types.
     typedef Scalar                       scalar_type;
