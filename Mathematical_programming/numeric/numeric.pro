@@ -25,5 +25,6 @@ HEADERS = combination.hpp \
     matrix_ops.hpp \
     lp_brute_force.hpp \
     linear_system.hpp \
-    lp_simplex.hpp
+    lp_simplex.hpp \
+    transportation_problem.hpp
 linear_problem.hppkelley_cutting_plane.hpp

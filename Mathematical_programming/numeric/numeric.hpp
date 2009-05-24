@@ -26,5 +26,6 @@
 #include "kelley_cutting_plane.hpp"
 #include "lp_simplex.hpp"
 #include "lp_brute_force.hpp"
+#include "transportation_problem.hpp"
 
 #endif // NUMERIC_NUMERIC_HPP
