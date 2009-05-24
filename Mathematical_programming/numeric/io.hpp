@@ -13,6 +13,7 @@
 #include "numeric_common.hpp"
 
 #include "linear_problem.hpp"
+#include "transportation_problem.hpp"
 
 namespace numeric
 {
@@ -287,6 +288,23 @@ namespace numeric
     ostr << "\n";
     
     ostr << "[xmin, fmin, status, extra] = glpk(c, A, b, lb, ub, ctype, vartype, sense)\n";
+  }
+  
+  template< class OutStream, class TPTraits >
+  inline
+  void output_transportation_problem( OutStream &ostr, 
+                                      transportation_problem::ITransportationProblem<TPTraits> const &tp,
+                                      char const *format = "%1$6g" )
+  {
+    size_t const m = transportation_problem::supplies_count(tp);
+    
+    output_vector_pretty(ostr, tp.b(),     " ", "", "\n\n", format);
+    
+    for (size_t r = 0; r < m; ++r)
+    {
+      output_vector_pretty(ostr, row(tp.C(), r), " ", "", "", format);
+      ostr << "    " << boost::format(format) % tp.a()(r) << "\n";
+    }
   }
 } // End of namespace 'numeric'.
 
