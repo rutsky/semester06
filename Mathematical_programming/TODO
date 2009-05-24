@@ -2,12 +2,13 @@
  * Configure precompiled header files.
  * Use better common interface for stating consideration function.
  * Rename modules.
- * Rewrite places that used local infimum/epsilon constant. Move constants to local traits.
+ * Rewrite places that used local infinity/epsilon constant. Move constants to local traits.
  * Check that all functions in *.hpp are inline.
  * Correct `linear problem' name.
  * Remove direct including of qt creator debug.
  * Examine how to made vectors and matrices copy and fix it in all projects. Is it `assign' or `operator = '?
  * Check usage of ublas::vector_expression.
  * Merge `nodebug' and `master' branches.
- * Debug Kelley's convex cutting plane.
+ + Debug Kelley's convex cutting plane.
  * Write CD with books for aunt Elena.
+ * Replace `goal function' by `objective function'
