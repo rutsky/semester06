@@ -11,4 +11,5 @@
  * Merge `nodebug' and `master' branches.
  + Debug Kelley's convex cutting plane.
  * Write CD with books for aunt Elena.
- * Replace `goal function' by `objective function'
+ * Replace `goal function' by `objective function'.
+ * Replace `admissible' by `feasible'.
