@@ -13,3 +13,5 @@
  * Write CD with books for aunt Elena.
  * Replace `goal function' by `objective function'.
  * Replace `admissible' by `feasible'.
+ * Add links on sources of algorithms.
+ * Implement ASSERT_EQ_ZERO(x) with debug output instead of BOOST_ASSERT(eq_zero(x)).
