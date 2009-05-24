@@ -244,6 +244,4 @@ int main( int argc, char *argv[] )
       numeric::output_vector_tex(*ofs, c, true);
     }
   }
-  
-  return 0;
 }
