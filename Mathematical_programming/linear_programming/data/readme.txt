@@ -1,4 +1,4 @@
-Data file consists of succesively dumped vectors and matrices by boost::uBLAS.
+Data file consists of succesively dumped vectors and matrices by boost::uBLAS library.
 
 min:
   1
