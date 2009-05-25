@@ -65,7 +65,7 @@ namespace newton
       scalar_type const dirLen = ublas::norm_2(dirLong);
       if (scalar_traits_type::equals(dirLen, 0))
       {
-        // Function gradient is al  most zero, found minimum.
+        // Function gradient is almost zero, found minimum.
         return x;
       }
       
