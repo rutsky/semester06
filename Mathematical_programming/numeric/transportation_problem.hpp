@@ -20,6 +20,8 @@
 #include <boost/concept_check.hpp>
 
 #include "potentials_alg.hpp"
+#include "linear_problem.hpp"
+#include "lp_simplex.hpp"
 
 namespace numeric
 {
@@ -210,15 +212,96 @@ namespace transportation_problem
   }
   
   template< class M, class TPTraits >
-  void solve_by_potentials( ITransportationProblem<TPTraits> const &tp,
+  void solve_by_potentials( ITransportationProblem<TPTraits> const &closedTP,
                             matrix_expression<M> &result )
   {
     typedef typename TPTraits::scalar_type scalar_type;
     typedef transportation_problem<scalar_type, TPTraits> transportation_problem_type;
     
-    transportation_problem_type closedTP;
-    to_closed(tp, closedTP);
+    ASSERT(is_closed(closedTP)); // TODO
+    
+    //transportation_problem_type closedTP;
+    //to_closed(tp, closedTP);
+    
     lp_potentials::solve(closedTP.a(), closedTP.b(), closedTP.C(), result);
+  }
+  
+  // TODO: Return convertor of solutions.
+  template< class TPTraits, class CLPTraits >
+  void to_linear_problem( ITransportationProblem<TPTraits> const &tp,
+                          linear_problem::canonical_linear_problem<typename CLPTraits::scalar_type, CLPTraits> &clp )
+  {
+    typedef typename CLPTraits::scalar_type scalar_type;
+    typedef vector<scalar_type>             vector_type;
+    typedef zero_vector<scalar_type>        zero_vector_type;
+    typedef matrix<scalar_type>             matrix_type;
+    typedef zero_matrix<scalar_type>        zero_matrix_type;
+    
+    ASSERT(is_closed(tp)); // TODO
+    
+    size_t const m = supplies_count(tp), n = demands_count(tp);
+    
+    clp.c() = zero_vector_type(m * n);
+    // TODO: Use algorithms.
+    for (size_t r = 0; r < m; ++r)
+      for (size_t c = 0; c < n; ++c)
+        clp.c()(r * n + c) = tp.C()(r, c);
+    
+    clp.A() = zero_matrix_type(m + n, m * n);
+    clp.b() = zero_vector_type(m + n);
+    
+    for (size_t r = 0; r < m; ++r)
+    {
+      for (size_t c = 0; c < n; ++c)
+        clp.A()(r, r * n + c) = 1;
+      clp.b()(r) = tp.a()(r);
+    }
+    
+    for (size_t c = 0; c < n; ++c)
+    {
+      for (size_t r = 0; r < m; ++r)
+        clp.A()(m + c, r * n + c) = 1;
+      clp.b()(m + c) = tp.b()(c);
+    }
+    
+    clp.update();
+    
+    BOOST_ASSERT(linear_problem::is_valid(clp));
+  }
+  
+  template< class TPTraits, class M >
+  typename TPTraits::scalar_type transportation_cost( ITransportationProblem<TPTraits> const &tp,
+                                                      matrix_expression<M> const &X )
+  {
+    return lp_potentials::transportationCost(tp.C(), X());
+  }
+  
+  template< class M, class TPTraits >
+  void solve_by_simplex( ITransportationProblem<TPTraits> const &closedTP,
+                         matrix_expression<M> &result )
+  {
+    typedef typename TPTraits::scalar_type scalar_type;
+    typedef vector<scalar_type>            vector_type;
+    typedef matrix<scalar_type>            matrix_type;
+    typedef transportation_problem<scalar_type, TPTraits> transportation_problem_type;
+    typedef linear_problem::canonical_linear_problem<scalar_type> canonical_linear_problem_type;
+    
+    ASSERT(is_closed(closedTP)); // TODO
+    
+    size_t const m = supplies_count(closedTP), n = demands_count(closedTP);
+
+    canonical_linear_problem_type clp;
+    to_linear_problem(closedTP, clp);
+
+    vector_type resultV;
+    simplex::simplex_result_type const resultState = solve_by_simplex(clp, resultV);
+    ASSERT_EQ(resultState, simplex::srt_min_found);
+    ASSERT_EQ(resultV.size(), m * n);
+    
+    result().resize(m, n);
+    for (size_t r = 0; r < m; ++r)
+      for (size_t c = 0; c < n; ++c)
+        result()(r, c) = resultV(r * n + c);
   }
 } // End of namespace 'transportation_problem'.
 } // End of namespace 'numeric'.

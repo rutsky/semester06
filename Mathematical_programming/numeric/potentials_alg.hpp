@@ -657,26 +657,26 @@ namespace lp_potentials
       // Searching starting by row. Must be equivalent to starting from column.
       VERIFY(find_loop(rows, cols, goalR, goalC, goalR, goalC, idxsOut, true, 1));
     }
-    
-    template< class M >
-    typename M::value_type transportationCost( matrix_expression<M> const &C, matrix_expression<M> const &X )
-    {
-      typedef typename M::value_type scalar_type;
-      
-      ASSERT_EQ(C().size1(), X().size1());
-      ASSERT_EQ(C().size2(), X().size2());
-      
-      size_t m = C().size1(), n = C().size2();
-      
-      scalar_type result = scalar_type();
-      // TODO: Use ublas functions.
-      for (size_t r = 0; r < m; ++r)
-        for (size_t c = 0; c < n; ++c)
-          result += C()(r, c) * X()(r, c);
-      
-      return result;
-    }
   } // End of anonymous namespace.
+  
+  template< class M >
+  typename M::value_type transportationCost( matrix_expression<M> const &C, matrix_expression<M> const &X )
+  {
+    typedef typename M::value_type scalar_type;
+    
+    ASSERT_EQ(C().size1(), X().size1());
+    ASSERT_EQ(C().size2(), X().size2());
+    
+    size_t m = C().size1(), n = C().size2();
+    
+    scalar_type result = scalar_type();
+    // TODO: Use ublas functions.
+    for (size_t r = 0; r < m; ++r)
+      for (size_t c = 0; c < n; ++c)
+        result += C()(r, c) * X()(r, c);
+    
+    return result;
+  }
   
   template< class V1, class V2, class M1, class M2 >
   void solve( vector_expression<V1> const &a,
