@@ -196,8 +196,14 @@ namespace lp_potentials
       {
         scalar_type &supply = a(r);
         
-        while (supply >= 0)
+        while (true)
         {
+          if (eq_zero(supply) && r == m - 1)
+          {
+            // Don't searching fake element in last row.
+            break;
+          }
+          
           ASSERT(!unprocessedCols.empty());
         
           // Locating column with lowest transfer cost from current row.
