@@ -358,7 +358,7 @@ namespace lp_potentials
         }
       
       matrix<bool> _isPlanPointByColumn = scalar_matrix<bool>(m, n, false);
-      for (size_t c = 0; c < m; ++c)
+      for (size_t c = 0; c < n; ++c)
         for (cells_map_type::const_iterator cellPtrIt = cols[c].begin(); cellPtrIt != cols[c].end(); ++cellPtrIt)
         {
           cell_type const &cell = *(cellPtrIt->second);
@@ -595,7 +595,7 @@ namespace lp_potentials
           }
         
         matrix<bool> _isPlanPointByColumn = scalar_matrix<bool>(m, n, false);
-        for (size_t c = 0; c < m; ++c)
+        for (size_t c = 0; c < n; ++c)
           for (cells_map_type::const_iterator cellPtrIt = cols[c].begin(); cellPtrIt != cols[c].end(); ++cellPtrIt)
           {
             cell_type const &cell = *(cellPtrIt->second);
@@ -671,6 +671,10 @@ namespace lp_potentials
     size_t nIterations(0);
     while (true)
     {
+      // debug
+      std::cout << "\n=== iteration #" << nIterations << " ===\n";
+      // end of debug
+      
       // Recalculating potentials coefficients.
       calculate_potentials_coefs(rows, cols, C, u, v);
 
