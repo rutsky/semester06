@@ -106,30 +106,57 @@ namespace lp_potentials
     }
   }
   
-  template< class V1, class V2, class M1, class M2 >
+  template< class V1, class V2, class M >
   bool is_plan( vector_expression<V1> const &a, vector_expression<V2> const &b,
-                matrix_expression<M1> const &C,
-                matrix_expression<M2> const &X )
+                matrix_expression<M> const &X )
   {
     typedef typename V1::value_type scalar_type;
     
-    ASSERT(assert_tp_valid(a, b, C));
-    ASSERT(is_tp_closed(a, b, C));
+    size_t const m = a().size(), n = b().size();
     
-    size_t const m = C().size1(), n = C().size2();
-    
-    ASSERT_EQ(C().size1(), m);
-    ASSERT_EQ(C().size2(), n);
+    ASSERT_EQ(X().size1(), m);
+    ASSERT_EQ(X().size2(), n);
     
     for (size_t r = 0; r < m; ++r)
-      if (!eq(std::inner_product(row(C(), r).begin(), row(C(), r).end(), row(X(), r).begin(), scalar_type(0.)), a()(r)))
+      if (!eq(std::accumulate(row   (X(), r).begin(), row   (X(), r).end(), scalar_type()), a()(r)))
         return false;
 
     for (size_t c = 0; c < n; ++c)
-      if (!eq(std::inner_product(column(C(), c).begin(), column(C(), c).end(), column(X(), c).begin(), scalar_type(0.)), b()(c)))
+      if (!eq(std::accumulate(column(X(), c).begin(), column(X(), c).end(), scalar_type()), b()(c)))
         return false;
     
     return true;
+  }
+  
+  template< class V1, class V2, class M >
+  bool assert_plan( vector_expression<V1> const &a, vector_expression<V2> const &b,
+                    matrix_expression<M> const &X )
+  {
+    typedef typename V1::value_type scalar_type;
+    
+    size_t const m = a().size(), n = b().size();
+    
+    ASSERT_EQ(X().size1(), m);
+    ASSERT_EQ(X().size2(), n);
+    
+    // debug
+    std::cout << "assert_plan()\n";
+    std::cout << "    a: "; output_vector_console(std::cout, a()); std::cout << "\n";
+    std::cout << "    b: "; output_vector_console(std::cout, b()); std::cout << "\n";
+    std::cout << "    X:\n"; output_matrix_console(std::cout, X());
+    // end of debug
+    
+    for (size_t r = 0; r < m; ++r)
+    {
+      ASSERT_FUZZY_EQ(std::accumulate(row   (X(), r).begin(), row   (X(), r).end(), scalar_type()), a()(r));
+    }
+
+    for (size_t c = 0; c < n; ++c)
+    {
+      ASSERT_FUZZY_EQ(std::accumulate(column(X(), c).begin(), column(X(), c).end(), scalar_type()), b()(c));
+    }
+    
+    return is_plan(a, b, X);
   }
 
   // TODO: Use `details' namespace.
@@ -301,7 +328,7 @@ namespace lp_potentials
       ASSERT_EQ(planCells.size(), m + n - 1);
       
       // Asserting that founded x is a plan.
-      ASSERT(is_plan(aVec, bVec, C, x));
+      ASSERT(assert_plan(aVec, bVec, x));
     }
     
     template< class M, class V >
@@ -627,11 +654,11 @@ namespace lp_potentials
     cells_maps_vector_type rows(m), cols(n);
     for (all_cells_map_type::const_iterator it = planCells.begin(); it != planCells.end(); ++it)
     {
-      size_t const c = it->first.first, r = it->first.second;
+      size_t const r = it->first.first, c = it->first.second;
       cell_ptr_type cellPtr = it->second;
       
-      ASSERT_EQ(c, cellPtr->c);
       ASSERT_EQ(r, cellPtr->r);
+      ASSERT_EQ(c, cellPtr->c);
       
       VERIFY(rows[r].insert(std::make_pair(c, cellPtr)).second);
       VERIFY(cols[c].insert(std::make_pair(r, cellPtr)).second);
@@ -710,7 +737,7 @@ namespace lp_potentials
       }
       
       // Asserting that new plan is a plan.
-      ASSERT(is_plan(a, b, C, x));
+      ASSERT(is_plan(a, b, x));
       
       // Updating storage: removing minimum shipment variable and adding maximum potential variable.
       
