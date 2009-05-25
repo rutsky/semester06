@@ -139,13 +139,6 @@ namespace lp_potentials
     ASSERT_EQ(X().size1(), m);
     ASSERT_EQ(X().size2(), n);
     
-    // debug
-    std::cout << "assert_plan()\n";
-    std::cout << "    a: "; output_vector_console(std::cout, a()); std::cout << "\n";
-    std::cout << "    b: "; output_vector_console(std::cout, b()); std::cout << "\n";
-    std::cout << "    X:\n"; output_matrix_console(std::cout, X());
-    // end of debug
-    
     for (size_t r = 0; r < m; ++r)
     {
       ASSERT_FUZZY_EQ(std::accumulate(row   (X(), r).begin(), row   (X(), r).end(), scalar_type()), a()(r));
@@ -227,13 +220,6 @@ namespace lp_potentials
         while (true)
         {
           bool const fake = eq_zero(supply);
-          
-          // debug
-          std::cout << "  row = " << r << "\n";
-          std::cout << "a: "; output_vector_console(std::cout, a); std::cout << "\n";
-          std::cout << "b: "; output_vector_console(std::cout, b); std::cout << "\n";
-          std::cout << "X:\n"; output_matrix_console(std::cout, x());
-          // end of debug
           
           ASSERT(!unprocessedCols.empty());
         
@@ -343,35 +329,6 @@ namespace lp_potentials
       ASSERT_EQ(rows.size(), m); // rows.size() == m
       ASSERT_EQ(cols.size(), n); // cols.size() == n
       
-      // debug
-      // Asserting that rows and columns data are valid.
-      matrix<bool> _isPlanPointByRow = scalar_matrix<bool>(m, n, false);
-      for (size_t r = 0; r < m; ++r)
-        for (cells_map_type::const_iterator cellPtrIt = rows[r].begin(); cellPtrIt != rows[r].end(); ++cellPtrIt)
-        {
-          cell_type const &cell = *(cellPtrIt->second);
-          size_t const c = cell.c;
-          ASSERT_LT(c, n);      // c <= n
-          ASSERT_EQ(cell.r, r); // cell.r == r
-          
-          _isPlanPointByRow(r, c) = true;
-        }
-      
-      matrix<bool> _isPlanPointByColumn = scalar_matrix<bool>(m, n, false);
-      for (size_t c = 0; c < n; ++c)
-        for (cells_map_type::const_iterator cellPtrIt = cols[c].begin(); cellPtrIt != cols[c].end(); ++cellPtrIt)
-        {
-          cell_type const &cell = *(cellPtrIt->second);
-          size_t const r = cell.r;
-          ASSERT_LT(r, m);      // r < m
-          ASSERT_EQ(cell.c, c); // cell.c == c
-          
-          _isPlanPointByColumn(r, c) = true;
-        }
-      
-      ASSERT_EQ(_isPlanPointByRow, _isPlanPointByColumn);
-      // end of debug
-      
       std::vector<boost::optional<scalar_type> > u(m), v(n);
       std::queue<size_t> rowsQueue, colsQueue;
       
@@ -448,26 +405,6 @@ namespace lp_potentials
       std::transform(u.begin(), u.end(), uVec().begin(), boost::lambda::ret<scalar_type>(*boost::lambda::_1));
       vVec().resize(n);
       std::transform(v.begin(), v.end(), vVec().begin(), boost::lambda::ret<scalar_type>(*boost::lambda::_1));
-      
-      // debug
-      // Asserting that potentials are valid.
-      for (size_t r = 0; r < m; ++r)
-        for (size_t c = 0; c < n; ++c)
-        {
-          scalar_type const p = uVec()(r) + vVec()(c) - C()(r, c);
-          if (_isPlanPointByRow(r, c))
-          {
-            ASSERT_EQ(p, scalar_type());
-          }
-          /*
-          // This is a lie:
-          else
-          {
-            ASSERT_GE(p, scalar_type());
-          }
-          */
-        }
-      // end of debug
     }
     
     template< class M, class V >
@@ -518,8 +455,6 @@ namespace lp_potentials
         ASSERT(rows[r].find(c) != rows[r].end());
         cell_type &curCell = *rows[r].find(c)->second;
         
-        std::cout << " >> (" << r << "," <<  c << ")\n"; // debug
-
         curCell.mark = true;
       }
       
@@ -595,8 +530,6 @@ namespace lp_potentials
         ASSERT(rows[r].find(c) != rows[r].end());
         cell_type &curCell = *rows[r].find(c)->second;
         
-        std::cout << " << (" << r << "," <<  c << ")\n"; // debug
-
         curCell.mark = false;
       }
 
@@ -610,37 +543,6 @@ namespace lp_potentials
     {
       // TODO: Assert sizes.
       size_t const m = rows.size(), n = cols.size();
-      
-      // debug
-      {
-        // Asserting that rows and columns data are valid.
-        matrix<bool> _isPlanPointByRow = scalar_matrix<bool>(m, n, false);
-        for (size_t r = 0; r < m; ++r)
-          for (cells_map_type::const_iterator cellPtrIt = rows[r].begin(); cellPtrIt != rows[r].end(); ++cellPtrIt)
-          {
-            cell_type const &cell = *(cellPtrIt->second);
-            size_t const c = cell.c;
-            ASSERT_LT(c, n);      // c <= n
-            ASSERT_EQ(cell.r, r); // cell.r == r
-            
-            _isPlanPointByRow(r, c) = true;
-          }
-        
-        matrix<bool> _isPlanPointByColumn = scalar_matrix<bool>(m, n, false);
-        for (size_t c = 0; c < n; ++c)
-          for (cells_map_type::const_iterator cellPtrIt = cols[c].begin(); cellPtrIt != cols[c].end(); ++cellPtrIt)
-          {
-            cell_type const &cell = *(cellPtrIt->second);
-            size_t const r = cell.r;
-            ASSERT_LT(r, m);      // r < m
-            ASSERT_EQ(cell.c, c); // cell.c == c
-            
-            _isPlanPointByColumn(r, c) = true;
-          }
-        
-        ASSERT_EQ(_isPlanPointByRow, _isPlanPointByColumn);
-      }
-      // end of debug
       
       // Resetting cells marks.
       for (size_t r = 0; r < m; ++r)
@@ -723,10 +625,6 @@ namespace lp_potentials
     scalar_type prevPlanTransportationCost = transportationCost(C, x);
     while (true)
     {
-      // debug
-      std::cout << "\n=== iteration #" << nIterations << " ===\n";
-      // end of debug
-      
       // Recalculating potentials coefficients.
       calculate_potentials_coefs(rows, cols, C, u, v);
       
@@ -743,15 +641,6 @@ namespace lp_potentials
             maxPColumn = c;
           }
 
-      // debug
-      std::cout << "u: "; output_vector_console(std::cout, u); std::cout << "\n";
-      std::cout << "v: "; output_vector_console(std::cout, v); std::cout << "\n";
-      std::cout << "X:\n"; output_matrix_console(std::cout, x);
-      std::cout << "P:\n"; output_matrix_console(std::cout, P);
-      std::cout << "cost:" << prevPlanTransportationCost << "\n";
-      std::cout << "max P elem: (" << maxPRow << "," << maxPColumn << ")\n";
-      // end of debug
-      
       if (!eq(x(maxPRow, maxPColumn), scalar_type()))
       {
         // Found optimal plan. Interrupting.
