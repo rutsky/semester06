@@ -51,4 +51,53 @@ namespace xmath
   }
 } // End of namespace 'xmath'.
 
+// TODO: Write debug on assert.
+#define ASSERT(e) \
+    BOOST_ASSERT(e)
+
+#define ASSERT_EQ(a, b) \
+    BOOST_ASSERT((a) == (b))
+
+#define ASSERT_NEQ(a, b) \
+    BOOST_ASSERT((a) != (b))
+
+#define ASSERT_LT(a, b) \
+    BOOST_ASSERT((a) < (b))
+
+#define ASSERT_LE(a, b) \
+    BOOST_ASSERT((a) <= (b))
+
+#define ASSERT_GT(a, b) \
+    BOOST_ASSERT((a) > (b))
+
+#define ASSERT_GE(a, b) \
+    BOOST_ASSERT((a) >= (b))
+
+#define ASSERT_FUZZY_EQ(a, b) \
+    ASSERT(xmath::eq((a), (b)))
+
+#define ASSERT_FUZZY_EQ_EPS(a, b, eps) \
+    ASSERT(xmath::eq((a), (b), (eps)))
+
+#define ASSERT_FUZZY_NEQ(a, b) \
+    ASSERT(!xmath::eq((a), (b)))
+
+#define ASSERT_FUZZY_NEQ_EPS(a, b, eps) \
+    ASSERT(!xmath::eq((a), (b), (eps)))
+
+#define ASSERT_FUZZY_EQ_ZERO(a) \
+    ASSERT(xmath::eq_zero((a)))
+   
+#define ASSERT_FUZZY_EQ_ZERO_EPS(a, eps) \
+    ASSERT(xmath::eq_zero((a), (eps)))
+
+// TODO: Other macroses: le, ge, sl, sg.
+
+// TODO: Write all functions' above `verify' version.
+#define VERIFY(e) \
+    BOOST_VERIFY(e)
+
+#define VERIFY_EQ(a, b) \
+    BOOST_VERIFY((a) == (b))
+
 #endif // XMATH_BOOST_HPP
