@@ -51,12 +51,19 @@ namespace xmath
   }
 } // End of namespace 'xmath'.
 
+// TODO: Look how asserts implemented in Boost::Test.
 // TODO: Must be more verbose.
 #define ASSERT(e) \
     BOOST_ASSERT(e)
 
 #define ASSERT_EQ(a, b) \
-    BOOST_ASSERT((a) == (b))
+    { \
+      if (!((a) == (b))) \
+      { \
+        std::cerr << "Assertion failed: `" << (a) << "' != `" << (b) << "'" << std::endl; \
+        BOOST_ASSERT(0); \
+      } \
+    } while(0)
 
 #define ASSERT_NEQ(a, b) \
     BOOST_ASSERT((a) != (b))
