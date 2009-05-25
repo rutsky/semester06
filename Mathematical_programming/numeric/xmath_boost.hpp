@@ -51,7 +51,7 @@ namespace xmath
   }
 } // End of namespace 'xmath'.
 
-// TODO: Write debug on assert.
+// TODO: Must be more verbose.
 #define ASSERT(e) \
     BOOST_ASSERT(e)
 
