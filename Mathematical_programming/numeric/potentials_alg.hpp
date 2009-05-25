@@ -371,7 +371,6 @@ namespace lp_potentials
       
       ASSERT_EQ(_isPlanPointByRow, _isPlanPointByColumn);
       // end of debug
-
       
       std::vector<boost::optional<scalar_type> > u(m), v(n);
       std::queue<size_t> rowsQueue, colsQueue;
@@ -408,7 +407,7 @@ namespace lp_potentials
           }
         }
         
-        if (!rowsQueue.empty())
+        if (!colsQueue.empty())
         {
           // Poping row index from columns queue.
           size_t const c = colsQueue.front();
@@ -429,7 +428,7 @@ namespace lp_potentials
               u[r] = C()(r, c) - v[c].get();
               
               // And adding processed columns to columns queue.
-              colsQueue.push(r);
+              rowsQueue.push(r);
             }
           }
         }
