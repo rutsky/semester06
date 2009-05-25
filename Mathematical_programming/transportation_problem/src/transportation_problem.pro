@@ -11,7 +11,8 @@ CONFIG += console precompile_header warn_on
 CONFIG -= app_bundle
 
 # QMAKE_CXXFLAGS += -std=c++98 -Wall -W -pedantic
-QMAKE_CXXFLAGS += -Winvalid-pch
+QMAKE_CXXFLAGS += -Winvalid-pch 
+#QMAKE_CXXFLAGS += -DBOOST_DISABLE_ASSERTS
 
 INCLUDEPATH += $(MY_NUMERIC_ROOT)
 
