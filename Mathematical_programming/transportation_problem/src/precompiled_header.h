@@ -13,6 +13,7 @@
 #include <iterator>
 #include <functional>
 #include <numeric>
+#include <utility>
 
 #include <iostream>
 #include <iomanip>
@@ -21,16 +22,20 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <queue>
+#include <list>
 
 // Boost stuff.
 #include <boost/assert.hpp>
 #include <boost/concept/assert.hpp>
 
+#include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
 #include <boost/function.hpp>
 #include <boost/lambda/lambda.hpp>
+#include <boost/utility.hpp>
 
 #include <boost/numeric/ublas/traits.hpp>
 #include <boost/numeric/ublas/vector.hpp>
