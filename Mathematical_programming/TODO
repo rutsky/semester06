@@ -15,3 +15,4 @@
  * Replace `admissible' by `feasible'.
  * Add links on sources of algorithms.
  * Implement ASSERT_EQ_ZERO(x) with debug output instead of BOOST_ASSERT(eq_zero(x)).
+ * Use `scalar_type()' for zero value instead of `scalar_type(0.)'.
