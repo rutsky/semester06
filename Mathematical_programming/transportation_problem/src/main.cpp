@@ -22,6 +22,7 @@ int main( int argc, char *argv[] )
   typedef numeric::vector<scalar_type>                                         vector_type;
   typedef numeric::matrix<scalar_type>                                         matrix_type;
   typedef numeric::transportation_problem::transportation_problem<scalar_type> transportation_problem_type;
+  typedef numeric::linear_problem::canonical_linear_problem<scalar_type>       canonical_linear_problem_type;
   
   //if (0)
   {
@@ -30,8 +31,8 @@ int main( int argc, char *argv[] )
     {
       // Reading input data.
       
-      //char const *inputFileName = "data/mine.in";
-      char const *inputFileName = "data/book_sample.in";
+      char const *inputFileName = "data/mine.in";
+      //char const *inputFileName = "data/book_sample.in";
       if (argc > 1)
         inputFileName = argv[1];
       
@@ -70,6 +71,7 @@ int main( int argc, char *argv[] )
       
       transportation_problem_type closedTP;
       numeric::transportation_problem::to_closed(tp, closedTP);
+      
       std::cout << "Closed transportation problem:\n";
       numeric::output_transportation_problem(std::cout, closedTP);
       std::cout << "\n";
@@ -80,7 +82,29 @@ int main( int argc, char *argv[] )
       
       std::cout << "Found solution:\n";
       numeric::output_matrix_console(std::cout, X);
-      std::cout << "\n\n";
+      std::cout << "With cost: " << numeric::transportation_problem::transportation_cost(closedTP, X) << "\n\n";
+      
+      canonical_linear_problem_type clp;
+      numeric::transportation_problem::to_linear_problem(closedTP, clp);
+      
+      std::cout << "Equivalent canonical linear problem:\n";
+      numeric::output_common_linear_problem(std::cout, clp, "%1$g");
+
+      {      
+        boost::scoped_ptr<std::ofstream> ofs;
+      
+        ofs.reset(new std::ofstream("output/lp_canonical.m"));
+        numeric::output_as_octave_source(*ofs, clp);
+      }
+
+      /*
+      matrix_type XBySimplex;
+      solve_by_simplex(closedTP, XBySimplex);
+      
+      std::cout << "Solution by simplex algorithm:\n";
+      numeric::output_matrix_console(std::cout, XBySimplex);
+      std::cout << "With cost: " << numeric::transportation_problem::transportation_cost(closedTP, XBySimplex) << "\n\n";
+      */
     }
   }
 }
