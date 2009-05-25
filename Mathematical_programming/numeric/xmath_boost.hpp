@@ -60,7 +60,7 @@ namespace xmath
     { \
       if (!((a) == (b))) \
       { \
-        std::cerr << "Assertion failed: `" << (a) << "' != `" << (b) << "'" << std::endl; \
+        std::cerr << "Assertion failed: `" << (a) << "' == `" << (b) << "'" << std::endl; \
         BOOST_ASSERT(0); \
       } \
     } while(0)
