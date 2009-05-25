@@ -6,11 +6,6 @@
  * 29.03.2009
  */
 
-#ifdef USING_QT_CREATOR
-// Only for debugging in Qt Creator.
-#include </opt/qtcreator-1.1.0/share/qtcreator/gdbmacros/gdbmacros.cpp>
-#endif // USING_QT_CREATOR
-
 #include <iostream>
 #include <fstream>
 #include <vector>
