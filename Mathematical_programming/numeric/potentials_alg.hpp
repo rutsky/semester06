@@ -1,8 +1,8 @@
 /*
  * potentials_alg.hpp
- * Simplex algorithm.
+ * Method of potentials for solving transportation problem.
  * Vladimir Rutsky <altsysrq@gmail.com>
- * 15.02.2009
+ * 25.05.2009
  */
 
 #ifndef NUMERIC_POTENTIALS_ALG_HPP
