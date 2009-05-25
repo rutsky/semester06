@@ -19,6 +19,8 @@
 #include <boost/concept/assert.hpp>
 #include <boost/concept_check.hpp>
 
+#include "potentials_alg.hpp"
+
 namespace numeric
 {
 namespace transportation_problem
@@ -66,71 +68,21 @@ namespace transportation_problem
   inline
   bool is_valid( ITransportationProblem<TPTraits> const &tp )
   {
-    typedef typename TPTraits::scalar_type scalar_type;
-
-    if (!(tp.C().size1() > 0 && tp.C().size2() > 0) &&
-        (tp.C().size1() == tp.a().size()) &&
-        (tp.C().size2() == tp.b().size()))
-    {
-      // Data sizes is not correspond.
-      return false;
-    }
-    
-    if (!(
-        std::find_if(tp.a().begin(), tp.a().end(), 
-                     boost::bind<bool>(std::less<scalar_type>(), _1, scalar_type(0.))) == tp.a().end() &&
-        std::find_if(tp.b().begin(), tp.b().end(), 
-                     boost::bind<bool>(std::less<scalar_type>(), _1, scalar_type(0.))) == tp.b().end() &&
-        std::find_if(tp.C().data().begin(), tp.C().data().end(), 
-                     boost::bind<bool>(std::less<scalar_type>(), _1, scalar_type(0.))) == tp.C().data().end()))
-    {
-      // One of data values is less than zero, which is incorrect.
-      return false;
-    }
-    
-    return true;
+    return lp_potentials::is_tp_valid(tp.a(), tp.b(), tp.C());
   }
   
   template< class TPTraits >
   inline
   bool assert_valid( ITransportationProblem<TPTraits> const &tp )
   {
-    typedef typename TPTraits::scalar_type scalar_type;
-
-    BOOST_ASSERT(tp.C().size1() > 0 && tp.C().size2() > 0);
-    BOOST_ASSERT(tp.C().size1() == tp.a().size());
-    BOOST_ASSERT(tp.C().size2() == tp.b().size());
-    
-    BOOST_ASSERT(std::find_if(tp.a().begin(), tp.a().end(), 
-                              boost::bind<bool>(std::less<scalar_type>(), _1, scalar_type(0.))) == tp.a().end());
-    BOOST_ASSERT(std::find_if(tp.b().begin(), tp.b().end(), 
-                              boost::bind<bool>(std::less<scalar_type>(), _1, scalar_type(0.))) == tp.b().end());
-    BOOST_ASSERT(std::find_if(tp.C().data().begin(), tp.C().data().end(), 
-                              boost::bind<bool>(std::less<scalar_type>(), _1, scalar_type(0.))) == tp.C().data().end());
-    
-    return is_valid(tp);
+    return lp_potentials::assert_tp_valid(tp.a(), tp.b(), tp.C());
   }
   
   template< class TPTraits >
   inline
   bool is_closed( ITransportationProblem<TPTraits> const &tp )
   {
-    typedef typename TPTraits::scalar_type scalar_type;
-    typedef vector<scalar_type> vector_type;
-    
-    BOOST_ASSERT(assert_valid(tp));
-    
-    if (std::accumulate(tp.a().begin(), tp.a().end(), scalar_type(0.)) == 
-        std::accumulate(tp.b().begin(), tp.b().end(), scalar_type(0.)))
-    {
-      // Sum of supplies equal to sum of demand, problem is closed.
-      return true;
-    }
-    else
-    {
-      // Problem is unclosed.
-      return false;
-    }
+    return transportation_problem::is_closed(tp.a(), tp.b(), tp.C());
   }
   
   template< class TPTraits >
@@ -197,6 +149,16 @@ namespace transportation_problem
     vector_type a_, b_;
     matrix_type C_;
   };
+  
+  //
+  // Solving algorithms.
+  //
+  
+  template< class M, class TPTraits >
+  void solve_by_potentials( ITransportationProblem<TPTraits> const &tp,
+                            matrix_expression<M> &result )
+  {
+  }
 } // End of namespace 'transportation_problem'.
 } // End of namespace 'numeric'.
 
