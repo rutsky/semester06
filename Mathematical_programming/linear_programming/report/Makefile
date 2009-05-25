@@ -3,7 +3,7 @@
 # Vladimir Rutsky <altsysrq@gmail.com>
 # 22.03.2009
 
-SOURCES = linear_programming_problem lp_only_source
+SOURCES = linear_programming_problem lp_only_source lp_brute_force
 DEPENDENCY = data/* matrix_A.tex vector_b.tex vector_c.tex
 TEX2PDF = pdflatex
 
