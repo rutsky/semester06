@@ -30,7 +30,8 @@ int main( int argc, char *argv[] )
     {
       // Reading input data.
       
-      char const *inputFileName = "data/mine.in";
+      //char const *inputFileName = "data/mine.in";
+      char const *inputFileName = "data/book_sample.in";
       if (argc > 1)
         inputFileName = argv[1];
       

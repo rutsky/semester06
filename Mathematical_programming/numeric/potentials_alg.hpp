@@ -170,9 +170,10 @@ namespace lp_potentials
                            matrix_expression<M>       &x,
                            all_cells_map_type         &planCells )
     {
-      typedef typename V::value_type scalar_type; // TODO
-      typedef vector<scalar_type>    vector_type;
-      typedef matrix<scalar_type>    matrix_type;
+      typedef typename V::value_type    scalar_type; // TODO
+      typedef vector<scalar_type>       vector_type;
+      typedef matrix<scalar_type>       matrix_type;
+      typedef zero_matrix<scalar_type> zero_matrix_type;
       
       vector_type a = aVec(), b = bVec();
       
@@ -189,7 +190,7 @@ namespace lp_potentials
       
       // Resetting result data().
       planCells.clear();
-      x().resize(m, n);
+      x() = zero_matrix_type(m, n);
       
       // Building start plan.
       for (size_t r = 0; r < m; ++r)
@@ -198,11 +199,14 @@ namespace lp_potentials
         
         while (true)
         {
-          if (eq_zero(supply) && r == m - 1)
-          {
-            // Don't searching fake element in last row.
-            break;
-          }
+          bool const fake = eq_zero(supply);
+          
+          // debug
+          std::cout << "  row = " << r << "\n";
+          std::cout << "a: "; output_vector_console(std::cout, a); std::cout << "\n";
+          std::cout << "b: "; output_vector_console(std::cout, b); std::cout << "\n";
+          std::cout << "X:\n"; output_matrix_console(std::cout, x());
+          // end of debug
           
           ASSERT(!unprocessedCols.empty());
         
@@ -220,9 +224,11 @@ namespace lp_potentials
             // Left supply can't satisfy current demand.
             
             // Decreasing demand by left supply value.
-            x()(r, minc) = supply;
-            demand -= supply;
-            supply = 0;
+            scalar_type const transfer = supply;
+            ASSERT_EQ(x()(r, minc), scalar_type(0.));
+            x()(r, minc) = transfer;
+            demand      -= transfer;
+            supply      -= transfer; supply = 0;
             
             // Adding current cell into plan.
             VERIFY(planCells.insert(std::make_pair(std::make_pair(r, minc), cell_ptr_type(new cell_type(r, minc)))).second);
@@ -235,9 +241,11 @@ namespace lp_potentials
             // Left supply is greater that current demand.
             
             // Satisfying demand.
-            x()(r, minc) = demand;
-            demand = 0;
-            supply -= demand;
+            scalar_type const transfer = demand;
+            ASSERT_EQ(x()(r, minc), scalar_type(0.));
+            x()(r, minc) = transfer;
+            demand      -= transfer; demand = 0;
+            supply      -= transfer;
             
             // Adding current cell into plan.
             VERIFY(planCells.insert(std::make_pair(std::make_pair(r, minc), cell_ptr_type(new cell_type(r, minc)))).second);
@@ -254,10 +262,12 @@ namespace lp_potentials
           {
             // Left supply exactly satisfies demand.
             // Satisfying demand
-            x()(r, minc) = demand;
-            demand = 0;
-            supply = 0;
-            
+            scalar_type const transfer = demand;
+            ASSERT_EQ(x()(r, minc), scalar_type(0.));
+            x()(r, minc) = transfer;
+            demand      -= transfer; demand = 0;
+            supply      -= transfer; supply = 0;
+
             // Adding current cell into plan
             VERIFY(planCells.insert(std::make_pair(std::make_pair(r, minc), cell_ptr_type(new cell_type(r, minc)))).second);
             
@@ -268,6 +278,17 @@ namespace lp_potentials
             unprocessedCols.erase(it, unprocessedCols.end());
             
             // Continuing on current row (for adding fake plan cell).
+            if (r == m - 1)
+            {
+              // But no fake elements at last row.
+              break;
+            }
+          }
+          
+          if (fake)
+          {
+            // Not more than one fake element per row.
+            break;
           }
         }
       }
@@ -280,7 +301,7 @@ namespace lp_potentials
       ASSERT_EQ(planCells.size(), m + n - 1);
       
       // Asserting that founded x is a plan.
-      ASSERT(is_plan(a, b, C, x));
+      ASSERT(is_plan(aVec, bVec, C, x));
     }
     
     template< class M, class V >
