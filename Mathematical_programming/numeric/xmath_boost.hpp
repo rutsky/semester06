@@ -81,7 +81,13 @@ namespace xmath
     BOOST_ASSERT((a) >= (b))
 
 #define ASSERT_FUZZY_EQ(a, b) \
-    ASSERT(xmath::eq((a), (b)))
+    { \
+      if (!eq((a), (b))) \
+      { \
+        std::cerr << "Assertion failed: `" << (a) << "' fuzzy equal to `" << (b) << "'" << std::endl; \
+        BOOST_ASSERT(0); \
+      } \
+    } while(0)
 
 #define ASSERT_FUZZY_EQ_EPS(a, b, eps) \
     ASSERT(xmath::eq((a), (b), (eps)))
