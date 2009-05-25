@@ -106,10 +106,10 @@ namespace lp_potentials
     }
   }
   
-  template< class V1, class V2, class M, class V3 >
-  void is_plan( vector_expression<V1> const &a, vector_expression<V2> const &b,
-                matrix_expression<M>  const &C,
-                vector_expression<V3> const &x )
+  template< class V1, class V2, class M1, class M2 >
+  bool is_plan( vector_expression<V1> const &a, vector_expression<V2> const &b,
+                matrix_expression<M1> const &C,
+                matrix_expression<M2> const &X )
   {
     typedef typename V1::value_type scalar_type;
     
@@ -122,11 +122,11 @@ namespace lp_potentials
     ASSERT_EQ(C().size2(), n);
     
     for (size_t r = 0; r < m; ++r)
-      if (!eq(std::inner_product(row(C, r).begin(), row(C, r).end(), row(x, r).begin(), scalar_type(0.)), a(r)))
+      if (!eq(std::inner_product(row(C(), r).begin(), row(C(), r).end(), row(X(), r).begin(), scalar_type(0.)), a()(r)))
         return false;
 
     for (size_t c = 0; c < n; ++c)
-      if (!eq(std::inner_product(column(C, c).begin(), column(C, c).end(), column(x, c).begin(), scalar_type(0.)), b(c)))
+      if (!eq(std::inner_product(column(C(), c).begin(), column(C(), c).end(), column(X(), c).begin(), scalar_type(0.)), b()(c)))
         return false;
     
     return true;
@@ -172,6 +172,7 @@ namespace lp_potentials
     {
       typedef typename V::value_type scalar_type; // TODO
       typedef vector<scalar_type>    vector_type;
+      typedef matrix<scalar_type>    matrix_type;
       
       ASSERT(assert_tp_valid(a, b, C));
       ASSERT(is_tp_closed(a, b, C));
@@ -186,12 +187,12 @@ namespace lp_potentials
       
       // Resetting result data().
       planCells.clear();
-      x.resize(m, n);
+      x().resize(m, n);
       
       // Building start plan.
       for (size_t r = 0; r < m; ++r)
       {
-        scalar_type &supply = a(r);
+        scalar_type &supply = a()(r);
         
         while (supply >= 0)
         {
@@ -199,17 +200,17 @@ namespace lp_potentials
         
           // Locating column with lowest transfer cost from current row.
           size_t const minc = *std::min_element(
-              submatrixi(C, size_t(r), size_t(1), unprocessedCols.begin(), unprocessedCols.end()).begin(),
-              submatrixi(C, size_t(r), size_t(1), unprocessedCols.begin(), unprocessedCols.end()).end());
+              subvector(vector_type(row(C(), r)), unprocessedCols.begin(), unprocessedCols.end()).begin(),
+              subvector(vector_type(row(C(), r)), unprocessedCols.begin(), unprocessedCols.end()).end());
           
-          scalar_type &demand = b(minc);
+          scalar_type &demand = b()(minc);
           
           if (supply < demand)
           {
             // Left supply can't satisfy current demand.
             
             // Decreasing demand by left supply value.
-            x(r, minc) = supply;
+            x()(r, minc) = supply;
             demand -= supply;
             supply = 0;
             
@@ -224,7 +225,7 @@ namespace lp_potentials
             // Left supply is greater that current demand.
             
             // Satisfying demand.
-            x(r, minc) = demand;
+            x()(r, minc) = demand;
             demand = 0;
             supply -= demand;
             
@@ -243,7 +244,7 @@ namespace lp_potentials
           {
             // Left supply exactly satisfies demand.
             // Satisfying demand
-            x(r, minc) = demand;
+            x()(r, minc) = demand;
             demand = 0;
             supply = 0;
             
@@ -341,7 +342,7 @@ namespace lp_potentials
               // For each unprocessed column calculating potential coefficient v[c]:
               //   u[r] + v[c] = C[r, c]   <=>
               //   v[c] = C[r, c] - u[r]
-              v[c] = C(r, c) - u(r).get();
+              v[c] = C()(r, c) - u[r].get();
               
               // And adding processed columns to columns queue.
               colsQueue.push(c);
@@ -367,7 +368,7 @@ namespace lp_potentials
               // For each unprocessed column calculating potential coefficient v[c]:
               //   u[r] + v[c] = C[r, c]   <=>
               //   u[r] = C[r, c] - v[c]
-              u[r] = C(r, c) - v(c).get();
+              u[r] = C()(r, c) - v[c].get();
               
               // And adding processed columns to columns queue.
               colsQueue.push(r);
@@ -376,17 +377,17 @@ namespace lp_potentials
         }
       }
       
-      uVec.resize(m);
-      std::transform(u.begin(), u.end(), uVec.begin(), *boost::lambda::_1);
-      vVec.resize(n);
-      std::transform(v.begin(), v.end(), vVec.begin(), *boost::lambda::_1);
+      uVec().resize(m);
+      std::transform(u.begin(), u.end(), uVec().begin(), boost::lambda::ret<scalar_type>(*boost::lambda::_1));
+      vVec().resize(n);
+      std::transform(v.begin(), v.end(), vVec().begin(), boost::lambda::ret<scalar_type>(*boost::lambda::_1));
       
       // debug
       // Asserting that potentials are valid.
       for (size_t r = 0; r < m; ++r)
         for (size_t c = 0; c < m; ++c)
         {
-          scalar_type const p = uVec(r) + vVec(c) - C(r, c);
+          scalar_type const p = uVec()(r) + vVec()(c) - C()(r, c);
           if (_isPlanPointByRow(r, c))
           {
             ASSERT_EQ(p, scalar_type(0));
@@ -404,39 +405,39 @@ namespace lp_potentials
                                matrix_expression<M> const &C,
                                matrix_expression<M>       &P )
     {
-      typedef typename V::scalar_type  scalar_type; // TODO
+      typedef typename V::value_type  scalar_type; // TODO
       typedef vector<scalar_type>      vector_type;
       typedef zero_vector<scalar_type> zero_vector_type;
       typedef matrix<scalar_type>      matrix_type;
       typedef zero_matrix<scalar_type> zero_matrix_type;
       
-      size_t const m = u.size(), n = v.size();
+      size_t const m = u().size(), n = v().size();
       
       // Asserting sizes.
-      ASSERT_GT(m, 0);         // m > 0
-      ASSERT_GT(n, 0);         // n > 0
-      ASSERT_GE(C().size1(), 0); // C().size1() > 0 
-      ASSERT_GE(C().size2(), 0); // C().size2() > 0
+      ASSERT_GT(m, 0);           // m > 0
+      ASSERT_GT(n, 0);           // n > 0
+      ASSERT_GT(C().size1(), 0); // C().size1() > 0 
+      ASSERT_GT(C().size2(), 0); // C().size2() > 0
       ASSERT_EQ(C().size1(), m); // C().size1() == m
       ASSERT_EQ(C().size2(), n); // C().size2() == n
 
-      P.resize(m, n);
+      P().resize(m, n);
       
       for (size_t r = 0; r < m; ++r)
         for (size_t c = 0; c < n; ++c)
         {
-          P(r, c) = u(r) + v(c) - C(r, c);
+          P()(r, c) = u()(r) + v()(c) - C()(r, c);
         }
     }
 
     template< class IdxsOutputIterator >
     bool find_loop( cells_maps_vector_type const &rows, cells_maps_vector_type const &cols,
                     size_t r, size_t c, size_t const goalR, size_t const goalC, 
-                    IdxsOutputIterator idxsOut, bool resetMarks, bool horizontalSearch )
+                    IdxsOutputIterator idxsOut, bool horizontalSearch )
     {
       // TODO: Assert sizes.
       
-      cell_type &curCell = *rows[r].find(c);
+      cell_type &curCell = *rows[r].find(c)->second;
       
       // Adding current point to building loop end on visit.
       curCell.mark = true;
@@ -464,7 +465,7 @@ namespace lp_potentials
           if (!cell.mark)
           {
             // Found cell not in current loop, trying to append it to current loop.
-            if (find_loop(rows, cols, cell.r, cell.c, goalR, goalC, idxsOut, false, !horizontalSearch))
+            if (find_loop(rows, cols, cell.r, cell.c, goalR, goalC, idxsOut, !horizontalSearch))
             {
               // Loop was found, outputting it.
               *idxsOut++ = std::make_pair(r, c);
@@ -496,7 +497,7 @@ namespace lp_potentials
           if (!cell.mark)
           {
             // Found cell not in current loop, trying to append it to current loop.
-            if (find_loop(rows, cols, cell.r, cell.c, goalR, goalC, idxsOut, false, !horizontalSearch))
+            if (find_loop(rows, cols, cell.r, cell.c, goalR, goalC, idxsOut, !horizontalSearch))
             {
               // Loop was found, outputting it.
               *idxsOut++ = std::make_pair(r, c);
@@ -564,16 +565,17 @@ namespace lp_potentials
         }
       
       // Searching starting by row. Must be equivalent to starting from column.
-      VERIFY(find_loop(rows, cols, goalR, goalC, goalR, goalC, idxsOut, true, true));
+      VERIFY(find_loop(rows, cols, goalR, goalC, goalR, goalC, idxsOut, true));
     }
   } // End of anonymous namespace.
   
-  template< class V1, class V2, class M >
+  template< class V1, class V2, class M1, class M2 >
   void solve( vector_expression<V1> const &a,
               vector_expression<V2> const &b,
-              matrix_expression<M>  const &C )
+              matrix_expression<M1> const &C,
+              matrix_expression<M2>       &X )
   {
-    typedef typename V1::scalar_type scalar_type; // TODO
+    typedef typename V1::value_type scalar_type; // TODO
     typedef vector<scalar_type>      vector_type;
     typedef zero_vector<scalar_type> zero_vector_type;
     typedef matrix<scalar_type>      matrix_type;
@@ -618,9 +620,14 @@ namespace lp_potentials
       calculate_potentials(u, v, C, P);
       
       // Searching cell with maximum potential.
-      typename matrix_type::storage_type::const_iterator it = std::max_element(P.data().begin(), P.data().end());
-      size_t const maxPRow    = it->index1();
-      size_t const maxPColumn = it->index2();
+      size_t maxPRow(0), maxPColumn(0);
+      for (size_t r = 0; r < m; ++r)
+        for (size_t c = 0; c < n; ++c)
+          if (P(maxPRow, maxPColumn) < P(r, c))
+          {
+            maxPRow    = r;
+            maxPColumn = c;
+          }
       
       if (eq(x(maxPRow, maxPColumn), scalar_type(0.)))
       {
@@ -695,7 +702,7 @@ namespace lp_potentials
     }
     
     // Copying result matrix.
-    C = x;
+    X() = x;
   }
 } // End of namespace 'lp_potentials'.
 } // End of namespace 'numeric'.

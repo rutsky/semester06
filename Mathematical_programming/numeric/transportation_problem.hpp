@@ -213,6 +213,13 @@ namespace transportation_problem
   void solve_by_potentials( ITransportationProblem<TPTraits> const &tp,
                             matrix_expression<M> &result )
   {
+    typedef typename TPTraits::scalar_type scalar_type;
+    typedef transportation_problem<scalar_type, TPTraits> transportation_problem_type;
+    
+    transportation_problem_type closedTP;
+    to_closed(tp, closedTP);
+    matrix<scalar_type> X;
+    lp_potentials::solve(closedTP.a(), closedTP.b(), closedTP.C(), result);
   }
 } // End of namespace 'transportation_problem'.
 } // End of namespace 'numeric'.

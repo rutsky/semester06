@@ -59,7 +59,9 @@ int main( int argc, char *argv[] )
     }
     
     {
-      // Solving transportation problem.
+      //
+      // Transportation problem.
+      //
       
       std::cout << "Solving transportation problem:\n";
       numeric::output_transportation_problem(std::cout, tp);
@@ -71,7 +73,13 @@ int main( int argc, char *argv[] )
       numeric::output_transportation_problem(std::cout, closedTP);
       std::cout << "\n";
       
+      // Solving using potentials algorithm.
+      matrix_type X;
+      solve_by_potentials(closedTP, X);
       
+      std::cout << "Found solution:\n";
+      numeric::output_matrix_octave(std::cout, X);
+      std::cout << "\n\n";
     }
   }
 }
