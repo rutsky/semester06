@@ -529,8 +529,8 @@ namespace lp_potentials
         if ((horizontalSearch && r == goalR) || (!horizontalSearch && c == goalC))
         {
           // Goal cell is seen from current cell. Closing loop.
-            *idxsOut++ = std::make_pair(r, c);
-            return true;
+          *idxsOut++ = std::make_pair(r, c);
+          return true;
         }
       }
       
@@ -748,6 +748,7 @@ namespace lp_potentials
       std::cout << "v: "; output_vector_console(std::cout, v); std::cout << "\n";
       std::cout << "X:\n"; output_matrix_console(std::cout, x);
       std::cout << "P:\n"; output_matrix_console(std::cout, P);
+      std::cout << "cost:" << prevPlanTransportationCost << "\n";
       std::cout << "max P elem: (" << maxPRow << "," << maxPColumn << ")\n";
       // end of debug
       
@@ -760,17 +761,22 @@ namespace lp_potentials
       
       // Searching loop.
       std::vector<std::pair<size_t, size_t> > loopCellsIdxs;
-      find_loop(rows, cols, maxPRow, maxPColumn, std::back_inserter(loopCellsIdxs));
-      ASSERT_GE(loopCellsIdxs.size(), 4);
-      ASSERT_LE(loopCellsIdxs.size(), m + n - 1);
-      ASSERT_EQ(loopCellsIdxs.size() % 2, 0);
+      {
+        std::vector<std::pair<size_t, size_t> > reversedLoopCellsIdxs;
+        find_loop(rows, cols, maxPRow, maxPColumn, std::back_inserter(reversedLoopCellsIdxs));
+        ASSERT_GE(reversedLoopCellsIdxs.size(), 4);
+        ASSERT_LE(reversedLoopCellsIdxs.size(), m + n - 1);
+        ASSERT_EQ(reversedLoopCellsIdxs.size() % 2, 0);
+        ASSERT(reversedLoopCellsIdxs[reversedLoopCellsIdxs.size() - 1] == std::make_pair(maxPRow, maxPColumn));
+        
+        loopCellsIdxs.assign(reversedLoopCellsIdxs.rbegin(), reversedLoopCellsIdxs.rend());
+      }
       
       // Locating cell from which shipment will be canceled on even subloop.
-      std::pair<size_t, scalar_type> minShipment = std::make_pair(2, x(loopCellsIdxs[2].first, loopCellsIdxs[2].second));
-      for (size_t i = 4; i < loopCellsIdxs.size(); i += 2)
+      std::pair<size_t, scalar_type> minShipment = std::make_pair(1, x(loopCellsIdxs[1].first, loopCellsIdxs[1].second));
+      for (size_t i = 1 + 2; i < loopCellsIdxs.size(); i += 2)
       {
         scalar_type const curShipment = x(loopCellsIdxs[i].first, loopCellsIdxs[i].second);
-        ASSERT_FUZZY_NEQ(curShipment, 0);
         if (curShipment < minShipment.second)
         {
           minShipment.first = i;
@@ -785,7 +791,7 @@ namespace lp_potentials
       scalar_type const shipmentValue = minShipment.second;
       
       // Removing on even subloop.
-      for (size_t i = 0; i < loopCellsIdxs.size(); i += 2)
+      for (size_t i = 1; i < loopCellsIdxs.size(); i += 2)
       {
         size_t const r = loopCellsIdxs[i].first;
         size_t const c = loopCellsIdxs[i].second;
@@ -793,7 +799,7 @@ namespace lp_potentials
       }
       
       // Adding on odd subloop.
-      for (size_t i = 1; i < loopCellsIdxs.size(); i += 2)
+      for (size_t i = 0; i < loopCellsIdxs.size(); i += 2)
       {
         size_t const r = loopCellsIdxs[i].first;
         size_t const c = loopCellsIdxs[i].second;
