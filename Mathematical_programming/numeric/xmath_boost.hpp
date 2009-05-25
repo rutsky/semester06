@@ -75,7 +75,13 @@ namespace xmath
     BOOST_ASSERT((a) <= (b))
 
 #define ASSERT_GT(a, b) \
-    BOOST_ASSERT((a) > (b))
+    { \
+      if (!((a) > (b))) \
+      { \
+        std::cerr << "Assertion failed: `" << (a) << "' > `" << (b) << "'" << std::endl; \
+        BOOST_ASSERT(0); \
+      } \
+    } while(0)
 
 #define ASSERT_GE(a, b) \
     BOOST_ASSERT((a) >= (b))
