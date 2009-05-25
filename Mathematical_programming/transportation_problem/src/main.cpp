@@ -73,10 +73,10 @@ int main( int argc, char *argv[] )
       std::cout << "Closed transportation problem:\n";
       numeric::output_transportation_problem(std::cout, closedTP);
       std::cout << "\n";
-      
+
       // Solving using potentials algorithm.
       matrix_type X;
-      solve_by_potentials(closedTP, X);
+      numeric::transportation_problem::solve_by_potentials(closedTP, X);
       
       std::cout << "Found solution:\n";
       numeric::output_matrix_console(std::cout, X);

@@ -48,11 +48,11 @@ namespace lp_potentials
     
     if (!(
         std::find_if(a().begin(), a().end(), 
-                     boost::bind<bool>(std::less_equal<scalar_type>(), _1, scalar_type(0.))) == a().end() &&
+                     boost::bind<bool>(std::less_equal<scalar_type>(), _1, scalar_type())) == a().end() &&
         std::find_if(b().begin(), b().end(), 
-                     boost::bind<bool>(std::less_equal<scalar_type>(), _1, scalar_type(0.))) == b().end() &&
+                     boost::bind<bool>(std::less_equal<scalar_type>(), _1, scalar_type())) == b().end() &&
         std::find_if(C().data().begin(), C().data().end(), 
-                     boost::bind<bool>(std::less<scalar_type>(), _1, scalar_type(0.))) == C().data().end()))
+                     boost::bind<bool>(std::less<scalar_type>(), _1, scalar_type())) == C().data().end()))
     {
       // One of data values is less than zero, which is incorrect.
       return false;
@@ -76,11 +76,11 @@ namespace lp_potentials
     ASSERT_EQ(C().size2(), b().size()); // C().size2() == b().size()
 
     ASSERT(std::find_if(a().begin(), a().end(), 
-                        boost::bind<bool>(std::less_equal<scalar_type>(), _1, scalar_type(0.))) == a().end());
+                        boost::bind<bool>(std::less_equal<scalar_type>(), _1, scalar_type())) == a().end());
     ASSERT(std::find_if(b().begin(), b().end(), 
-                        boost::bind<bool>(std::less_equal<scalar_type>(), _1, scalar_type(0.))) == b().end());
+                        boost::bind<bool>(std::less_equal<scalar_type>(), _1, scalar_type())) == b().end());
     ASSERT(std::find_if(C().data().begin(), C().data().end(), 
-                        boost::bind<bool>(std::less<scalar_type>(), _1, scalar_type(0.))) == C().data().end());
+                        boost::bind<bool>(std::less<scalar_type>(), _1, scalar_type())) == C().data().end());
     
     return is_tp_valid(a, b, C);
   }
@@ -93,8 +93,8 @@ namespace lp_potentials
     
     BOOST_ASSERT(assert_tp_valid(a, b, C));
     
-    if (std::accumulate(a().begin(), a().end(), scalar_type(0.)) == 
-        std::accumulate(b().begin(), b().end(), scalar_type(0.)))
+    if (std::accumulate(a().begin(), a().end(), scalar_type()) == 
+        std::accumulate(b().begin(), b().end(), scalar_type()))
     {
       // Sum of supplies equal to sum of demand, problem is closed.
       return true;
@@ -252,7 +252,7 @@ namespace lp_potentials
             
             // Decreasing demand by left supply value.
             scalar_type const transfer = supply;
-            ASSERT_EQ(x()(r, minc), scalar_type(0.));
+            ASSERT_EQ(x()(r, minc), scalar_type());
             x()(r, minc) = transfer;
             demand      -= transfer;
             supply      -= transfer; supply = 0;
@@ -269,7 +269,7 @@ namespace lp_potentials
             
             // Satisfying demand.
             scalar_type const transfer = demand;
-            ASSERT_EQ(x()(r, minc), scalar_type(0.));
+            ASSERT_EQ(x()(r, minc), scalar_type());
             x()(r, minc) = transfer;
             demand      -= transfer; demand = 0;
             supply      -= transfer;
@@ -290,7 +290,7 @@ namespace lp_potentials
             // Left supply exactly satisfies demand.
             // Satisfying demand
             scalar_type const transfer = demand;
-            ASSERT_EQ(x()(r, minc), scalar_type(0.));
+            ASSERT_EQ(x()(r, minc), scalar_type());
             x()(r, minc) = transfer;
             demand      -= transfer; demand = 0;
             supply      -= transfer; supply = 0;
@@ -404,6 +404,11 @@ namespace lp_potentials
               // And adding processed columns to columns queue.
               colsQueue.push(c);
             }
+            else
+            {
+              // Asserting that there is no conflicts.
+              ASSERT_EQ(v[c].get(), C()(r, c) - u[r].get());
+            }
           }
         }
         
@@ -427,8 +432,13 @@ namespace lp_potentials
               //   u[r] = C[r, c] - v[c]
               u[r] = C()(r, c) - v[c].get();
               
-              // And adding processed columns to columns queue.
+              // And adding processed rows to rows queue.
               rowsQueue.push(r);
+            }
+            else
+            {
+              // Asserting that there is no conflicts.
+              ASSERT_EQ(u[r], C()(r, c) - v[c].get());
             }
           }
         }
@@ -447,12 +457,15 @@ namespace lp_potentials
           scalar_type const p = uVec()(r) + vVec()(c) - C()(r, c);
           if (_isPlanPointByRow(r, c))
           {
-            ASSERT_EQ(p, scalar_type(0));
+            ASSERT_EQ(p, scalar_type());
           }
+          /*
+          // This is a lie:
           else
           {
-            ASSERT_GE(p, scalar_type(0));
+            ASSERT_GE(p, scalar_type());
           }
+          */
         }
       // end of debug
     }
@@ -624,6 +637,25 @@ namespace lp_potentials
       // Searching starting by row. Must be equivalent to starting from column.
       VERIFY(find_loop(rows, cols, goalR, goalC, goalR, goalC, idxsOut, true));
     }
+    
+    template< class M >
+    typename M::value_type transportationCost( matrix_expression<M> const &C, matrix_expression<M> const &X )
+    {
+      typedef typename M::value_type scalar_type;
+      
+      ASSERT_EQ(C().size1(), X().size1());
+      ASSERT_EQ(C().size2(), X().size2());
+      
+      size_t m = C().size1(), n = C().size2();
+      
+      scalar_type result = scalar_type();
+      // TODO: Use ublas functions.
+      for (size_t r = 0; r < m; ++r)
+        for (size_t c = 0; c < n; ++c)
+          result += C()(r, c) * X()(r, c);
+      
+      return result;
+    }
   } // End of anonymous namespace.
   
   template< class V1, class V2, class M1, class M2 >
@@ -668,6 +700,7 @@ namespace lp_potentials
     matrix_type P;
     size_t const nMaxIterations(1000); // debug
     size_t nIterations(0);
+    scalar_type prevPlanTransportationCost = transportationCost(C, x);
     while (true)
     {
       // debug
@@ -689,21 +722,21 @@ namespace lp_potentials
             maxPRow    = r;
             maxPColumn = c;
           }
+
+      // debug
+      std::cout << "u: "; output_vector_console(std::cout, u); std::cout << "\n";
+      std::cout << "v: "; output_vector_console(std::cout, v); std::cout << "\n";
+      std::cout << "X:\n"; output_matrix_console(std::cout, x);
+      std::cout << "P:\n"; output_matrix_console(std::cout, P);
+      std::cout << "max P elem: (" << maxPRow << "," << maxPColumn << ")\n";
+      // end of debug
       
-      if (eq(x(maxPRow, maxPColumn), scalar_type(0.)))
+      if (eq(x(maxPRow, maxPColumn), scalar_type()))
       {
         // Found optimal plan. Interrupting.
         break;
       }
-      ASSERT_EQ(x(maxPRow, maxPColumn), scalar_type(0.));
-      
-      // debug
-      std::cout << "u: "; output_vector_console(std::cout, u);
-      std::cout << "v: "; output_vector_console(std::cout, u);
-      std::cout << "X: "; output_matrix_console(std::cout, x);
-      std::cout << "P: "; output_matrix_console(std::cout, P);
-      std::cout << "max P elem: (" << maxPRow << "," << maxPColumn << ")\n";
-      // end of debug
+      ASSERT_EQ(x(maxPRow, maxPColumn), scalar_type());
       
       // Searching loop.
       std::vector<std::pair<size_t, size_t> > loopCellsIdxs;
@@ -749,6 +782,11 @@ namespace lp_potentials
       
       // Asserting that new plan is a plan.
       ASSERT(is_plan(a, b, x));
+      
+      // Asserting that it cost is lower than cost of previus plan.
+      scalar_type const newPlanTransportationCost = transportationCost(C, x);
+      ASSERT_LE(newPlanTransportationCost, prevPlanTransportationCost);
+      prevPlanTransportationCost = newPlanTransportationCost;
       
       // Updating storage: removing minimum shipment variable and adding maximum potential variable.
       
