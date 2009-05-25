@@ -137,11 +137,6 @@ namespace linear_problem
         }
       } while (combination::next_combination(idxs.begin(), n, m));
       
-      // debug
-      //std::cout << "solve_by_running_over_basic_vectors(): nIterations=" << nFoundedBasicVecs << 
-      //    ", nBasicVectors=" << nFoundedBasicVecs << std::endl;
-      // end of debug
-      
       BOOST_ASSERT(minVec);
       
       result() = conv(minVec->second);
