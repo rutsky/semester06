@@ -218,7 +218,6 @@ namespace transportation_problem
     
     transportation_problem_type closedTP;
     to_closed(tp, closedTP);
-    matrix<scalar_type> X;
     lp_potentials::solve(closedTP.a(), closedTP.b(), closedTP.C(), result);
   }
 } // End of namespace 'transportation_problem'.

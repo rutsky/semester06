@@ -78,7 +78,7 @@ int main( int argc, char *argv[] )
       solve_by_potentials(closedTP, X);
       
       std::cout << "Found solution:\n";
-      numeric::output_matrix_octave(std::cout, X);
+      numeric::output_matrix_console(std::cout, X);
       std::cout << "\n\n";
     }
   }

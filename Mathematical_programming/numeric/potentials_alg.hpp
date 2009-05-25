@@ -68,10 +68,10 @@ namespace lp_potentials
     typedef typename V1::value_type scalar_type; // TODO
 
     // Asserting sizes.
-    ASSERT_GT(a().size(), 0);         // a().size() > 0
-    ASSERT_GT(b().size(), 0);         // b().size() > 0
-    ASSERT_GT(C().size1(), 0);        // C().size1() > 0 
-    ASSERT_GT(C().size2(), 0);        // C().size2() > 0
+    ASSERT_GT(a().size(), 0);           // a().size() > 0
+    ASSERT_GT(b().size(), 0);           // b().size() > 0
+    ASSERT_GT(C().size1(), 0);          // C().size1() > 0 
+    ASSERT_GT(C().size2(), 0);          // C().size2() > 0
     ASSERT_EQ(C().size1(), a().size()); // C().size1() == a().size()
     ASSERT_EQ(C().size2(), b().size()); // C().size2() == b().size()
 
@@ -165,7 +165,7 @@ namespace lp_potentials
     typedef std::map<std::pair<size_t, size_t>, cell_ptr_type> all_cells_map_type;
     
     template< class V, class M >
-    void build_start_plan( vector_expression<V> a, vector_expression<V> b,
+    void build_start_plan( vector_expression<V> const &aVec, vector_expression<V> const &bVec,
                            matrix_expression<M> const &C,
                            matrix_expression<M>       &x,
                            all_cells_map_type         &planCells )
@@ -173,6 +173,8 @@ namespace lp_potentials
       typedef typename V::value_type scalar_type; // TODO
       typedef vector<scalar_type>    vector_type;
       typedef matrix<scalar_type>    matrix_type;
+      
+      vector_type a = aVec(), b = bVec();
       
       ASSERT(assert_tp_valid(a, b, C));
       ASSERT(is_tp_closed(a, b, C));
@@ -192,18 +194,20 @@ namespace lp_potentials
       // Building start plan.
       for (size_t r = 0; r < m; ++r)
       {
-        scalar_type &supply = a()(r);
+        scalar_type &supply = a(r);
         
         while (supply >= 0)
         {
           ASSERT(!unprocessedCols.empty());
         
           // Locating column with lowest transfer cost from current row.
-          size_t const minc = *std::min_element(
-              subvector(vector_type(row(C(), r)), unprocessedCols.begin(), unprocessedCols.end()).begin(),
-              subvector(vector_type(row(C(), r)), unprocessedCols.begin(), unprocessedCols.end()).end());
+          boost::optional<size_t> minElemIdx;
+          for (unprocessed_cols_list_type::const_iterator it = unprocessedCols.begin(); it != unprocessedCols.end(); ++it)
+            if (!minElemIdx || C()(r, *it) < C()(r, minElemIdx.get()))
+              minElemIdx = *it;
+          size_t const minc = *minElemIdx;
           
-          scalar_type &demand = b()(minc);
+          scalar_type &demand = b(minc);
           
           if (supply < demand)
           {
