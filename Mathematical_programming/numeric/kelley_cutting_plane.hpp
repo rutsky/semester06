@@ -118,6 +118,10 @@ namespace kelley_cutting_plane
           BOOST_ASSERT(inner_prod(row(commonLP.A(), newRows - 1), commonResult) > commonLP.b()(newRows - 1));
           
           BOOST_ASSERT(linear_problem::assert_valid(commonLP));
+          
+          // debug
+          output_common_linear_problem(std::cout, commonLP);
+          // end of debug.
         }
       }
       
