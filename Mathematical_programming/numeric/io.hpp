@@ -151,13 +151,13 @@ namespace numeric
   }
   
   template< class OutStream, class E >
-  OutStream &output_matrix_console( OutStream &ostr, matrix_expression<E> const &m, char const *format = "%1$g" )
+  OutStream &output_matrix_console( OutStream &ostr, matrix_expression<E> const &m, char const *format = "%1$5g" )
   {
-    char const *rowsDelimiter    = ";\n";
+    char const *rowsDelimiter    = ";\n ";
     char const *columnsDelimiter = " ";
     char const *matrixStart      = "[";
     char const *matrixEnd        = "]\n";
-    char const *rowStart         = " ";
+    char const *rowStart         = "";
     char const *rowEnd           = "";
     return output_matrix_pretty(ostr, m, 
                                 rowsDelimiter, columnsDelimiter, 
@@ -168,7 +168,7 @@ namespace numeric
   
   // TODO: Rename to smth. like `output_octave'.
   template< class OutStream, class E >
-  OutStream &output_matrix_octave( OutStream &ostr, matrix_expression<E> const &m, char const *format = "%1$g" )
+  OutStream &output_matrix_octave( OutStream &ostr, matrix_expression<E> const &m, char const *format = "%1$5g" )
   {
     char const *rowsDelimiter    = "; ";
     char const *columnsDelimiter = " ";
