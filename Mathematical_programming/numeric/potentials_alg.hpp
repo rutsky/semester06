@@ -86,10 +86,10 @@ namespace lp_potentials
   }
   
   template< class V1, class V2, class M >
-  void is_tp_closed( vector_expression<V1> const &a, vector_expression<V2> const &b,
+  bool is_tp_closed( vector_expression<V1> const &a, vector_expression<V2> const &b,
                      matrix_expression<M>  const &C )
   {
-    typedef typename V1::scalar_type scalar_type; // TODO
+    typedef typename V1::value_type scalar_type; // TODO
     
     BOOST_ASSERT(assert_tp_valid(a, b, C));
     

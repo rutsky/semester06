@@ -63,6 +63,13 @@ int main( int argc, char *argv[] )
       
       std::cout << "Solving transportation problem:\n";
       numeric::output_transportation_problem(std::cout, tp);
+      std::cout << "\n";
+      
+      transportation_problem_type closedTP;
+      numeric::transportation_problem::to_closed(tp, closedTP);
+      std::cout << "Closed transportation problem:\n";
+      numeric::output_transportation_problem(std::cout, closedTP);
+      std::cout << "\n";
       
       
     }

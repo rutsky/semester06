@@ -82,7 +82,7 @@ namespace transportation_problem
   inline
   bool is_closed( ITransportationProblem<TPTraits> const &tp )
   {
-    return transportation_problem::is_closed(tp.a(), tp.b(), tp.C());
+    return lp_potentials::is_tp_closed(tp.a(), tp.b(), tp.C());
   }
   
   template< class TPTraits >
@@ -109,6 +109,8 @@ namespace transportation_problem
   struct transportation_problem
     : public ITransportationProblem<Traits>
   {
+    typedef transportation_problem<Scalar, Traits> self_type;
+    
     typedef ITransportationProblem<Traits> base_type;
     typedef Traits                         tp_traits_type;
     
@@ -136,6 +138,16 @@ namespace transportation_problem
       , C_(other.C_)
     {}
     
+    template< class S, template<class> class TPTraits >
+    self_type & operator = ( ITransportationProblem<TPTraits<S> > const &other )
+    {
+      this->a() = other.a();
+      this->b() = other.b();
+      this->C() = other.C();
+      
+      return *this;
+    }
+
     vector_type                  const & a    () const { return a_; }
     vector_type                        & a    ()       { return a_; }
     
@@ -153,6 +165,49 @@ namespace transportation_problem
   //
   // Solving algorithms.
   //
+  
+  // TODO: Return converter.
+  template< class S, template< class > class TPTraits >
+  inline
+  void to_closed( ITransportationProblem<TPTraits<S> > const &tp, 
+                  transportation_problem<S, TPTraits<S> >    &closedTP )
+  {
+    typedef S                        scalar_type;
+    typedef zero_vector<scalar_type> zero_vector_type;
+    
+    ASSERT(assert_valid(tp));
+    
+    closedTP = tp;
+    size_t const m = supplies_count(tp), n = demands_count(tp);
+    
+    scalar_type const asum = std::accumulate(tp.a().begin(), tp.a().end(), scalar_type(0.));
+    scalar_type const bsum = std::accumulate(tp.b().begin(), tp.b().end(), scalar_type(0.));
+    
+    if (asum < bsum)
+    {
+      // Supplies is not satisfies demand. Adding fake supply row.
+      closedTP.a().resize(m + 1, true);
+      closedTP.a()(m) = bsum - asum;
+      
+      closedTP.C().resize(m + 1, n, true);
+      row(closedTP.C(), m) = zero_vector_type(n);
+    }
+    else if (asum > bsum)
+    {
+      // Too many supplies. Adding fake demand.
+      closedTP.b().resize(n + 1, true);
+      closedTP.b()(n) = asum - bsum;
+      
+      closedTP.C().resize(m, n + 1, true);
+      column(closedTP.C(), n) = zero_vector_type(n);
+    }
+    else
+    {
+      // Transportation problem is closed.
+    }
+    
+    ASSERT(is_closed(closedTP));
+  }
   
   template< class M, class TPTraits >
   void solve_by_potentials( ITransportationProblem<TPTraits> const &tp,
