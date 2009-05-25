@@ -503,14 +503,36 @@ namespace lp_potentials
     template< class IdxsOutputIterator >
     bool find_loop( cells_maps_vector_type const &rows, cells_maps_vector_type const &cols,
                     size_t r, size_t c, size_t const goalR, size_t const goalC, 
-                    IdxsOutputIterator idxsOut, bool horizontalSearch )
+                    IdxsOutputIterator idxsOut, bool horizontalSearch, size_t depth )
     {
       // TODO: Assert sizes.
       
-      cell_type &curCell = *rows[r].find(c)->second;
+      // `depth' equals to number of cells in current `loop' (current cell is counted).
+      // `horizontalSearch' is true if from current cell must be searched cells only on current cell row.
       
       // Adding current point to building loop end on visit.
-      curCell.mark = true;
+      if (!(r == goalR && c == goalC))
+      {
+        // Not at first call.
+        
+        ASSERT(rows[r].find(c) != rows[r].end());
+        cell_type &curCell = *rows[r].find(c)->second;
+        
+        std::cout << " >> (" << r << "," <<  c << ")\n"; // debug
+
+        curCell.mark = true;
+      }
+      
+      if (depth >= 3)
+      {
+        // Starting from depth 3 looking for ability to close loop.
+        if ((horizontalSearch && r == goalR) || (!horizontalSearch && c == goalC))
+        {
+          // Goal cell is seen from current cell. Closing loop.
+            *idxsOut++ = std::make_pair(r, c);
+            return true;
+        }
+      }
       
       if (horizontalSearch)
       {
@@ -524,18 +546,12 @@ namespace lp_potentials
             // Omitting current cell.
             continue;
           }
-          
-          if (cell.r == goalR && cell.c == goalC)
-          {
-            // Found loop, outputting it.
-            *idxsOut++ = std::make_pair(r, c);
-            return true;
-          }
+          ASSERT(!(cell.r == goalR && cell.c == goalC));
           
           if (!cell.mark)
           {
             // Found cell not in current loop, trying to append it to current loop.
-            if (find_loop(rows, cols, cell.r, cell.c, goalR, goalC, idxsOut, !horizontalSearch))
+            if (find_loop(rows, cols, cell.r, cell.c, goalR, goalC, idxsOut, !horizontalSearch, depth + 1))
             {
               // Loop was found, outputting it.
               *idxsOut++ = std::make_pair(r, c);
@@ -546,7 +562,7 @@ namespace lp_potentials
       }
       else
       {
-        // Searching for next cell to append to loop in the row of loop end.
+        // Searching for next cell to append to loop in the column of loop end.
         for (cells_map_type::const_iterator cellPtrIt = cols[c].begin(); cellPtrIt != cols[c].end(); ++cellPtrIt)
         {
           cell_type const &cell = *(cellPtrIt->second);
@@ -556,18 +572,12 @@ namespace lp_potentials
             // Omitting current cell.
             continue;
           }
-          
-          if (cell.r == goalR && cell.c == goalC)
-          {
-            // Found loop, outputting it.
-            *idxsOut++ = std::make_pair(r, c);
-            return true;
-          }
+          ASSERT(!(cell.r == goalR && cell.c == goalC));
           
           if (!cell.mark)
           {
             // Found cell not in current loop, trying to append it to current loop.
-            if (find_loop(rows, cols, cell.r, cell.c, goalR, goalC, idxsOut, !horizontalSearch))
+            if (find_loop(rows, cols, cell.r, cell.c, goalR, goalC, idxsOut, !horizontalSearch, depth + 1))
             {
               // Loop was found, outputting it.
               *idxsOut++ = std::make_pair(r, c);
@@ -578,7 +588,17 @@ namespace lp_potentials
       }
       
       // Nothing useful found, removing current point from loop end.
-      curCell.mark = false;
+      if (!(r == goalR && c == goalC))
+      {
+        // Not at first call.
+        
+        ASSERT(rows[r].find(c) != rows[r].end());
+        cell_type &curCell = *rows[r].find(c)->second;
+        
+        std::cout << " << (" << r << "," <<  c << ")\n"; // debug
+
+        curCell.mark = false;
+      }
 
       return false;
     }
@@ -635,7 +655,7 @@ namespace lp_potentials
         }
       
       // Searching starting by row. Must be equivalent to starting from column.
-      VERIFY(find_loop(rows, cols, goalR, goalC, goalR, goalC, idxsOut, true));
+      VERIFY(find_loop(rows, cols, goalR, goalC, goalR, goalC, idxsOut, true, 1));
     }
     
     template< class M >
@@ -731,7 +751,7 @@ namespace lp_potentials
       std::cout << "max P elem: (" << maxPRow << "," << maxPColumn << ")\n";
       // end of debug
       
-      if (eq(x(maxPRow, maxPColumn), scalar_type()))
+      if (!eq(x(maxPRow, maxPColumn), scalar_type()))
       {
         // Found optimal plan. Interrupting.
         break;
