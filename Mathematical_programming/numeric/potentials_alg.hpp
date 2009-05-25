@@ -442,7 +442,7 @@ namespace lp_potentials
       // debug
       // Asserting that potentials are valid.
       for (size_t r = 0; r < m; ++r)
-        for (size_t c = 0; c < m; ++c)
+        for (size_t c = 0; c < n; ++c)
         {
           scalar_type const p = uVec()(r) + vVec()(c) - C()(r, c);
           if (_isPlanPointByRow(r, c))
@@ -451,7 +451,7 @@ namespace lp_potentials
           }
           else
           {
-            ASSERT_GT(p, scalar_type(0));
+            ASSERT_GE(p, scalar_type(0));
           }
         }
       // end of debug
