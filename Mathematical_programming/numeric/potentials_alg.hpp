@@ -677,7 +677,7 @@ namespace lp_potentials
       
       // Recalculating potentials coefficients.
       calculate_potentials_coefs(rows, cols, C, u, v);
-
+      
       // Recalculating potentials.
       calculate_potentials(u, v, C, P);
       
@@ -697,6 +697,14 @@ namespace lp_potentials
         break;
       }
       ASSERT_EQ(x(maxPRow, maxPColumn), scalar_type(0.));
+      
+      // debug
+      std::cout << "u: "; output_vector_console(std::cout, u);
+      std::cout << "v: "; output_vector_console(std::cout, u);
+      std::cout << "X: "; output_matrix_console(std::cout, x);
+      std::cout << "P: "; output_matrix_console(std::cout, P);
+      std::cout << "max P elem: (" << maxPRow << "," << maxPColumn << ")\n";
+      // end of debug
       
       // Searching loop.
       std::vector<std::pair<size_t, size_t> > loopCellsIdxs;
