@@ -27,16 +27,18 @@ int main()
   typedef numeric::ublas::unit_vector<scalar_type> unit_vector_type;
   typedef numeric::ublas::matrix     <scalar_type> matrix_type;
   
-  typedef scalar_type (*function_type     )( vector_type const & );
-  typedef vector_type (*function_grad_type)( vector_type const & );
-  typedef scalar_type (*scalar_norm_type  )( scalar_type const & );
+  typedef boost::function<scalar_type( vector_type )> function_type;
+  typedef boost::function<vector_type( vector_type )> function_grad_type;
+  //typedef scalar_type (*function_type     )( vector_type const & );
+  //typedef vector_type (*function_grad_type)( vector_type const & );
+  typedef scalar_type (*scalar_norm_type  )( scalar_type );
   typedef scalar_type (*vector_norm_type  )( numeric::ublas::vector_expression<vector_type> const & );
     
   function_type      const f                  = &function::function<vector_type>;
   function_grad_type const df                 = &function::functionGrad<vector_type>;
   scalar_type        const preferredPrecision = function::preferredPrecision;
   scalar_type        const step               = function::step;
-  scalar_norm_type   const sNorm              = &numeric::abs<scalar_type>;
+  scalar_norm_type   const sNorm              = &xmath::abs<scalar_type>;
   vector_norm_type   const vNorm              = &numeric::ublas::norm_2<vector_type>;
   
   {
@@ -85,10 +87,16 @@ int main()
     
     std::vector<vector_type> points;
     
-    vector_type const xMin = numeric::gradient_descent::find_min
+    vector_type xMin;
+    numeric::gradient_descent::gradient_descent_result const result =
+        numeric::gradient_descent::find_min
                                <function_type, function_grad_type, vector_type>(
-                                  f, df, startPoint, preferredPrecision, step, numeric::true_predicate(), 
-                                  std::back_inserter(points));
+                                  f, df, 
+                                  startPoint, 
+                                  preferredPrecision, step, 
+                                  xMin,
+                                  numeric::true_predicate(), std::back_inserter(points));
+    BOOST_ASSERT(result == result); // TODO: Handle result states.
     
     {
       // Saving passed spots.
@@ -140,11 +148,17 @@ int main()
         scalar_type const precision = function::precisions[p];
         
         std::vector<vector_type> points;
-        vector_type const xMin = numeric::gradient_descent::find_min
+        vector_type xMin;
+        numeric::gradient_descent::gradient_descent_result const result =
+            numeric::gradient_descent::find_min
                                    <function_type, function_grad_type, vector_type>(
-                                      f, df, startPoint, precision, step, numeric::true_predicate(),
-                                      std::back_inserter(points));
-        
+                                      f, df, 
+                                      startPoint, 
+                                      precision, step, 
+                                      xMin,
+                                      numeric::true_predicate(), std::back_inserter(points));
+        BOOST_ASSERT(result == result); // TODO: Handle result states.
+
         *ofs << boost::format("%1$1.0e") % precision << " & " << points.size() << " & (";
         numeric::output_vector_coordinates(*ofs, xMin, ", ", "");
         *ofs << ") & ";
