@@ -184,7 +184,7 @@ namespace numeric
   }
   
   template< class OutStream, class V >
-  OutStream &output_vector_console( OutStream &ostr, vector_expression<V> const &v, char const *format = "%1$g" )
+  OutStream &output_vector_console( OutStream &ostr, vector_expression<V> const &v, char const *format = "%1$5g" )
   {
     char const *delimiter   = " ";
     char const *start       = "[";
