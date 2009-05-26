@@ -1,0 +1,1 @@
+Found minimum at (0.666656, 0.666656) with precision 1.0e-04 after 16 steps.
