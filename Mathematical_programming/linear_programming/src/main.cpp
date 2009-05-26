@@ -92,7 +92,19 @@ struct GeneticAlgGoalFunction
   
   GeneticAlgGoalFunction( canonical_linear_problem_type const &clp )
     : clp_(clp)
-  {}
+  {
+    size_t const m = numeric::linear_problem::constraints_count(clp_);
+    
+    // Normalizing plane normals.
+    for (size_t r = 0; r < m; ++r)
+    {
+      scalar_type const norm = numeric::norm_2(row(clp_.A(), r));
+      row(clp_.A(), r) /= norm;
+      clp_.b() /= norm;
+    }
+    
+    clp_.update();
+  }
   
   template< class V >
   scalar_type operator () ( numeric::vector_expression<V> const &x )
@@ -102,12 +114,22 @@ struct GeneticAlgGoalFunction
     
     ASSERT_EQ(x().size(), n);
     
+    if (std::find_if(x().begin(), x().end(), boost::bind(std::less<scalar_type>(), _1, scalar_type())) != x().end())
+    {
+      // Found negative coordinate.
+      return -xmath::infinity<scalar_type>();
+    }
+    
     // Initializing function result with goal value.
     scalar_type result = numeric::inner_prod(clp_.c(), x());
     
     // Then adding penalty for constraint violation.
     for (size_t r = 0; r < m; ++r)
-      result += numeric::sqr(numeric::inner_prod(numeric::row(clp_.A(), r), x()) - clp_.b()(r));
+    {
+      scalar_type const dist = xmath::abs(numeric::inner_prod(numeric::row(clp_.A(), r), x()) - clp_.b()(r));
+      //result += 1e3 * dist;
+      result += dist;
+    }
     
     return result;
   }
@@ -319,6 +341,7 @@ int main( int argc, char *argv[] )
 
         std::cout << "Found solution by genetic algorithm:\n";
         numeric::output_vector_console(std::cout, xMin);
+        std::cout << "\n";
       }
     }
     
