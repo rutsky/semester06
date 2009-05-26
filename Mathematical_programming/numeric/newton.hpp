@@ -18,16 +18,18 @@
 
 #include "golden_section_search.hpp"
 #include "lerp.hpp"
+#include "determinant.hpp"
+#include "invert_matrix.hpp"
 
 namespace numeric
 {
 namespace newton
 {
   // TODO: Inverse Hessian is a bad thing.
-  template< class Func, class FuncGrad, class FuncInvHessian, class V, class PointsOut >
+  template< class Func, class FuncGrad, class FuncHessian, class V, class PointsOut >
   inline
   ublas::vector<typename V::value_type> 
-    find_min( Func function, FuncGrad functionGrad, FuncInvHessian functionInvHessian,
+    find_min( Func function, FuncGrad functionGrad, FuncHessian functionHessian,
               V const &startPoint,
               typename V::value_type precision,
               typename V::value_type step,
@@ -41,10 +43,10 @@ namespace newton
     typedef typename V::value_type            scalar_type;
     typedef ublas::vector<scalar_type>        vector_type;
     typedef ublas::matrix<scalar_type>        matrix_type;
-    typedef ublas::scalar_traits<scalar_type> scalar_traits_type;
     
-    BOOST_CONCEPT_ASSERT((boost::UnaryFunction<Func,     scalar_type, vector_type>));
-    BOOST_CONCEPT_ASSERT((boost::UnaryFunction<FuncGrad, vector_type, vector_type>));
+    BOOST_CONCEPT_ASSERT((boost::UnaryFunction<Func,        scalar_type, vector_type>));
+    BOOST_CONCEPT_ASSERT((boost::UnaryFunction<FuncGrad,    vector_type, vector_type>));
+    BOOST_CONCEPT_ASSERT((boost::UnaryFunction<FuncHessian, matrix_type, vector_type>));
     
     BOOST_ASSERT(precision > 0);
     
@@ -57,13 +59,30 @@ namespace newton
     while (true)
     {
       // Searching next point in specific direction based on antigradient.
+
+      matrix_type const hessian    = functionHessian(x);
+      //std::cout << "hessian: " << hessian << "\n"; // debug
+      scalar_type const hessianDet = matrix_determinant(hessian);
+      //std::cout << "hessianDet: " << hessianDet << "\n"; // debug
+      
+      if (eq_zero(hessianDet))
+      {
+        // Hessian determinant zero, it's means something. // TODO
+        return x;
+      }
+      
+      matrix_type invHessian;
+      VERIFY(invert_matrix(hessian, invHessian));
+      //std::cout << "invHessian: " << invHessian << "\n"; // debug
       
       vector_type const grad       = functionGrad(x);
-      matrix_type const invHessian = functionInvHessian(x);
+      std::cout << "grad: " << grad << "\n"; // debug
       vector_type const dirLong    = -ublas::prod(invHessian, grad);
+      //std::cout << "dirLong: " << dirLong << "\n"; // debug
       
       scalar_type const dirLen = ublas::norm_2(dirLong);
-      if (scalar_traits_type::equals(dirLen, 0))
+      //std::cout << "dirLen: " << dirLen << "\n"; // debug
+      if (eq_zero(dirLen))
       {
         // Function gradient is almost zero, found minimum.
         return x;
@@ -71,7 +90,8 @@ namespace newton
       
       // Obtaining normalized direction of moving.
       vector_type const dir = dirLong / dirLen;
-      BOOST_ASSERT(scalar_traits_type::equals(ublas::norm_2(dir), 1));
+      BOOST_ASSERT(eq(ublas::norm_2(dir), 1));
+      //std::cout << "dir: " << dir << "\n"; // debug
       
       vector_type const s0 = x;
       vector_type const s1 = s0 + dir * step;
@@ -87,6 +107,9 @@ namespace newton
       /*
       std::cout << "x="; 
       output_vector_coordinates(std::cout, x);
+      std::cout << "dir=" << dir << "\n";
+      std::cout << "grad=" << grad << "\n";
+      std::cout << "invH=" << invHessian << "\n";
       std::cout << "f(x0) = " << function(s0 + dir * step * 0) << std::endl;
       std::cout << "f(x)  = " << function(s0 + dir * step * section) << std::endl;
       std::cout << "f(x1) = " << function(s0 + dir * step * 1) << std::endl;
