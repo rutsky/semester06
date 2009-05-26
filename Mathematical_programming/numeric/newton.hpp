@@ -61,7 +61,9 @@ namespace newton
       // Searching next point in specific direction based on antigradient.
 
       matrix_type const hessian    = functionHessian(x);
+      //std::cout << "hessian: " << hessian << "\n"; // debug
       scalar_type const hessianDet = matrix_determinant(hessian);
+      //std::cout << "hessianDet: " << hessianDet << "\n"; // debug
       
       if (eq_zero(hessianDet))
       {
@@ -71,11 +73,15 @@ namespace newton
       
       matrix_type invHessian;
       VERIFY(invert_matrix(hessian, invHessian));
+      //std::cout << "invHessian: " << invHessian << "\n"; // debug
       
       vector_type const grad       = functionGrad(x);
+      //std::cout << "grad: " << grad << "\n"; // debug
       vector_type const dirLong    = -ublas::prod(invHessian, grad);
+      //std::cout << "dirLong: " << dirLong << "\n"; // debug
       
       scalar_type const dirLen = ublas::norm_2(dirLong);
+      //std::cout << "dirLen: " << dirLen << "\n"; // debug
       if (eq_zero(dirLen))
       {
         // Function gradient is almost zero, found minimum.
@@ -85,6 +91,7 @@ namespace newton
       // Obtaining normalized direction of moving.
       vector_type const dir = dirLong / dirLen;
       BOOST_ASSERT(eq(ublas::norm_2(dir), 1));
+      //std::cout << "dir: " << dir << "\n"; // debug
       
       vector_type const s0 = x;
       vector_type const s1 = s0 + dir * step;
@@ -96,7 +103,22 @@ namespace newton
           golden_section::find_min<function_bind_type, scalar_type>(functionBind, 0.0, 1.0, precision / step);
       BOOST_ASSERT(0 <= section && section <= 1);
       
+      // debug
+      /*
+      std::cout << "x="; 
+      output_vector_coordinates(std::cout, x);
+      std::cout << "dir=" << dir << "\n";
+      std::cout << "grad=" << grad << "\n";
+      std::cout << "invH=" << invHessian << "\n";
+      std::cout << "f(x0) = " << function(s0 + dir * step * 0) << std::endl;
+      std::cout << "f(x)  = " << function(s0 + dir * step * section) << std::endl;
+      std::cout << "f(x1) = " << function(s0 + dir * step * 1) << std::endl;
+      std::cout << "section=" << section << std::endl; // debug
+      */
+      // end of debug
+      
       vector_type const nextX = s0 + dir * step * section;
+      //std::cout << "dist= " << ublas::norm_2(x - nextX) << std::endl; // debug
       if (ublas::norm_2(x - nextX) < precision)
       {
         // Next point is equal to current (with precision), seems found minimum.
