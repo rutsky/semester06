@@ -29,13 +29,14 @@ int main()
   
   typedef boost::function<scalar_type( vector_type const & )> function_type;
   typedef boost::function<vector_type( vector_type const & )> function_grad_type;
+  typedef boost::function<matrix_type( vector_type const & )> function_hessian_type;
   typedef boost::function<matrix_type( vector_type const & )> function_inv_hessian_type;
   typedef scalar_type (*scalar_norm_type  )( scalar_type );
   typedef scalar_type (*vector_norm_type  )( numeric::ublas::vector_expression<vector_type> const & );
     
   function_type             const f                  = &function::function<vector_type>;
   function_grad_type        const df                 = &function::functionGrad<vector_type>;
-  function_inv_hessian_type const invH               = &function::inverseHessian<vector_type>;
+  function_hessian_type     const h                  = &function::hessian<vector_type>;
   scalar_type               const preferredPrecision = function::preferredPrecision;
   scalar_type               const step               = function::step;
   scalar_norm_type          const sNorm              = &xmath::abs<scalar_type>;
@@ -90,15 +91,14 @@ int main()
     
     vector_type const xMin = numeric::newton::find_min
                                <function_type, function_grad_type, function_inv_hessian_type, vector_type>(
-                                  f, df, invH,
+                                  f, df, h,
                                   startPoint, 
                                   preferredPrecision, step, 
                                   std::back_inserter(points));
     
-    /*
     {
       // Saving passed spots.
-      char const *dataFileName = "../output/gd_points.dat";
+      char const *dataFileName = "output/nm_points.dat";
       boost::scoped_ptr<std::ofstream> ofs(new std::ofstream(dataFileName));
       if (ofs->fail())
       {
@@ -114,7 +114,7 @@ int main()
     if (points.begin() != points.end())
     {
       // Saving passed spots function values (for contours).
-      char const *dataFileName = "../output/gd_contours.gp";
+      char const *dataFileName = "output/nm_contours.gp";
       boost::scoped_ptr<std::ofstream> ofs(new std::ofstream(dataFileName));
       if (ofs->fail())
       {
@@ -129,6 +129,7 @@ int main()
       *ofs << std::endl;
     }
     
+    /*
     {
       // Generating report data.
       
