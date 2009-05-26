@@ -24,10 +24,9 @@ namespace numeric
 {
   // Matrix inversion routine.
   // Uses lu_factorize and lu_substitute in uBLAS to invert a matrix.
-  // FIXME: Note: inverse matrix argument size should match input argument size.
   template< class M1, class M2 >
   inline
-  bool invert_matrix( M1 const &input, M2 &inverse )
+  bool invert_matrix( M1 const &input, M2 &inverse ) // TODO: Use matrix_expression.
   {
     BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<M1>));
     BOOST_CONCEPT_ASSERT((ublas::MatrixExpressionConcept<M2>));
@@ -48,7 +47,7 @@ namespace numeric
       return false;
 
     // Create identity matrix of "inverse".
-    inverse.assign(identity_matrix_type(A.size1()));
+    inverse = identity_matrix_type(A.size1());
 
     // Backsubstitute to get the inverse.
     ublas::lu_substitute(A, pm, inverse);
