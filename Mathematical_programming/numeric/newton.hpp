@@ -76,7 +76,7 @@ namespace newton
       //std::cout << "invHessian: " << invHessian << "\n"; // debug
       
       vector_type const grad       = functionGrad(x);
-      std::cout << "grad: " << grad << "\n"; // debug
+      //std::cout << "grad: " << grad << "\n"; // debug
       vector_type const dirLong    = -ublas::prod(invHessian, grad);
       //std::cout << "dirLong: " << dirLong << "\n"; // debug
       
