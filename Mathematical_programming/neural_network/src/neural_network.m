@@ -7,7 +7,7 @@ f  = inline("x^2 + y^2 - 10 * x - 8 * y");
 g1 = inline("    x + 2 * y - 2"); # <= 0
 g2 = inline("2 * x +     y - 2"); # <= 0
 
-precision = 1e-8;
+precision = 1e-4;
 startX = 20;
 startY = 20;
 startStep = 5;
@@ -57,11 +57,13 @@ step = startStep;
 centerX = startX;
 centerY = startY;
 
+nSteps = 0;
 while (step >= precision)
   newCenter = processNetworkLayer(f, g1, g2, centerX, centerY, step, step, neuronsHalfX, neuronsHalfY);
   centerX = newCenter(1);
   centerY = newCenter(2);
   step = step ./ 2;
+  nSteps = nSteps + 1;
 endwhile
 
-printf("(%g, %g)", centerX, centerY);
+printf("Found minimum at (%g, %g) with precision %.1e after %d steps.", centerX, centerY, precision, nSteps);
