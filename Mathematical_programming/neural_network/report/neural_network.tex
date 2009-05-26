@@ -1,0 +1,46 @@
+% lp_potentials.tex
+% Source of solving convex function minimization with convex constraints by neural network.
+% Vladimir Rutsky <altsysrq@gmail.com>
+% 26.05.2009
+
+\documentclass[10pt,a4paper,titlepage]{article}
+
+% Spaces after commas.
+\frenchspacing
+% Minimal carrying number of characters,
+\righthyphenmin=2
+
+% Encoding support.
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+
+\usepackage{amsmath, amsthm, amssymb}
+
+% From K.V.Voroncov Latex in samples, 2005.
+\textheight=24cm   % Text height.
+\textwidth=16cm    % Text width
+\oddsidemargin=0pt % Left side indention.
+\topmargin=-1.5cm  % Top side indention.
+\parindent=24pt    % Paragraph indent.
+\parskip=0pt       % Distance between paragraphs.
+\tolerance=2000
+%\flushbottom       % Page height aligning.
+
+% For listings.
+\usepackage{listings}
+
+% Source code listings.
+%\renewcommand{\lstlistingname}{Исходный код}
+
+
+\begin{document}
+
+\lstset{language=Octave, caption=Neural network,%
+label=nn-source-code, basicstyle=\footnotesize,%
+numbers=left, numberstyle=\footnotesize, numbersep=5pt, frame=single, breaklines=true, breakatwhitespace=false,%
+inputencoding=utf8x}
+\lstinputlisting{data/neural_network.m}
+
+\end{document}
