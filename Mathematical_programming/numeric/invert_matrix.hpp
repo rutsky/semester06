@@ -1,6 +1,6 @@
 /*
  * invert_matrix.hpp
- * Finding matrix inverse finctions.
+ * Finding matrix inverse functions.
  * Based on Fredrik Orderud's "LU Matrix Inversion"
  * (http://www.crystalclearsoftware.com/cgi-bin/boost_wiki/wiki.pl?LU_Matrix_Inversion),
  * which based on Numerical Recipies in C, 2nd ed., by Press, Teukolsky, Vetterling & Flannery.
