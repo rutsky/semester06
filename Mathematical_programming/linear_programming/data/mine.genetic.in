@@ -1,0 +1,14 @@
+[6](-100,-100,-100,-100,-100,-100)
+[6](100,100,100,100,100,100)
+[6](0.3,0.3,0.3,0.3,0.3,0.3)
+1000
+20
+0.8
+1e-4
+
+There is this values:
+  vector_type loGen, hiGen, mutations;
+  size_t nIndividuals;
+  size_t nPrecisionSelect;
+  double liveRate;
+  scalar_type preferredPrecision;

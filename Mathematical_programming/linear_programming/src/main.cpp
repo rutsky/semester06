@@ -81,6 +81,41 @@ typename CLPTraits::inequality_signs_vector_type
   return result;
 }
 
+template< class CLPTraits = numeric::linear_problem::common_linear_problem_traits<double> >
+struct GeneticAlgGoalFunction
+{
+  typedef CLPTraits                             clp_traits_type;
+  typedef typename clp_traits_type::scalar_type scalar_type;
+  typedef numeric::vector<scalar_type>          vector_type;
+  
+  typedef numeric::linear_problem::canonical_linear_problem<scalar_type> canonical_linear_problem_type;
+  
+  GeneticAlgGoalFunction( canonical_linear_problem_type const &clp )
+    : clp_(clp)
+  {}
+  
+  template< class V >
+  scalar_type operator () ( numeric::vector_expression<V> const &x )
+  {
+    size_t const m = numeric::linear_problem::constraints_count(clp_);
+    size_t const n = numeric::linear_problem::variables_count(clp_);
+    
+    ASSERT_EQ(x().size(), n);
+    
+    // Initializing function result with goal value.
+    scalar_type result = numeric::inner_prod(clp_.c(), x());
+    
+    // Then adding penalty for constraint violation.
+    for (size_t r = 0; r < m; ++r)
+      result += numeric::sqr(numeric::inner_prod(numeric::row(clp_.A(), r), x()) - clp_.b()(r));
+    
+    return result;
+  }
+  
+private:
+  canonical_linear_problem_type clp_;
+};
+
 // The main program function.
 int main( int argc, char *argv[] )
 {
@@ -198,6 +233,7 @@ int main( int argc, char *argv[] )
         BOOST_ASSERT(numeric::linear_problem::is_simplex_solving_correct(directLP));
       }
       
+      if (0)
       {
         // Solving problems by brute force.
         
@@ -228,6 +264,61 @@ int main( int argc, char *argv[] )
             " (result=" << static_cast<int>(dualCanonicalResult) << ")\n";
         
         BOOST_ASSERT(numeric::linear_problem::is_brute_force_solving_correct(directLP));
+      }
+      
+      {
+        // Solving problem by genetic algorithm.
+        
+        vector_type loGen, hiGen, mutations;
+        size_t nIndividuals;
+        size_t nPrecisionSelect;
+        double liveRate;
+        scalar_type preferredPrecision;
+
+        {
+          char const *geneticInputFileName = "data/mine.genetic.in";
+          if (argc > 2)
+            geneticInputFileName = argv[2];
+            
+          std::ifstream is(geneticInputFileName);
+          
+          if (!is)
+          {
+            // Failed to open input file.
+            std::cerr << "Failed to open `" << inputFileName << "' file." << std::endl;
+            return 1;
+          }
+          
+          is >> loGen >> hiGen >> mutations >> nIndividuals >> nPrecisionSelect >> liveRate >> preferredPrecision;
+          
+          if (!is)
+          {
+            // Failed to read something.
+            std::cerr << "Failed to read input data from `" << inputFileName << "' file." << std::endl;
+            return 2;
+          }
+        }
+        
+        //typedef std::vector<vector_type>     points_vec_type;
+        //typedef std::vector<points_vec_type> points_vecs_vec_type;
+        //points_vecs_vec_type selectedPointsVecs, notSelectedPointsVec;
+        
+        typedef GeneticAlgGoalFunction<numeric::linear_problem::common_linear_problem_traits<scalar_type> > goal_function_type;
+        typedef boost::function<scalar_type( vector_type const & )> function_type;
+        function_type f = goal_function_type(directCanonicalLP);
+        
+        typedef numeric::genetic::ParallelepipedonUniformGenerator<vector_type> generator_type;
+        typedef numeric::genetic::LCCrossOver                                   crossover_type;
+        typedef numeric::genetic::ParallelepipedonMutation<scalar_type>         mutation_type;
+        
+        vector_type const xMin = numeric::genetic::vectorSpaceGeneticSearch
+          <generator_type, crossover_type, mutation_type, vector_type, function_type, scalar_type>(
+            generator_type(loGen, hiGen), crossover_type(), mutation_type(mutations.begin(), mutations.end()), f, 
+            nIndividuals, liveRate, preferredPrecision, nPrecisionSelect,
+            numeric::DummyOutputIterator(), numeric::DummyOutputIterator());
+
+        std::cout << "Found solution by genetic algorithm:\n";
+        numeric::output_vector_console(std::cout, xMin);
       }
     }
     
