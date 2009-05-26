@@ -3,7 +3,7 @@
 # Vladimir Rutsky <altsysrq@gmail.com>
 # 22.03.2009
 
-SOURCES = 2d_minimisation 2d_minimisation_newton
+SOURCES = 2d_minimisation 2d_minimisation_newton 2d_minimisation_genetic
 DEPENDENCY = data/*
 TEX2PDF = pdflatex
 
