@@ -27,5 +27,6 @@
 #include "lp_simplex.hpp"
 #include "lp_brute_force.hpp"
 #include "transportation_problem.hpp"
+#include "determinant.hpp"
 
 #endif // NUMERIC_NUMERIC_HPP

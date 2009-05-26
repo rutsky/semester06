@@ -27,5 +27,6 @@ HEADERS = combination.hpp \
     linear_system.hpp \
     lp_simplex.hpp \
     transportation_problem.hpp \
-    potentials_alg.hpp
+    potentials_alg.hpp \
+    determinant.hpp
 linear_problem.hppkelley_cutting_plane.hpp
