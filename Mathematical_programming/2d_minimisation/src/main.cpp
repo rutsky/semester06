@@ -129,11 +129,10 @@ int main()
       *ofs << std::endl;
     }
     
-    /*
     {
       // Generating report data.
       
-      char const *dataFileName = "../output/gd_result.tex";
+      char const *dataFileName = "output/nm_result.tex";
       boost::scoped_ptr<std::ofstream> ofs(new std::ofstream(dataFileName));
       if (ofs->fail())
       {
@@ -147,16 +146,12 @@ int main()
         scalar_type const precision = function::precisions[p];
         
         std::vector<vector_type> points;
-        vector_type xMin;
-        numeric::gradient_descent::gradient_descent_result const result =
-            numeric::gradient_descent::find_min
-                                   <function_type, function_grad_type, vector_type>(
-                                      f, df, 
-                                      startPoint, 
-                                      precision, step, 
-                                      xMin,
-                                      numeric::true_predicate(), std::back_inserter(points));
-        BOOST_ASSERT(result == result); // TODO: Handle result states.
+        vector_type const xMin = numeric::newton::find_min
+                               <function_type, function_grad_type, function_inv_hessian_type, vector_type>(
+                                  f, df, h,
+                                  startPoint, 
+                                  precision, step, 
+                                  std::back_inserter(points));
 
         *ofs << boost::format("%1$1.0e") % precision << " & " << points.size() << " & (";
         numeric::output_vector_coordinates(*ofs, xMin, ", ", "");
@@ -179,7 +174,6 @@ int main()
         *ofs << " \\\\\n";
       }
     }
-    */
   }
   
   if (0)
