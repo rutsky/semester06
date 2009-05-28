@@ -91,17 +91,19 @@ namespace kelley_cutting_plane
       
       // Adding new limits to common linear problem according to elements that satisfies g_i(x) > 0.
       bool isInside(true);
-      for (size_t r = 0; r < n; ++r)
+      for (size_t i = 0; i < g.size(); ++i)
       {
-        scalar_type const gr = g[r](commonResult);
+        // For each constraint adding new cutting plane if needed.
+        
+        scalar_type const gr = g[i](commonResult);
         if (gr > 0)
         {
           isInside = false;
           
           // Adding new constraint:
-          // g[r](commonResult) + grad g[r](commonResult) * (x - commonResult) <= 0.
+          // g[i](commonResult) + grad g[i](commonResult) * (x - commonResult) <= 0.
           // or 
-          // grad g[r](commonResult) * x <= grad g[r](commonResult) * commonResult - g[r](commonResult).
+          // grad g[i](commonResult) * x <= grad g[i](commonResult) * commonResult - g[i](commonResult).
           
           size_t const newRows = commonLP.b().size() + 1;
           BOOST_ASSERT(commonLP.ASign().size() == newRows - 1);
@@ -114,7 +116,7 @@ namespace kelley_cutting_plane
           
           commonLP.ASign()(newRows - 1) = linear_problem::inequality_leq;
           
-          vector_type const grGrad = gGrad[r](commonResult);
+          vector_type const grGrad = gGrad[i](commonResult);
           BOOST_ASSERT(!eq_zero(norm_2(grGrad))); // FIXME: I think this is possible case.
           row(commonLP.A(), newRows - 1) = grGrad;
           
