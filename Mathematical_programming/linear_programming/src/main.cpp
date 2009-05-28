@@ -288,6 +288,7 @@ int main( int argc, char *argv[] )
         BOOST_ASSERT(numeric::linear_problem::is_brute_force_solving_correct(directLP));
       }
       
+      if (0)
       {
         // Solving problem by genetic algorithm.
         
