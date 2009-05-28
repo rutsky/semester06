@@ -78,6 +78,7 @@ namespace kelley_cutting_plane
       // debug
       std::cout << "=== iteration #" << nIterations + 1 << " ===" << std::endl;
       output_common_linear_problem(std::cout, commonLP, "%1$8g");
+      std::cout.flush();
       // end of debug.
       
       // Solving linear problem.
