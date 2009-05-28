@@ -93,7 +93,7 @@ int main()
   
   function_type             const f                  = &function::function<vector_type>;
   function_grad_type        const df                 = &function::functionGrad<vector_type>;
-  //scalar_type               const preferredPrecision = function::preferredPrecision;
+  scalar_type               const preferredPrecision = function::preferredPrecision;
   scalar_type               const minLB              = function::minimumLowerBound;
   
   typedef numeric::linear_problem::common_linear_problem<scalar_type> common_linear_problem_type;
@@ -163,7 +163,8 @@ int main()
         numeric::kelley_cutting_plane::find_min(
             extendedConstraints.begin(),      extendedConstraints.end(),
             extendedConstraintsGrads.begin(), extendedConstraintsGrads.end(),
-            commonLP);
+            commonLP,
+            preferredPrecision);
     
     std::cout << "Result:\n" << resultV << std::endl;
   }
