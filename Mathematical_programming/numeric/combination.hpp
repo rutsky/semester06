@@ -49,8 +49,16 @@ namespace combination
   template< class ScalarType, class RndIter >
   bool next_combination( RndIter indexes, ScalarType n, ScalarType k )
   {
+    // TODO: assert(n >= 0 && k >= 0);
+    
+    if (k == 0)
+    {
+      // None set of indexes has no next combination.
+      return false;
+    }
+    assert(k <= n);
+    
     // TODO: BiDi iterators
-    assert(n > 0 && k > 0 && k <= n);
     
     ScalarType i = k - 1;
     while (i > 0 && indexes[i] >= n - k + i)
