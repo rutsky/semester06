@@ -557,6 +557,15 @@ namespace simplex
 
     typedef typename MatrixType::value_type value_type;
     typedef ublas::vector<value_type>       vector_type;
+    typedef zero_vector<value_type>         zero_vector_type;
+
+    if (eq_zero(norm_2(c)))
+    {
+      // Goal function is always zero.
+      // TODO: Should be as separated return status.
+      resultV = zero_vector_type(c.size());
+      return srt_min_found;
+    }
     
     vector_type curBasicV = basicV;
     BOOST_ASSERT(assert_basic_vector(A, b, curBasicV));
@@ -760,6 +769,7 @@ namespace simplex
     
     typedef typename MatrixType::value_type         value_type;
     typedef ublas::vector<value_type>               vector_type;
+    typedef ublas::zero_vector<value_type>          zero_vector_type;
     typedef ublas::matrix<value_type>               matrix_type;
     typedef ublas::basic_range<size_t, long>        range_type;
     typedef std::vector<size_t>                     range_container_type;
@@ -776,6 +786,14 @@ namespace simplex
     
     BOOST_ASSERT(c.size() == N.size());
     BOOST_ASSERT(b.size() == M.size());
+    
+    if (eq_zero(norm_2(c)))
+    {
+      // Goal function is always zero.
+      // TODO: Should be as separated return status.
+      resultV = zero_vector_type(N.size());
+      return srt_min_found;
+    }
 
     // Searching first basic vector using artificial basis.
     vector_type firstBasicV(N.size());
