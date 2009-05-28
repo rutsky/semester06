@@ -40,7 +40,8 @@ namespace kelley_cutting_plane
   vector<S> 
     find_min( FuncIterator     funcBegin,     FuncIterator         funcEnd,
               GradFuncIterator gradFuncBegin, GradFuncIterator     gradFuncEnd,
-              linear_problem::common_linear_problem<S, CLPTraits> &commonLP )
+              linear_problem::common_linear_problem<S, CLPTraits> &commonLP,
+              S precision )
   {
     typedef CLPTraits                                   clp_traits;
     typedef S                                           scalar_type;
@@ -71,6 +72,8 @@ namespace kelley_cutting_plane
     std::vector<function_type>          g    (funcBegin,     funcEnd);
     std::vector<gradient_function_type> gGrad(gradFuncBegin, gradFuncEnd);
     
+    boost::optional<vector_type> prevFoundSimplexMin;
+    
     size_t nIterations(0);
     size_t const nMaxIterations(1000); // debug
     while (nIterations < nMaxIterations)
@@ -88,6 +91,14 @@ namespace kelley_cutting_plane
       //BOOST_ASSERT(linear_problem::is_simplex_solving_correct(commonLP)); // TODO, debug
       
       std::cout << "Simplex algorithm gives x = " << commonResult << std::endl;
+      
+      if (prevFoundSimplexMin && norm_2(*prevFoundSimplexMin - commonResult) < precision)
+      {
+        // Reached required precision.
+        // TODO: Not really good criteria.
+        return commonResult;
+      }
+      prevFoundSimplexMin = commonResult;
       
       // Adding new limits to common linear problem according to elements that satisfies g_i(x) > 0.
       bool isInside(true);
