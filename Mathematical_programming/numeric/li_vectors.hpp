@@ -71,7 +71,7 @@ namespace numeric
         }
         
         BOOST_ASSERT(r < v.size()); // because eliminateVector() returned true
-        BOOST_ASSERT(eq(v[r], 1));
+        ASSERT_FUZZY_EQ(v[r], 1);
         
         if (!liVectors_.empty())
         {
@@ -160,6 +160,11 @@ namespace numeric
           BOOST_ASSERT(eq(v[r], 1));
           v[r] = 1.; // rounding
           return true;
+        }
+        else
+        {
+          // TODO
+          v[r] = 0.;
         }
       }
       
