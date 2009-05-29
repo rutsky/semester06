@@ -17,6 +17,7 @@
 namespace numeric
 {
   // TODO: Check is inserting of zero vectors is handled.
+  // TODO: Correctly work with epsilon-like values.
   template< class VectorType >
   class linear_independent_vectors
   {
