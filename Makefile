@@ -9,3 +9,7 @@ all:
 public:
 	git push git@github.com:rutsky/semester06.git
 	git push git@gitorious.org:spbstu/semester06.git
+
+clean-light:
+	find . -name '*.o' -exec rm '{}' \;
+	find . -wholename '*.gch/c++' -exec rm '{}' \;
