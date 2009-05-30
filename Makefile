@@ -13,3 +13,6 @@ public:
 clean-light:
 	find . -name '*.o' -exec rm '{}' \;
 	find . -wholename '*.gch/c++' -exec rm '{}' \;
+
+archive:
+	tar -cf ../semester06_`date +%F_%H-%M-%S`.tar ./
