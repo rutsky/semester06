@@ -129,27 +129,63 @@ int main( int argc, char *argv[] )
     {
       typedef void (*decode_func_ptr_type)( unsigned char const *, size_t, size_t, size_t, unsigned char *);
       
-      decode_func_ptr_type decodeFuncs     [] = { &pcx::decode };
-      char const *decodeFuncsNames[] = { "general" };
+      decode_func_ptr_type decodeFuncs[] = 
+        { 
+          &pcx::decode,
+          &pcx::decode_1,
+          &pcx::decode_2,
+          &pcx::decode_3,
+          &pcx::decode_4,
+        };
+      size_t const nImplementations = sizeof(decodeFuncs) / sizeof(decodeFuncs[0]);
       
-      for (size_t funcIdx = 0; funcIdx < sizeof(decodeFuncs) / sizeof(decodeFuncs[0]); ++funcIdx)
+      char const *decodeFuncsNames    [nImplementations] = 
+        {
+          "general",
+          "#1 w/o iostream",
+          "#2 constants inlined",
+          "#3 using `int' type",
+          "#4 ",
+        };
+
+      size_t const nTotalTries = 10;
+      size_t const nTries = 10;
+      Uint32 results[nImplementations][nTotalTries];
+      
+      for (size_t totalTry = 0; totalTry < nTotalTries; ++totalTry)
+      {
+        for (size_t funcIdx = 0; funcIdx < nImplementations; ++funcIdx)
+        {
+          // Locating each implementation running time.
+          
+          decode_func_ptr_type const decodeFunc = decodeFuncs[funcIdx];
+          
+          Uint32 const startTics = SDL_GetTicks();
+          for (size_t i = 0; i < nTries; ++i)
+          {
+            decodeFunc(&(inputData[headerSize]), dataSize, width, height, &(image[0]));
+          }
+          Uint32 const endTics = SDL_GetTicks();
+          
+          results[funcIdx][totalTry] = endTics - startTics;
+        }
+      }
+      
+      // Final report.
+      std::cout << "Average result based on " << nTotalTries << " runs by " << nTries << " calls." << std::endl;
+      for (size_t funcIdx = 0; funcIdx < nImplementations; ++funcIdx)
       {
         // Locating each implementation running time.
         
-        decode_func_ptr_type const decodeFunc = decodeFuncs[funcIdx];
         char const *decodeFuncName = decodeFuncsNames[funcIdx];
         
         std::cout << "Implementation: " << decodeFuncName << std::endl;
         
-        size_t const nTries = 1000;
-        Uint32 const startTics = SDL_GetTicks();
-        for (size_t i = 0; i < nTries; ++i)
-        {
-          decodeFunc(&(inputData[headerSize]), dataSize, width, height, &(image[0]));
-        }
-        Uint32 const endTics = SDL_GetTicks();
+        Uint32 runTicks = 0;
+        for (size_t i = 0; i < nTotalTries; ++i)
+          runTicks += results[funcIdx][i];
         
-        double const totalTime = (double)(endTics - startTics) / 1000.0;
+        double const totalTime = (double)runTicks / ((double)nTotalTries * 1000.0);
         double const timePerTry = totalTime / nTries;
         
         std::cout << nTries << " calls in " << totalTime << " seconds (" << timePerTry << " seconds per try)." << std::endl;

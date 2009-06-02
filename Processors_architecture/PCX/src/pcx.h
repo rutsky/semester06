@@ -79,4 +79,24 @@ namespace pcx
   void decode( unsigned char const *input, size_t size,
                size_t width, size_t height,
                unsigned char *image );
+  
+  void decode_1(
+      unsigned char const *input, size_t size,
+      size_t width, size_t height,
+      unsigned char *image );
+  
+  void decode_2(
+      unsigned char const *input, size_t size,
+      size_t width, size_t height,
+      unsigned char *image );
+
+  void decode_3(
+      unsigned char const *input, size_t size,
+      size_t width, size_t height,
+      unsigned char *image );
+
+  void decode_4(
+      unsigned char const *input, size_t size,
+      size_t width, size_t height,
+      unsigned char *image );
 } // End of namespace 'pcx'.
