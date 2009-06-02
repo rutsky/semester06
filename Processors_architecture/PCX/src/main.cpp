@@ -102,13 +102,15 @@ int main( int argc, char *argv[] )
   std::vector<unsigned char> image;
   size_t width, height, nPlanes;
   {
-    if (header.xMin >= header.xMax || header.yMin >= header.yMax)
+    if (header.xMin > header.xMax || header.yMin > header.yMax)
     {
       std::cerr << "Error: incorrect image size!" << std::endl;
       return 4;
     }
-    width  = header.xMax - header.xMin;
-    height = header.yMax - header.yMin;
+    width  = header.xMax - header.xMin + 1;
+    height = header.yMax - header.yMin + 1;
+    //width  = 5;
+    //height = 5;
     
     if ((inputData.size() - sizeof(header)) / (height * header.nPlanes) < header.bytesPerLine)
     {
@@ -116,6 +118,8 @@ int main( int argc, char *argv[] )
       return 5;
     }
     size_t const bytesPerLine = header.bytesPerLine;
+    //size_t const bytesPerLine = 324;
+    //size_t const bytesPerLine = header.bytesPerLine + 2; // mmm
     
     nPlanes = header.nPlanes;
     
@@ -123,7 +127,7 @@ int main( int argc, char *argv[] )
     image.resize(height * width * nPlanes);
     
     // Decoding.
-    pcx::decode(&(inputData[0]), width, height, bytesPerLine, &(image[0]));
+    pcx::decode(&(inputData[0]) + sizeof(header), width, height, bytesPerLine, &(image[0]));
   }
   
   // Saving decoded image as PPM.

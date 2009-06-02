@@ -4,6 +4,8 @@
  * 02.06.2009
  */
 
+#include <iostream> // debug
+
 #include "pcx.h"
 
 namespace pcx
@@ -11,9 +13,9 @@ namespace pcx
   namespace
   {
     inline 
-    size_t input_index( size_t bytesPerLine, size_t nPlanes, size_t decodingX, size_t y, size_t plane)
+    size_t input_index( size_t bytesPerLine, size_t nPlanes, size_t decodingX, size_t y)
     {
-      return y * nPlanes * bytesPerLine + plane * bytesPerLine + decodingX;
+      return y * nPlanes * bytesPerLine + decodingX;
     }
     
     inline 
@@ -37,41 +39,55 @@ namespace pcx
   {
     size_t const nPlanes = 3;
   
+    // Decoding each resulting image row.
     for (size_t y = 0; y < height; ++y)
     {
-      // Decoding each resulting image row.
-      
-      for (size_t plane = 0; plane < nPlanes; ++plane)
+      // Decoding scan line.
+      size_t plane = 0, x = 0, d = 0;
+      while (d < bytesPerLine * nPlanes && plane < nPlanes)
       {
-        // Decoding each plane (`R', `G', `B') of current row.
-
-        size_t x = 0;
-        for (size_t d = 0; d < bytesPerLine && x < width; ++d)
+        unsigned char byte = input[input_index(bytesPerLine, nPlanes, d, y)];
+        ++d;
+        size_t count = 1;
+        
+        //std::cout << "(" << x << "," << y << ") " << (int)byte << " (" << (int)(byte & 0xC0) << ")\n";
+        
+        if ((byte & 0xC0) == 0xC0) // 0xC0 = 2#11000000
         {
-          // Decoding plane byte.
-          unsigned char const byte = input[input_index(bytesPerLine, nPlanes, d, y, plane)];
+          // RLE encoded data.
           
-          if ((byte & 0xC0) == 0xC0) // 0xC0 = 2#11000000
+          count = (byte & 0x3F); // 0x3F = 2#00111111
+          if (d >= bytesPerLine * nPlanes)
           {
-            // RLE encoded data.
-            
-            size_t const nRepeat = (byte & 0x3F); // 0x3F = 2#00111111
-            ++d;
-            
-            for (size_t i = 0; i < nRepeat && d < bytesPerLine && x < width; ++i, ++x, ++d)
-            {
-              unsigned char const byte = input[input_index(bytesPerLine, nPlanes, d, y, plane)];
-              image[image_index(width, nPlanes, x, y, plane)] = byte;
-            }
+            std::cerr << "Error: interrupting uncomplete decoding pixel (" << x << "," << y << 
+                "): end of line input buffer." << std::endl;
+            break;
           }
-          else
+          byte = input[input_index(bytesPerLine, nPlanes, d, y)];
+          ++d;
+        }
+        
+        for (size_t i = 0; i < count; ++i)
+        {
+          if (x >= width)
           {
-            // Raw data.
-            image[image_index(width, nPlanes, x, y, plane)] = byte;
-            ++x;
+            // Completely filled current plane.
+            x = 0;
+            ++plane;
           }
+
+          if (plane >= nPlanes)
+          {
+            // Filled all planes, skipping junk.
+            break;
+          }
+          
+          image[image_index(width, nPlanes, x, y, plane)] = byte;
+          ++x;
         }
       }
+      
+      //std::cout << "row = " << y << " error: " << width - x << "\n"; // debug
     }
   }
 } // End of namespace 'pcx'.
