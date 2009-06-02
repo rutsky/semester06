@@ -13,6 +13,8 @@
 
 #include "pcx.h"
 
+// TODO: Divivde `main()' on subroutines.
+
 /* The main program function */
 int main( int argc, char *argv[] )
 {
@@ -72,17 +74,17 @@ int main( int argc, char *argv[] )
   // Outputing information.
   {
     std::cout << "PCX image header info:\n";
-    std::cout << "  Manufacturer:     " << header.manufacturer << "\n";
-    std::cout << "  Version:          " << header.version << "\n";
-    std::cout << "  Encoding:         " << header.encoding << "\n";
-    std::cout << "  Bits per pixel:   " << header.bpp << "\n";
-    std::cout << "  Window:           " << "from (" << header.xMin << "," << header.yMin << ") to (" << header.xMax << "," << header.yMax << ")" << "\n";
-    std::cout << "  Resolution (dpi): " << "(" << header.hdpi << "," << header.vdpi << ")" << "\n";
-    std::cout << "  Colormap:         " << header.colormap << "\n";
-    std::cout << "  Planes:           " << header.nPlanes << "\n";
-    std::cout << "  Bytes per line:   " << header.bytesPerLine << "\n";
-    std::cout << "  Pallete type:     " << header.palleteType << "\n";
-    std::cout << "  Screen size:      " << "(" << header.screenWidth << "," << header.screenHeight << ")" << "\n";
+    std::cout << "  Manufacturer:     " << (int)header.manufacturer << "\n";
+    std::cout << "  Version:          " << (int)header.version << "\n";
+    std::cout << "  Encoding:         " << (int)header.encoding << "\n";
+    std::cout << "  Bits per pixel:   " << (int)header.bpp << "\n";
+    std::cout << "  Window:           " << "from (" << (int)header.xMin << "," << (int)header.yMin << ") to (" << 
+                                                       (int)header.xMax << "," << (int)header.yMax << ")" << "\n";
+    std::cout << "  Resolution (dpi): " << "(" << (int)header.hdpi << "," << (int)header.vdpi << ")" << "\n";
+    std::cout << "  Planes:           " << (int)header.nPlanes << "\n";
+    std::cout << "  Bytes per line:   " << (int)header.bytesPerLine << "\n";
+    std::cout << "  Pallete type:     " << (int)header.palleteType << "\n";
+    std::cout << "  Screen size:      " << "(" << (int)header.screenWidth << "," << (int)header.screenHeight << ")" << "\n";
   }
   
   if (!(header.manufacturer == 10 &&
@@ -98,7 +100,7 @@ int main( int argc, char *argv[] )
   
   // Decoding image.
   std::vector<unsigned char> image;
-  size_t width, height;
+  size_t width, height, nPlanes;
   {
     if (header.xMin >= header.xMax || header.yMin >= header.yMax)
     {
@@ -115,10 +117,40 @@ int main( int argc, char *argv[] )
     }
     size_t const bytesPerLine = header.bytesPerLine;
     
+    nPlanes = header.nPlanes;
+    
     // Allocating result image.
-    image.resize(height * width * header.nPlanes);
+    image.resize(height * width * nPlanes);
     
     // Decoding.
     pcx::decode(&(inputData[0]), width, height, bytesPerLine, &(image[0]));
+  }
+  
+  // Saving decoded image as PPM.
+  {
+    // Opening output PPM file.
+    std::ofstream ofs;
+    {
+      ofs.open(outputFileName, std::ios::out);
+      if (ofs.fail())
+      {
+        std::cerr << "Failed to open `" << outputFileName << "'." << std::endl;
+        return 1;
+      }
+    }
+    
+    // Writing header.
+    ofs << "P3\n";  // P3 means that colors are in ASCII.
+    ofs << "# Comment.\n";
+    ofs << width << " " << height << "\n";
+    ofs << "255\n"; // Colors are in range [0, 255].
+    for (size_t y = 0; y < height; ++y)
+      for (size_t x = 0; x < width; ++x)
+      {
+        ofs << (int)image[y * width * nPlanes + width * 0 + x];
+        for (size_t p = 1; p < nPlanes; ++p)
+          ofs << " " << (int)image[y * width * nPlanes + width * p + x];
+        ofs << "\n";
+      }
   }
 }
