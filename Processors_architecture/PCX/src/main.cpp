@@ -11,6 +11,8 @@
 #include <cstring>
 #include <vector>
 
+#include "SDL.h"
+
 #include "pcx.h"
 
 // TODO: Divivde `main()' on subroutines.
@@ -124,7 +126,35 @@ int main( int argc, char *argv[] )
     image.resize(height * width * nPlanes);
     
     // Decoding.
-    pcx::decode(&(inputData[headerSize]), dataSize, width, height, &(image[0]));
+    {
+      typedef void (*decode_func_ptr_type)( unsigned char const *, size_t, size_t, size_t, unsigned char *);
+      
+      decode_func_ptr_type decodeFuncs     [] = { &pcx::decode };
+      char const *decodeFuncsNames[] = { "general" };
+      
+      for (size_t funcIdx = 0; funcIdx < sizeof(decodeFuncs) / sizeof(decodeFuncs[0]); ++funcIdx)
+      {
+        // Locating each implementation running time.
+        
+        decode_func_ptr_type const decodeFunc = decodeFuncs[funcIdx];
+        char const *decodeFuncName = decodeFuncsNames[funcIdx];
+        
+        std::cout << "Implementation: " << decodeFuncName << std::endl;
+        
+        size_t const nTries = 1000;
+        Uint32 const startTics = SDL_GetTicks();
+        for (size_t i = 0; i < nTries; ++i)
+        {
+          decodeFunc(&(inputData[headerSize]), dataSize, width, height, &(image[0]));
+        }
+        Uint32 const endTics = SDL_GetTicks();
+        
+        double const totalTime = (double)(endTics - startTics) / 1000.0;
+        double const timePerTry = totalTime / nTries;
+        
+        std::cout << nTries << " calls in " << totalTime << " seconds (" << timePerTry << " seconds per try)." << std::endl;
+      }
+    }
   }
   
   // Saving decoded image as PPM.

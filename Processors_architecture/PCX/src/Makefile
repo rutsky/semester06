@@ -6,9 +6,9 @@
 PROGRAM_NAME = pcx_decode
 OBJECT_FILES = main.o pcx_decode.o
 CC = g++
-LIB_COMPILER_OPTIONS =
+LIB_COMPILER_OPTIONS = $(shell sdl-config --cflags)
 COMPILER_OPTIONS = -c -g -Wall -O3 $(LIB_COMPILER_OPTIONS)
-LIB_LINK_OPTIONS =
+LIB_LINK_OPTIONS = $(shell sdl-config --libs)
 LINK_OPTIONS = -o $(PROGRAM_NAME) $(LIB_LINK_OPTIONS)
 
 all: $(PROGRAM_NAME)
