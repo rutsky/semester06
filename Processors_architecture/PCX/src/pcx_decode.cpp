@@ -4,25 +4,15 @@
  * 02.06.2009
  */
 
-#include <iostream> // debug
+#include <iostream>
 
 #include "pcx.h"
 
 namespace pcx
 {
-  namespace
-  {
-    inline 
-    size_t image_index( size_t width, size_t nPlanes, size_t x, size_t y, size_t plane)
-    {
-      return y * nPlanes * width + plane * width + x;
-    }
-  }
-  
   // Decodes RLE compressed 24 bit RGB image without pallete as in ZSoft PCX version 3 or greater file format.
   // Each line of image consists of 3 planes (`R', `G', `B').
-  // Each plane are encoded with RLE in `input' using exactly `bytesPerLine' bytes.
-  // So input must be of `height' * `bytesPerLine' * 3 bytes.
+  // All planes are encoded as single chunk in input (incorrect by documentation that I read).
   // Output is an array of `height' resulting image lines.
   // Each line of output is an array of the image's row colors (`R', `G', `B').
   // Note: memory for output image must be allocated!
@@ -40,8 +30,6 @@ namespace pcx
       ++d;
       size_t count = 1;
       
-      //std::cout << "(" << x << "," << y << ") " << (int)byte << " (" << (int)(byte & 0xC0) << ")\n";
-      
       if ((byte & 0xC0) == 0xC0) // 0xC0 = 2#11000000
       {
         // RLE encoded data.
@@ -53,6 +41,7 @@ namespace pcx
               "): end of line input buffer." << std::endl;
           break;
         }
+        
         byte = input[d];
         ++d;
       }
@@ -78,11 +67,9 @@ namespace pcx
           break;
         }
         
-        image[image_index(width, nPlanes, x, y, plane)] = byte;
+        image[y * nPlanes * width + plane * width + x] = byte;
         ++x;
       }
     }
-    
-    //std::cout << "row = " << y << " error: " << width - x << "\n"; // debug
   }
 } // End of namespace 'pcx'.
