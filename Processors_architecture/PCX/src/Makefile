@@ -4,7 +4,7 @@
 # 05.03.2005
 
 PROGRAM_NAME = pcx_decode
-OBJECT_FILES = main.o
+OBJECT_FILES = main.o pcx_decode.o
 CC = g++
 LIB_COMPILER_OPTIONS =
 COMPILER_OPTIONS = -c -g -Wall -O3 $(LIB_COMPILER_OPTIONS)

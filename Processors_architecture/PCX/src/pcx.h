@@ -4,10 +4,11 @@
  * 02.06.2009
  */
 
+#include <cstdlib>
+
 namespace pcx
 {
 #pragma pack(push, 1)
-
   struct PCXFileHeader
   {
     typedef unsigned char  byte_type;
@@ -72,6 +73,11 @@ namespace pcx
     // Blank to fill out 128 byte header. Set all bytes to 0.
     byte_type fill_74_54[54];
   };
-
 #pragma pack(pop)
+
+  // See implementation for details.
+  void decode( unsigned char const *input,
+               size_t width, size_t height,
+               size_t bytesPerLine,
+               unsigned char *image );
 } // End of namespace 'pcx'.

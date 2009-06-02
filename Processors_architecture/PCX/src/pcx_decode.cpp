@@ -15,10 +15,10 @@ namespace pcx
   // Output is an array of `height' resulting image lines.
   // Each line of output is an array of the image's row colors (`R', `G', `B').
   // Note: memory for output image must be allocated!
-  void decode( unsigned char *input,
+  void decode( unsigned char const *input,
                size_t width, size_t height,
                size_t bytesPerLine,
-               unsigned char *image[] )
+               unsigned char *image )
   {
     size_t const nPlanes = 3;
   
@@ -36,14 +36,14 @@ namespace pcx
           // Decoding plane byte.
           unsigned char const byte = input[(y * nPlanes + plane) * bytesPerLine + d];
           
-          if ((byte & 0xC0) = 0xC0) // 0xC0 = 2#11000000
+          if ((byte & 0xC0) == 0xC0) // 0xC0 = 2#11000000
           {
             // RLE encoded data.
             
             size_t const nRepeat = (byte & 0x3F); // 0x3F = 2#00111111
             ++d;
             
-            for (d < bytesPerLine && x < width; ++x, ++d)
+            for (size_t i = 0; i < nRepeat && d < bytesPerLine && x < width; ++i, ++x, ++d)
             {
               unsigned char const byte = input[(y * nPlanes + plane) * bytesPerLine + d];
               image[y * width * nPlanes + x * nPlanes + plane] = byte;
