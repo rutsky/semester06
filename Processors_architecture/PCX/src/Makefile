@@ -20,7 +20,7 @@ $(PROGRAM_NAME): $(OBJECT_FILES)
 	$(CC) $(COMPILER_OPTIONS) $<
 
 clean:
-	rm -rf *.o *~ $(PROGRAM_NAME)
+	rm -f *.o *~ $(PROGRAM_NAME)
 
 main.o: main.cpp pcx.h
 
