@@ -152,8 +152,8 @@ int main( int argc, char *argv[] )
           "#4 deduced output image addressing",
           "#5 deduced input fata addressing",
           "#6 reimplemented cycle",
-          "#7 deduces some logic",
-          "#8 deduces some logic",
+          "#7 deduces some logic 1",
+          "#8 deduces some logic 2",
         };
 
       size_t const nTotalTries = 10;

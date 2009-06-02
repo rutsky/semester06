@@ -46,8 +46,6 @@ namespace pcx
       }
 
       *image++ = byte;
-      if (image == imageEnd)
-        break;
     }
   }
 } // End of namespace 'pcx'.
