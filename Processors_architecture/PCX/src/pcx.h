@@ -76,8 +76,7 @@ namespace pcx
 #pragma pack(pop)
 
   // See implementation for details.
-  void decode( unsigned char const *input,
+  void decode( unsigned char const *input, size_t size,
                size_t width, size_t height,
-               size_t bytesPerLine,
                unsigned char *image );
 } // End of namespace 'pcx'.

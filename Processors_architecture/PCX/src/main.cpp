@@ -59,10 +59,11 @@ int main( int argc, char *argv[] )
 
   // Initializing PCX header.
   pcx::PCXFileHeader header;
+  size_t const headerSize = sizeof(header);
   {
-    assert(sizeof(header) == 128); // debug
-    if (inputData.size() >= sizeof(header))
-      memcpy(reinterpret_cast<void *>(&header), reinterpret_cast<void *>(&(inputData[0])), sizeof(header));
+    assert(headerSize == 128); // debug
+    if (inputData.size() >= headerSize)
+      memcpy(reinterpret_cast<void *>(&header), reinterpret_cast<void *>(&(inputData[0])), headerSize);
     else
     {
       // Input file too small to be correct.
@@ -70,6 +71,7 @@ int main( int argc, char *argv[] )
       return 2;
     }
   }
+  size_t const dataSize = inputData.size() - headerSize;
   
   // Outputing information.
   {
@@ -109,17 +111,12 @@ int main( int argc, char *argv[] )
     }
     width  = header.xMax - header.xMin + 1;
     height = header.yMax - header.yMin + 1;
-    //width  = 5;
-    //height = 5;
     
-    if ((inputData.size() - sizeof(header)) / (height * header.nPlanes) < header.bytesPerLine)
+    if (dataSize / (height * header.nPlanes) < header.bytesPerLine)
     {
       std::cerr << "Error: incorrect bytes per line value!" << std::endl;
       return 5;
     }
-    size_t const bytesPerLine = header.bytesPerLine;
-    //size_t const bytesPerLine = 324;
-    //size_t const bytesPerLine = header.bytesPerLine + 2; // mmm
     
     nPlanes = header.nPlanes;
     
@@ -127,7 +124,7 @@ int main( int argc, char *argv[] )
     image.resize(height * width * nPlanes);
     
     // Decoding.
-    pcx::decode(&(inputData[0]) + sizeof(header), width, height, bytesPerLine, &(image[0]));
+    pcx::decode(&(inputData[headerSize]), dataSize, width, height, &(image[0]));
   }
   
   // Saving decoded image as PPM.
