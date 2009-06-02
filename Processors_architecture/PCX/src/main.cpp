@@ -136,6 +136,7 @@ int main( int argc, char *argv[] )
           &pcx::decode_2,
           &pcx::decode_3,
           &pcx::decode_4,
+          &pcx::decode_5,
         };
       size_t const nImplementations = sizeof(decodeFuncs) / sizeof(decodeFuncs[0]);
       
@@ -145,7 +146,8 @@ int main( int argc, char *argv[] )
           "#1 w/o iostream",
           "#2 constants inlined",
           "#3 using `int' type",
-          "#4 ",
+          "#4 deduced output image addressing",
+          "#5 deduced input fata addressing",
         };
 
       size_t const nTotalTries = 10;
