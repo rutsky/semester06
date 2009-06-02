@@ -13,7 +13,6 @@ namespace pcx
                  size_t width, size_t height,
                  unsigned char *image )
   {
-    // Decoding scan line.
     size_t plane = 0, x = 0, y = 0, d = 0;
     while (d < size && y < height)
     {
@@ -23,13 +22,9 @@ namespace pcx
       
       if ((byte & 0xC0) == 0xC0) // 0xC0 = 2#11000000
       {
-        // RLE encoded data.
-        
         count = (byte & 0x3F); // 0x3F = 2#00111111
         if (d >= size)
-        {
           break;
-        }
         
         byte = input[d];
         ++d;
@@ -39,7 +34,6 @@ namespace pcx
       {
         if (x >= width)
         {
-          // Completely filled current plane.
           x = 0;
           ++plane;
         }
@@ -51,10 +45,7 @@ namespace pcx
         }
         
         if (y >= height)
-        {
-          // Readed complete image. Interrupting.
           break;
-        }
         
         image[y * 3 * width + plane * width + x] = byte;
         ++x;

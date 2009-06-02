@@ -1,4 +1,4 @@
-/* pcx_decode_3.cpp
+/* pcx_decode_4.cpp
  * PCX fast decoding routine.
  * Implementation #4.
  * Vladimir Rutsky <altsysrq@gmail.com>
@@ -13,11 +13,9 @@ namespace pcx
                  size_t width, size_t height,
                  unsigned char *image )
   {
-    unsigned char const *planeEnd = image + width;
     unsigned char const *imageEnd = image + height * 3 * width;
   
-    // Decoding scan line.
-    int plane = 0, d = 0;
+    int d = 0;
     while (d < size && image != imageEnd)
     {
       unsigned char byte = input[d];
@@ -26,8 +24,6 @@ namespace pcx
       
       if ((byte & 0xC0) == 0xC0) // 0xC0 = 2#11000000
       {
-        // RLE encoded data.
-        
         count = (byte & 0x3F); // 0x3F = 2#00111111
         if (d >= size)
         {
@@ -40,23 +36,8 @@ namespace pcx
       
       for (int i = 0; i < count; ++i)
       {
-        if (image == planeEnd)
-        {
-          // Completely filled current plane.
-          planeEnd += width;
-          ++plane;
-        }
-
-        if (plane >= 3)
-        {
-          plane = 0;
-        }
-        
         if (image == imageEnd)
-        {
-          // Readed complete image. Interrupting.
           break;
-        }
         
         *image++ = byte;
       }
