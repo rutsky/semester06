@@ -1,3 +1,3 @@
 *.o
 *~
-pcx_reader
+pcx_decode
