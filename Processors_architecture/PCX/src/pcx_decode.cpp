@@ -8,7 +8,22 @@
 
 namespace pcx
 {
-  // Decodes RLE compressed 24 bit image without pallete as in ZSoft PCX version 3 or greater file format.
+  namespace
+  {
+    inline 
+    size_t input_index( size_t bytesPerLine, size_t nPlanes, size_t decodingX, size_t y, size_t plane)
+    {
+      return y * nPlanes * bytesPerLine + plane * bytesPerLine + decodingX;
+    }
+    
+    inline 
+    size_t image_index( size_t width, size_t nPlanes, size_t x, size_t y, size_t plane)
+    {
+      return y * nPlanes * width + plane * width + x;
+    }
+  }
+  
+  // Decodes RLE compressed 24 bit RGB image without pallete as in ZSoft PCX version 3 or greater file format.
   // Each line of image consists of 3 planes (`R', `G', `B').
   // Each plane are encoded with RLE in `input' using exactly `bytesPerLine' bytes.
   // So input must be of `height' * `bytesPerLine' * 3 bytes.
@@ -34,7 +49,7 @@ namespace pcx
         for (size_t d = 0; d < bytesPerLine && x < width; ++d)
         {
           // Decoding plane byte.
-          unsigned char const byte = input[(y * nPlanes + plane) * bytesPerLine + d];
+          unsigned char const byte = input[input_index(bytesPerLine, nPlanes, d, y, plane)];
           
           if ((byte & 0xC0) == 0xC0) // 0xC0 = 2#11000000
           {
@@ -45,14 +60,14 @@ namespace pcx
             
             for (size_t i = 0; i < nRepeat && d < bytesPerLine && x < width; ++i, ++x, ++d)
             {
-              unsigned char const byte = input[(y * nPlanes + plane) * bytesPerLine + d];
-              image[y * width * nPlanes + x * nPlanes + plane] = byte;
+              unsigned char const byte = input[input_index(bytesPerLine, nPlanes, d, y, plane)];
+              image[image_index(width, nPlanes, x, y, plane)] = byte;
             }
           }
           else
           {
             // Raw data.
-            image[y * width * nPlanes + x * nPlanes + plane] = byte;
+            image[image_index(width, nPlanes, x, y, plane)] = byte;
             ++x;
           }
         }
