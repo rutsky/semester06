@@ -139,6 +139,7 @@ int main( int argc, char *argv[] )
           &pcx::decode_5,
           &pcx::decode_6,
           &pcx::decode_7,
+          &pcx::decode_8,
         };
       size_t const nImplementations = sizeof(decodeFuncs) / sizeof(decodeFuncs[0]);
       
@@ -152,6 +153,7 @@ int main( int argc, char *argv[] )
           "#5 deduced input fata addressing",
           "#6 reimplemented cycle",
           "#7 deduces some logic",
+          "#8 deduces some logic",
         };
 
       size_t const nTotalTries = 10;

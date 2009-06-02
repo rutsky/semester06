@@ -5,7 +5,8 @@
 
 PROGRAM_NAME = pcx_decode
 OBJECT_FILES = main.o pcx_decode.o \
-  pcx_decode_1.o pcx_decode_2.o pcx_decode_3.o pcx_decode_4.o pcx_decode_5.o pcx_decode_6.o pcx_decode_7.o
+  pcx_decode_1.o pcx_decode_2.o pcx_decode_3.o pcx_decode_4.o \
+  pcx_decode_5.o pcx_decode_6.o pcx_decode_7.o pcx_decode_8.o
 CC = g++
 LIB_COMPILER_OPTIONS = $(shell sdl-config --cflags)
 #COMPILER_OPTIONS = -c -g -Wall -O3 $(LIB_COMPILER_OPTIONS)
@@ -39,3 +40,4 @@ pcx_decode_4.o: pcx_decode_4.cpp pcx.h
 pcx_decode_5.o: pcx_decode_5.cpp pcx.h
 pcx_decode_6.o: pcx_decode_6.cpp pcx.h
 pcx_decode_7.o: pcx_decode_7.cpp pcx.h
+pcx_decode_8.o: pcx_decode_8.cpp pcx.h
