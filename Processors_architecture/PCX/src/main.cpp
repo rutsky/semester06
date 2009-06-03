@@ -6,9 +6,12 @@
 
 #include <iostream>
 #include <fstream>
+#include <istream>
 #include <memory>
 #include <cassert>
 #include <cstring>
+#include <string>
+#include <sstream>
 #include <vector>
 
 #include "SDL.h"
@@ -22,10 +25,29 @@ int main( int argc, char *argv[] )
 {
   char const *inputFileName = "../data/baboon.pcx";
   char const *outputFileName = "../data/baboon.ppm";
+  size_t nTotalTries = 10;
+  size_t nTries = 10; // TODO: Set to 1000.
+  
   if (argc >= 2)
     inputFileName = argv[1];
   if (argc >= 3)
     outputFileName = argv[2];
+  if (argc >= 4)
+  {
+    std::string const str(argv[3]);
+    std::istringstream istr(str);
+    int x;
+    istr >> x;
+    nTries = x;
+  }
+  if (argc >= 5)
+  {
+    std::string str(argv[4]);
+    std::istringstream istr(str);
+    int x;
+    istr >> x;
+    nTotalTries = x;
+  }
   
   std::vector<unsigned char> inputData;
   {
@@ -140,6 +162,7 @@ int main( int argc, char *argv[] )
           &pcx::decode_6,
           &pcx::decode_7,
           &pcx::decode_8,
+          &pcx::decode_9,
         };
       size_t const nImplementations = sizeof(decodeFuncs) / sizeof(decodeFuncs[0]);
       
@@ -152,14 +175,14 @@ int main( int argc, char *argv[] )
           "#4 deduced output image addressing",
           "#5 deduced input fata addressing",
           "#6 reimplemented cycle",
-          "#7 deduces some logic 1",
-          "#8 deduces some logic 2",
+          "#7 deduced some logic 1",
+          "#8 deduced some logic 2",
+          "#9 ",
         };
 
-      size_t const nTotalTries = 10;
-      size_t const nTries = 10;
       Uint32 results[nImplementations][nTotalTries];
       
+      std::cout << "Starting " << nTotalTries << " runs by " << nTries << " calls..." << std::endl;
       for (size_t totalTry = 0; totalTry < nTotalTries; ++totalTry)
       {
         for (size_t funcIdx = 0; funcIdx < nImplementations; ++funcIdx)

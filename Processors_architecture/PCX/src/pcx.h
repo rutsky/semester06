@@ -4,10 +4,10 @@
  * 02.06.2009
  */
 
-#include <cstdlib>
-
 namespace pcx
 {
+  typedef unsigned long size_t;
+
 #pragma pack(push, 1)
   struct PCXFileHeader
   {
@@ -116,6 +116,11 @@ namespace pcx
       unsigned char *image );
 
   void decode_8(
+      unsigned char const *input, size_t size,
+      size_t width, size_t height,
+      unsigned char *image );
+
+  void decode_9(
       unsigned char const *input, size_t size,
       size_t width, size_t height,
       unsigned char *image );
