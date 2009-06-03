@@ -167,21 +167,25 @@ int main( int argc, char *argv[] )
           &pcx::decode_7,
           &pcx::decode_8,
           &pcx::decode_9,
+          &pcx::decode_10,
+          &pcx::decode_11,
         };
       size_t const nImplementations = sizeof(decodeFuncs) / sizeof(decodeFuncs[0]);
       
       char const *decodeFuncsNames    [nImplementations] = 
         {
           "general",
-          "#1 w/o iostream",
-          "#2 constants inlined",
-          "#3 using `int' type",
-          "#4 deduced output image addressing",
-          "#5 deduced input fata addressing",
-          "#6 reimplemented cycle",
-          "#7 deduced some logic 1",
-          "#8 deduced some logic 2",
-          "#9 ",
+          "# 1 w/o iostream",
+          "# 2 constants inlined",
+          "# 3 using `int' type",
+          "# 4 deduced output image addressing",
+          "# 5 deduced input fata addressing",
+          "# 6 reimplemented cycle",
+          "# 7 deduced some logic 1",
+          "# 8 deduced some logic 2",
+          "# 9 pairing in output",
+          "#10 I/O by WORD",
+          "#11",
         };
 
       double results[nImplementations][nTotalTries];

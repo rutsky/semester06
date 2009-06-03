@@ -1,6 +1,6 @@
-/* pcx_decode_9.cpp
+/* pcx_decode_10.cpp
  * PCX fast decoding routine.
- * Implementation #9.
+ * Implementation #10.
  * Vladimir Rutsky <altsysrq@gmail.com>
  * 02.06.2009
  */
@@ -9,7 +9,7 @@
 
 namespace pcx
 {
-  void decode_9( unsigned char const *input, size_t size,
+  void decode_10( unsigned char const *input, size_t size,
                  size_t width, size_t height,
                  unsigned char *image )
   {
@@ -18,7 +18,21 @@ namespace pcx
   
     while (input != inputEnd && image != imageEnd)
     {
-      unsigned char byte = *input++;
+      unsigned char byte;
+      while (image < imageEnd - 4)
+      {
+        unsigned int word1 = *((unsigned int const *)input);
+      
+        if (!(word1 & 0xC0C0C0C0))
+        {
+          *((unsigned int *)image) = word1;
+          image += 4;
+        }
+        else
+          break;
+      }
+    
+      byte = *input++;
       
       if ((byte & 0xC0) == 0xC0) // 0xC0 = 2#11000000
       {
@@ -33,7 +47,7 @@ namespace pcx
           if (image + count > imageEnd)
           {
             count = imageEnd - image;
-          
+            
             for (; count & 0x3; --count)
               *image++ = byte;
             
@@ -44,7 +58,6 @@ namespace pcx
               *image++ = byte;
               *image++ = byte;
             }
-            
             break;
           }
           else
