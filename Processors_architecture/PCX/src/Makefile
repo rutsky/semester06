@@ -36,7 +36,7 @@ clean:
 	rm -f *~ 
 	rm -f $(PROGRAM_NAME)
 
-main.o: main.cpp pcx.h
+main.o: main.cpp pcx.h mtimer.hpp
 	$(CC) $(MAIN_COMPILER_OPTIONS) $<
 
 pcx_decode.o: pcx_decode.cpp pcx.h

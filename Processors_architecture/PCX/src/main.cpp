@@ -14,7 +14,11 @@
 #include <sstream>
 #include <vector>
 
-#include "SDL.h"
+#ifdef WIN32
+  #include "mtimer.hpp"
+#else
+  #include "SDL.h"
+#endif
 
 #include "pcx.h"
 
@@ -180,7 +184,7 @@ int main( int argc, char *argv[] )
           "#9 ",
         };
 
-      Uint32 results[nImplementations][nTotalTries];
+      double results[nImplementations][nTotalTries];
       
       std::cout << "Starting " << nTotalTries << " runs by " << nTries << " calls..." << std::endl;
       for (size_t totalTry = 0; totalTry < nTotalTries; ++totalTry)
@@ -191,14 +195,23 @@ int main( int argc, char *argv[] )
           
           decode_func_ptr_type const decodeFunc = decodeFuncs[funcIdx];
           
+        #ifdef WIN32
+          Timer timer;
+          double const startTime = timer.GetTime();
+        #else
           Uint32 const startTics = SDL_GetTicks();
+        #endif
           for (size_t i = 0; i < nTries; ++i)
           {
             decodeFunc(&(inputData[headerSize]), dataSize, width, height, &(image[0]));
           }
+        #ifdef WIN32
+          double const tryTime = timer.GetTime() - startTime;
+        #else
           Uint32 const endTics = SDL_GetTicks();
-          
-          results[funcIdx][totalTry] = endTics - startTics;
+          double const tryTime = (double)(endTics - startTics) / 1000.0;
+        #endif
+          results[funcIdx][totalTry] = tryTime;
         }
       }
       
@@ -212,14 +225,13 @@ int main( int argc, char *argv[] )
         
         std::cout << "Implementation: " << decodeFuncName << std::endl;
         
-        Uint32 runTicks = 0;
+        double runTime = 0;
         for (size_t i = 0; i < nTotalTries; ++i)
-          runTicks += results[funcIdx][i];
+          runTime += results[funcIdx][i];
         
-        double const totalTime = (double)runTicks / ((double)nTotalTries * 1000.0);
-        double const timePerTry = totalTime / nTries;
+        double const timePerTry = runTime / nTries;
         
-        std::cout << nTries << " calls in " << totalTime << " seconds (" << timePerTry << " seconds per try)." << std::endl;
+        std::cout << nTries << " calls in " << runTime << " seconds (" << timePerTry << " seconds per try)." << std::endl;
       }
     }
   }
@@ -251,4 +263,6 @@ int main( int argc, char *argv[] )
         ofs << "\n";
       }
   }
+
+  return 0;
 }
