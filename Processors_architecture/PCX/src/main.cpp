@@ -29,8 +29,8 @@ int main( int argc, char *argv[] )
 {
   char const *inputFileName = "../data/baboon.pcx";
   char const *outputFileName = "../data/baboon.ppm";
-  size_t nTotalTries = 10;
   size_t nTries = 10; // TODO: Set to 1000.
+  size_t nTotalTries = 10;
   
   if (argc >= 2)
     inputFileName = argv[1];
