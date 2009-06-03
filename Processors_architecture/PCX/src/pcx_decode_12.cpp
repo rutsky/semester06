@@ -1,6 +1,6 @@
-/* pcx_decode_11.cpp
+/* pcx_decode_12.cpp
  * PCX fast decoding routine.
- * Implementation #11.
+ * Implementation #12.
  * Vladimir Rutsky <altsysrq@gmail.com>
  * 02.06.2009
  */
@@ -9,7 +9,7 @@
 
 namespace pcx
 {
-  void decode_11( unsigned char const *input, size_t size,
+  void decode_12( unsigned char const *input, size_t size,
                  size_t width, size_t height,
                  unsigned char *image )
   {
@@ -18,27 +18,30 @@ namespace pcx
   
     while (input != inputEnd && image != imageEnd)
     {
-      while (image < imageEnd - 8)
+      if (!(reinterpret_cast<long>(image) & 0x3))
       {
-        unsigned int word1 = *((unsigned int const *)(input + 0));
-        unsigned int word2 = *((unsigned int const *)(input + 4));
+        while (image < imageEnd - 4)
+        {
+          unsigned int word1 = *((unsigned int const *)(input + 0));
+          unsigned int word2 = *((unsigned int const *)(input + 4));
       
-        if (!((word1 | word2) & 0xC0C0C0C0))
-        {
-          *((unsigned int *)(image + 0)) = word1;
-          *((unsigned int *)(image + 4)) = word2;
-          input += 8;
-          image += 8;
-        }
-        else
-        {
-          if (!(word1 & 0xC0C0C0C0))
+          if (!((word1 | word2) & 0xC0C0C0C0))
           {
             *((unsigned int *)(image + 0)) = word1;
-            input += 4;
-            image += 4;
+            *((unsigned int *)(image + 4)) = word2;
+            input += 8;
+            image += 8;
           }
-          break;
+          else
+          {
+            if (!(word1 & 0xC0C0C0C0))
+            {
+              *((unsigned int *)(image + 0)) = word1;
+              input += 4;
+              image += 4;
+            }
+            break;
+          }
         }
       }
     

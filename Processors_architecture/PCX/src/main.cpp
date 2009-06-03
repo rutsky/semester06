@@ -169,6 +169,7 @@ int main( int argc, char *argv[] )
           &pcx::decode_9,
           &pcx::decode_10,
           &pcx::decode_11,
+          &pcx::decode_12,
         };
       size_t const nImplementations = sizeof(decodeFuncs) / sizeof(decodeFuncs[0]);
       
@@ -185,7 +186,8 @@ int main( int argc, char *argv[] )
           "# 8 deduced some logic 2",
           "# 9 pairing in output",
           "#10 I/O by WORD",
-          "#11",
+          "#11 I/O by paired WORDs",
+          "#12 reading aligned by 4",
         };
 
       double results[nImplementations][nTotalTries];

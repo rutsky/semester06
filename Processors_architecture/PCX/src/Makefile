@@ -7,7 +7,7 @@ PROGRAM_NAME = pcx_decode
 OBJECT_FILES = main.o pcx_decode.o \
   pcx_decode_1.o  pcx_decode_2.o  pcx_decode_3.o  pcx_decode_4.o \
   pcx_decode_5.o  pcx_decode_6.o  pcx_decode_7.o  pcx_decode_8.o \
-  pcx_decode_9.o  pcx_decode_10.o pcx_decode_11.o
+  pcx_decode_9.o  pcx_decode_10.o pcx_decode_11.o pcx_decode_12.o
 CC = g++
 
 MAIN_LIB_COMPILER_OPTIONS = $(shell sdl-config --cflags)

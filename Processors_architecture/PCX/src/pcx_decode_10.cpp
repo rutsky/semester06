@@ -18,7 +18,6 @@ namespace pcx
   
     while (input != inputEnd && image != imageEnd)
     {
-      unsigned char byte;
       while (image < imageEnd - 4)
       {
         unsigned int word1 = *((unsigned int const *)input);
@@ -27,12 +26,13 @@ namespace pcx
         {
           *((unsigned int *)image) = word1;
           image += 4;
+          input += 4;
         }
         else
           break;
       }
     
-      byte = *input++;
+      unsigned char byte = *input++;
       
       if ((byte & 0xC0) == 0xC0) // 0xC0 = 2#11000000
       {
