@@ -1,6 +1,6 @@
-/* pcx_decode_09.cpp
+/* pcx_decode_09a.cpp
  * PCX fast decoding routine.
- * Implementation #9.
+ * Implementation #9a.
  * Vladimir Rutsky <altsysrq@gmail.com>
  * 02.06.2009
  */
@@ -8,7 +8,7 @@
 #include "pcx.h"
 
 //
-// #9. Using `memset()' for outputting.
+// #9a. Using `memset()' for outputting.
 //
 
 #include <cstring>

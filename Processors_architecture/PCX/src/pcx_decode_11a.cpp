@@ -1,6 +1,6 @@
-/* pcx_decode_11.cpp
+/* pcx_decode_11a.cpp
  * PCX fast decoding routine.
- * Implementation #10.
+ * Implementation #11a.
  * Vladimir Rutsky <altsysrq@gmail.com>
  * 02.06.2009
  */
@@ -8,16 +8,16 @@
 #include "pcx.h"
 
 //
-// #11. I/O by paired 2 DWORDs.
+// #11a. I/O by blindly paired 2 DWORDs.
 //
 
 #define DO_3_TIMES(expr) expr expr expr
 
 namespace pcx
 {
-  void decode_11( unsigned char const *input, size_t size,
-                  size_t width, size_t height,
-                  unsigned char *image )
+  void decode_11a( unsigned char const *input, size_t size,
+                   size_t width, size_t height,
+                   unsigned char *image )
   {
     unsigned char const *imageEnd = image + height * 3 * width;
     unsigned char const *inputEnd = input + size;
@@ -26,22 +26,16 @@ namespace pcx
     {
       while (image < imageEnd - 8) // We know, that input size must be enough for full image decoding.
       {
-        unsigned int const dword1 = *((unsigned int const *)(input + 0));
+        unsigned int       dword1 = *((unsigned int const *)(input + 0));
+        unsigned int const dword2 = *((unsigned int const *)(input + 4));
       
+        *((unsigned int *)(image + 0)) = dword1;
+        
+        dword1 |= dword2;
+
         if (dword1 & 0xC0C0C0C0)
           break;
 
-        unsigned int const dword2 = *((unsigned int const *)(input + 4));
-        
-        if (dword2 & 0xC0C0C0C0)
-        {
-          *((unsigned int *)(image + 0)) = dword1;
-          input += 4;
-          image += 4;
-          break;
-        }
-
-        *((unsigned int *)(image + 0)) = dword1;
         *((unsigned int *)(image + 4)) = dword2;
         
         input += 8;

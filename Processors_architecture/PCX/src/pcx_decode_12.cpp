@@ -14,8 +14,8 @@
 namespace pcx
 {
   void decode_12( unsigned char const *input, size_t size,
-                 size_t width, size_t height,
-                 unsigned char *image )
+                  size_t width, size_t height,
+                  unsigned char *image )
   {
     unsigned char const *imageEnd = image + height * 3 * width;
     unsigned char const *inputEnd = input + size;

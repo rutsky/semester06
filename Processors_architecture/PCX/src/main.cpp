@@ -170,6 +170,8 @@ int main( int argc, char *argv[] )
           &pcx::decode_09a,
           &pcx::decode_10,
           &pcx::decode_11,
+          &pcx::decode_11a,
+          &pcx::decode_11b,
           &pcx::decode_12,
         };
       size_t const nImplementations = sizeof(decodeFuncs) / sizeof(decodeFuncs[0]);
@@ -177,19 +179,21 @@ int main( int argc, char *argv[] )
       char const *decodeFuncsNames    [nImplementations] = 
         {
           "general",
-          "# 1 w/o iostream",
-          "# 2 constants inlined",
-          "# 3 using `int' type",
-          "# 4 deduced output image addressing",
-          "# 5 deduced input data addressing",
-          "# 6 reimplemented cycle",
-          "# 7 inlined outputting",
-          "# 8 inlined outputting in all cases",
-          "# 9 pairing in output",
-          "# 9 using memset() for output",
-          "#10 I/O by DWORD",
-          "#11 I/O by paired DWORDs",
-          "#12 reading aligned by 4",
+          "# 1  w/o iostream",
+          "# 2  constants inlined",
+          "# 3  using `int' type",
+          "# 4  deduced output image addressing",
+          "# 5  deduced input data addressing",
+          "# 6  reimplemented cycle",
+          "# 7  inlined outputting",
+          "# 8  inlined outputting in all cases",
+          "# 9  pairing in output",
+          "# 9a using memset() for output",
+          "#10  I/O by DWORD",
+          "#11  I/O by paired 2 DWORDs",
+          "#11a I/O by blindly paired 2 DWORDs",
+          "#11b I/O by blindly paired 4 DWORDs",
+          "#12 reading aligned by 4 bytes",
         };
 
       double results[nImplementations][nTotalTries + 2]; // `... + 2' because we skipping first and last runs.
@@ -239,7 +243,7 @@ int main( int argc, char *argv[] )
         
         double const timePerTry = runTime / nTries;
         
-        std::cout << nTries << " calls in " << runTime << " seconds (" << timePerTry << " seconds per try)." << std::endl;
+        std::cout << nTries << " calls in " << runTime << " seconds (" << timePerTry << " seconds per try).\n" << std::endl;
       }
     }
   }

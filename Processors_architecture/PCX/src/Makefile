@@ -5,10 +5,10 @@
 
 PROGRAM_NAME = pcx_decode
 OBJECT_FILES = main.o pcx_decode.o \
-  pcx_decode_01.o pcx_decode_02.o  pcx_decode_03.o pcx_decode_04.o \
-  pcx_decode_05.o pcx_decode_06.o  pcx_decode_07.o pcx_decode_08.o \
-  pcx_decode_09.o pcx_decode_09a.o pcx_decode_10.o pcx_decode_11.o \
-  pcx_decode_12.o
+  pcx_decode_01.o  pcx_decode_02.o  pcx_decode_03.o  pcx_decode_04.o \
+  pcx_decode_05.o  pcx_decode_06.o  pcx_decode_07.o  pcx_decode_08.o \
+  pcx_decode_09.o  pcx_decode_09a.o pcx_decode_10.o  pcx_decode_11.o \
+  pcx_decode_11a.o pcx_decode_11b.o pcx_decode_12.o
 CC = g++
 
 MAIN_LIB_COMPILER_OPTIONS = $(shell sdl-config --cflags)
@@ -40,7 +40,7 @@ clean:
 main.o: main.cpp pcx.h mtimer.hpp
 	$(CC) $(MAIN_COMPILER_OPTIONS) $<
 
-pcx_decode.o: pcx_decode.cpp pcx.h
+pcx_decode.o    : pcx_decode.cpp     pcx.h
 
 pcx_decode_01.o : pcx_decode_01.cpp  pcx.h
 pcx_decode_02.o : pcx_decode_02.cpp  pcx.h
@@ -53,3 +53,7 @@ pcx_decode_08.o : pcx_decode_08.cpp  pcx.h
 pcx_decode_09.o : pcx_decode_09.cpp  pcx.h
 pcx_decode_09a.o: pcx_decode_09a.cpp pcx.h
 pcx_decode_10.o : pcx_decode_10.cpp  pcx.h
+pcx_decode_11.o : pcx_decode_11.cpp  pcx.h
+pcx_decode_11a.o: pcx_decode_11a.cpp pcx.h
+pcx_decode_11b.o: pcx_decode_11a.cpp pcx.h
+pcx_decode_12.o : pcx_decode_12.cpp  pcx.h
