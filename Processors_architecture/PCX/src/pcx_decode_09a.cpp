@@ -8,14 +8,16 @@
 #include "pcx.h"
 
 //
-// #9. Pairing in output.
+// #9. Using `memset()' for outputting.
 //
+
+#include <cstring>
 
 namespace pcx
 {
-  void decode_09( unsigned char const *input, size_t size,
-                  size_t width, size_t height,
-                  unsigned char *image )
+  void decode_09a( unsigned char const *input, size_t size,
+                   size_t width, size_t height,
+                   unsigned char *image )
   {
     unsigned char const *imageEnd = image + height * 3 * width;
     unsigned char const *inputEnd = input + size;
@@ -38,34 +40,16 @@ namespace pcx
           {
             count = imageEnd - image;
             
-            for (; count & 0x3; --count)
-              *image++ = byte;
-            
-            for (; count > 0; count -= 4)
-            {
-              *(image + 0) = byte;
-              *(image + 1) = byte;
-              *(image + 2) = byte;
-              *(image + 3) = byte;
-              image += 4;
-            }
+            memset(image, static_cast<int>(byte), count);
+            image += count;
             
             break;
           }
           else
           {
-            for (; count & 0x3; --count)
-              *image++ = byte;
-            
-            for (; count > 0; count -= 4)
-            {
-              *(image + 0) = byte;
-              *(image + 1) = byte;
-              *(image + 2) = byte;
-              *(image + 3) = byte;
-              image += 4;
-            }
-
+            memset(image, static_cast<int>(byte), count);
+            image += count;
+              
             continue;
           }
         }

@@ -4,12 +4,10 @@
  * 02.06.2009
  */
 
+#include <cstddef>
+
 namespace pcx
 {
-  // Using own `size_t' type because including standart headers 
-  // will obligate to use some optimizations when compiling with g++.
-  typedef unsigned long size_t;
-
 #pragma pack(push, 1)
   struct PCXFileHeader
   {
@@ -123,6 +121,11 @@ namespace pcx
       unsigned char *image );
 
   void decode_09(
+      unsigned char const *input, size_t size,
+      size_t width, size_t height,
+      unsigned char *image );
+
+  void decode_09a(
       unsigned char const *input, size_t size,
       size_t width, size_t height,
       unsigned char *image );

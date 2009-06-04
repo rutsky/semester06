@@ -167,6 +167,7 @@ int main( int argc, char *argv[] )
           &pcx::decode_07,
           &pcx::decode_08,
           &pcx::decode_09,
+          &pcx::decode_09a,
           &pcx::decode_10,
           &pcx::decode_11,
           &pcx::decode_12,
@@ -185,15 +186,16 @@ int main( int argc, char *argv[] )
           "# 7 inlined outputting",
           "# 8 inlined outputting in all cases",
           "# 9 pairing in output",
+          "# 9 using memset() for output",
           "#10 I/O by DWORD",
           "#11 I/O by paired DWORDs",
           "#12 reading aligned by 4",
         };
 
-      double results[nImplementations][nTotalTries];
+      double results[nImplementations][nTotalTries + 2]; // `... + 2' because we skipping first and last runs.
       
       std::cout << "Starting " << nTotalTries << " runs by " << nTries << " calls..." << std::endl;
-      for (size_t totalTry = 0; totalTry < nTotalTries; ++totalTry)
+      for (size_t totalTry = 0; totalTry < nTotalTries + 2; ++totalTry)
       {
         for (size_t funcIdx = 0; funcIdx < nImplementations; ++funcIdx)
         {
@@ -232,7 +234,7 @@ int main( int argc, char *argv[] )
         std::cout << "Implementation: " << decodeFuncName << std::endl;
         
         double runTime = 0;
-        for (size_t i = 0; i < nTotalTries; ++i)
+        for (size_t i = 1; i <= nTotalTries; ++i)
           runTime += results[funcIdx][i];
         
         double const timePerTry = runTime / nTries;
