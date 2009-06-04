@@ -24,7 +24,7 @@ namespace pcx
   
     do
     {
-      while (image < imageEnd - 4)
+      while (image < imageEnd - 4) // We know, that input size must be enough for full image decoding.
       {
         unsigned int const dword = *((unsigned int const *)input);
       
