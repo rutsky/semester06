@@ -1,6 +1,6 @@
-/* pcx_decode_11b.cpp
+/* pcx_decode_13.cpp
  * PCX fast decoding routine.
- * Implementation #11a.
+ * Implementation #13.
  * Vladimir Rutsky <altsysrq@gmail.com>
  * 02.06.2009
  */
@@ -8,48 +8,63 @@
 #include "pcx.h"
 
 //
-// #11a. I/O by blindly paired 4 DWORDs.
+// #13. I/O by blindly paired 2 DWORDs using MMX.
 //
 
-#define DO_8_TIMES(expr) expr expr expr expr expr expr expr expr
+#define DO_4_TIMES(expr) expr expr expr expr
 
 namespace pcx
 {
-  void decode_11b( unsigned char const *input, size_t size,
-                   size_t width, size_t height,
-                   unsigned char *image )
+  void decode_13( unsigned char const *input, size_t size,
+                  size_t width, size_t height,
+                  unsigned char *image )
   {
     unsigned char const *imageEnd = image + height * 3 * width;
     unsigned char const *inputEnd = input + size;
-  
+    
+    static const dword_type mask[16] = 
+      { 
+        0xC0, 0xC0, 0xC0, 0xC0,
+        0xC0, 0xC0, 0xC0, 0xC0,
+        0xC0, 0xC0, 0xC0, 0xC0,
+        0xC0, 0xC0, 0xC0, 0xC0,
+      };
+    
+    // Preloading mask into mm4.
+    asm("movq    mm4, QWORD PTR [%[maskaddr]]": : [maskaddr] "r"(mask));
+
     do
     {
-      while (image < imageEnd - 16) // We know, that input size must be enough for full image decoding.
+      while (image < imageEnd - 8) // We know, that input size must be enough for full image decoding.
       {
-        unsigned int dword1 = *((unsigned int const *)(input +  0));
-        unsigned int dword2 = *((unsigned int const *)(input +  4));
-        *((unsigned int *)(image +  0)) = dword1;
+        // Reading 8 bytes from input to mm0.
+        asm("movq     mm0, QWORD PTR [%[inaddr]]" : : [inaddr]  "r"(input));
         
-        dword1 |= dword2;
-        *((unsigned int *)(image +  4)) = dword2;
+        // Copying readed 8 bytes to mm1.
+        asm("movq     mm1, mm0": : );
+        // Bytewise `and' with mask.
+        asm("pand     mm1, mm4": : );
+        // Bytewise comparision.
+        asm("pcmpeqb  mm1, mm4": : );
+        // Packing 2 dwords of mm1 with signed saturation into mm1 lower dwords. Contents of mm5 not matters.
+        asm("packsswb mm1, mm5": : );
         
-        dword2 = *((unsigned int const *)(input +  8));
-        dword1 |= dword2;
-        *((unsigned int *)(image +  8)) = dword2;
-
-        dword2 = *((unsigned int const *)(input + 12));
-        dword1 |= dword2;
-        *((unsigned int *)(image + 12)) = dword2;
-
-        if (dword1 & 0xC0C0C0C0)
+        // Copying packing result into variable.
+        dword_type check;
+        asm volatile ("movd     %[var], mm1": [var] "=r"(check) : );
+        
+        if (check != 0)
           break;
 
-        input += 16;
-        image += 16;
+        // Writing 8 bytes from mm0 to image.
+        asm("movq     QWORD PTR [%[outaddr]], mm0": : [outaddr] "r"(image));
+        
+        input += 8;
+        image += 8;
       }
-    
-      // 8 times -- as average neede in guess error with 16 bytes.
-      DO_8_TIMES(
+
+      // 4 times -- as average needed in guess error with 8 bytes.
+      DO_4_TIMES(
       {
         unsigned char byte = *input++;
 
@@ -106,7 +121,7 @@ namespace pcx
         if (input == inputEnd || image == imageEnd)
           return;
       }
-      ); // End of 'DO_8_TIMES'.
+      ); // End of 'DO_4_TIMES'.
     } while (true);
   }
 } // End of namespace 'pcx'.

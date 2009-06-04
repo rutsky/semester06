@@ -11,7 +11,7 @@
 // #11a. I/O by blindly paired 2 DWORDs.
 //
 
-#define DO_3_TIMES(expr) expr expr expr
+#define DO_4_TIMES(expr) expr expr expr expr
 
 namespace pcx
 {
@@ -42,7 +42,8 @@ namespace pcx
         image += 8;
       }
     
-      DO_3_TIMES(
+      // 4 times -- as average needed in guess error with 8 bytes.
+      DO_4_TIMES(
       {
         unsigned char byte = *input++;
 
@@ -99,7 +100,7 @@ namespace pcx
         if (input == inputEnd || image == imageEnd)
           return;
       }
-      ); // End of 'DO_3_TIMES'.
+      ); // End of 'DO_4_TIMES'.
     } while (true);
   }
 } // End of namespace 'pcx'.

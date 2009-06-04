@@ -8,11 +8,13 @@
 
 namespace pcx
 {
+  typedef unsigned char  byte_type;
+  typedef unsigned short word_type;
+  typedef unsigned int   dword_type; // FIXME! This type must be eactly 4 bytes long.
+
 #pragma pack(push, 1)
   struct PCXFileHeader
   {
-    typedef unsigned char  byte_type;
-    typedef unsigned short word_type;
   
     // Offset 0, size 1.
     // Constant Flag, 10 for ZSoft .PCX files.
@@ -151,6 +153,11 @@ namespace pcx
       unsigned char *image );
 
   void decode_12(
+      unsigned char const *input, size_t size,
+      size_t width, size_t height,
+      unsigned char *image );
+
+  void decode_13(
       unsigned char const *input, size_t size,
       size_t width, size_t height,
       unsigned char *image );
