@@ -13,6 +13,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <iomanip>
 
 #ifdef WIN32
   #include "mtimer.hpp"
@@ -27,10 +28,10 @@
 /* The main program function */
 int main( int argc, char *argv[] )
 {
-  char const *inputFileName = "../data/baboon.pcx";
-  char const *outputFileName = "../data/baboon.ppm";
+  char const *inputFileName = "../data/baboon4.pcx";
+  char const *outputFileName = "../data/baboon4.ppm";
   size_t nTries = 100; // TODO: Set to 1000.
-  size_t nTotalTries = 10;
+  size_t nTotalTries = 20;
   
   if (argc >= 2)
     inputFileName = argv[1];
@@ -174,6 +175,7 @@ int main( int argc, char *argv[] )
           &pcx::decode_11b,
           &pcx::decode_12,
           &pcx::decode_13,
+          &pcx::decode_13a,
         };
       size_t const nImplementations = sizeof(decodeFuncs) / sizeof(decodeFuncs[0]);
       
@@ -196,6 +198,7 @@ int main( int argc, char *argv[] )
           "#11b I/O by blindly paired 4 DWORDs",
           "#12  reading aligned by 4 bytes",
           "#13  I/O by blindly paired 2 DWORDs using MMX",
+          "#13a I/O by blindly paired 2 DWORDs using MMX (only copying with MMX)",
         };
 
       double results[nImplementations][nTotalTries + 2]; // `... + 2' because we skipping first and last runs.
@@ -239,13 +242,22 @@ int main( int argc, char *argv[] )
         
         std::cout << "Implementation: " << decodeFuncName << std::endl;
         
+        double minTime = results[funcIdx][1], maxTime = results[funcIdx][1];
         double runTime = 0;
         for (size_t i = 1; i <= nTotalTries; ++i)
+        {
           runTime += results[funcIdx][i];
+          if (minTime > results[funcIdx][i])
+            minTime = results[funcIdx][i];
+          if (maxTime < results[funcIdx][i])
+            maxTime = results[funcIdx][i];
+        }
         
-        double const timePerTry = runTime / nTries;
+        double const timePerTotalTry = runTime / nTotalTries;
         
-        std::cout << nTries << " calls in " << runTime << " seconds (" << timePerTry << " seconds per try).\n" << std::endl;
+        std::cout << nTotalTries << " * " << nTries << " calls in " << std::setw(9) << std::left << runTime << " seconds " 
+            << "(min="  << std::setw(9) << std::left << minTime << " max=" << std::setw(9) << std::left << maxTime 
+            << " avg=" << std::setw(9) << std::left << timePerTotalTry << " seconds per " << nTries << " calls)\n" << std::endl;
       }
     }
   }

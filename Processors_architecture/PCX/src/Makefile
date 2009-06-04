@@ -8,7 +8,8 @@ OBJECT_FILES = main.o pcx_decode.o \
   pcx_decode_01.o  pcx_decode_02.o  pcx_decode_03.o  pcx_decode_04.o \
   pcx_decode_05.o  pcx_decode_06.o  pcx_decode_07.o  pcx_decode_08.o \
   pcx_decode_09.o  pcx_decode_09a.o pcx_decode_10.o  pcx_decode_11.o \
-  pcx_decode_11a.o pcx_decode_11b.o pcx_decode_12.o  pcx_decode_13.o
+  pcx_decode_11a.o pcx_decode_11b.o pcx_decode_12.o  pcx_decode_13.o \
+  pcx_decode_13a.o
 CC = g++
 
 MAIN_LIB_COMPILER_OPTIONS = $(shell sdl-config --cflags)
@@ -58,3 +59,4 @@ pcx_decode_11a.o: pcx_decode_11a.cpp pcx.h
 pcx_decode_11b.o: pcx_decode_11a.cpp pcx.h
 pcx_decode_12.o : pcx_decode_12.cpp  pcx.h
 pcx_decode_13.o : pcx_decode_13.cpp  pcx.h
+pcx_decode_13a.o: pcx_decode_13a.cpp pcx.h

@@ -1,65 +1,69 @@
-Loaded `../data/baboon4.pcx' file.                                                                                                                        
-1160132 bytes length.                                                                                                                                     
-PCX image header info:                                                                                                                                    
-  Manufacturer:     10                                                                                                                                    
-  Version:          5                                                                                                                                     
-  Encoding:         1                                                                                                                                     
-  Bits per pixel:   8                                                                                                                                     
-  Window:           from (0,0) to (595,595)                                                                                                               
-  Resolution (dpi): (300,300)                                                                                                                             
-  Planes:           3                                                                                                                                     
-  Bytes per line:   596                                                                                                                                   
-  Pallete type:     1                                                                                                                                     
-  Screen size:      (0,0)
-Starting 10 runs by 100 calls...
-Average result based on 10 runs by 100 calls.
+Loaded `../data/baboon4.pcx' file.                                                                                                                                                  
+1160132 bytes length.                                                                                                                                                               
+PCX image header info:                                                                                                                                                              
+  Manufacturer:     10                                                                                                                                                              
+  Version:          5                                                                                                                                                               
+  Encoding:         1                                                                                                                                                               
+  Bits per pixel:   8                                                                                                                                                               
+  Window:           from (0,0) to (595,595)                                                                                                                                         
+  Resolution (dpi): (300,300)                                                                                                                                                       
+  Planes:           3                                                                                                                                                               
+  Bytes per line:   596                                                                                                                                                             
+  Pallete type:     1                                                                                                                                                               
+  Screen size:      (0,0)                                                                                                                                                           
+Starting 20 runs by 100 calls...                                                                                                                                                    
+Average result based on 20 runs by 100 calls.                                                                                                                                       
 Implementation: general
-100 calls in 12.356 seconds (0.12356 seconds per try).
+20 * 100 calls in 22.637    seconds (min=1.084     max=1.29      avg=1.13185   seconds per 100 calls)
 
 Implementation: # 1  w/o iostream
-100 calls in 11.345 seconds (0.11345 seconds per try).
+20 * 100 calls in 20.593    seconds (min=0.995     max=1.066     avg=1.02965   seconds per 100 calls)
 
 Implementation: # 2  constants inlined
-100 calls in 11.399 seconds (0.11399 seconds per try).
+20 * 100 calls in 20.503    seconds (min=0.995     max=1.049     avg=1.02515   seconds per 100 calls)
 
 Implementation: # 3  using `int' type
-100 calls in 10.181 seconds (0.10181 seconds per try).
+20 * 100 calls in 18.204    seconds (min=0.879     max=0.932     avg=0.9102    seconds per 100 calls)
 
 Implementation: # 4  deduced output image addressing
-100 calls in 6.477 seconds (0.06477 seconds per try).
+20 * 100 calls in 11.842    seconds (min=0.572     max=0.622     avg=0.5921    seconds per 100 calls)
 
 Implementation: # 5  deduced input data addressing
-100 calls in 7.419 seconds (0.07419 seconds per try).
+20 * 100 calls in 13.491    seconds (min=0.649     max=0.696     avg=0.67455   seconds per 100 calls)
 
 Implementation: # 6  reimplemented cycle
-100 calls in 6.45 seconds (0.0645 seconds per try).
+20 * 100 calls in 11.64     seconds (min=0.558     max=0.645     avg=0.582     seconds per 100 calls)
 
 Implementation: # 7  inlined outputting
-100 calls in 4.918 seconds (0.04918 seconds per try).
+20 * 100 calls in 9.147     seconds (min=0.434     max=0.574     avg=0.45735   seconds per 100 calls)
 
 Implementation: # 8  inlined outputting in all cases
-100 calls in 4.696 seconds (0.04696 seconds per try).
+20 * 100 calls in 8.509     seconds (min=0.405     max=0.455     avg=0.42545   seconds per 100 calls)
 
 Implementation: # 9  pairing in output
-100 calls in 4.657 seconds (0.04657 seconds per try).
+20 * 100 calls in 8.305     seconds (min=0.401     max=0.447     avg=0.41525   seconds per 100 calls)
 
 Implementation: # 9a using memset() for output
-100 calls in 4.818 seconds (0.04818 seconds per try).
+20 * 100 calls in 8.729     seconds (min=0.421     max=0.462     avg=0.43645   seconds per 100 calls)
 
 Implementation: #10  I/O by DWORD
-100 calls in 4.654 seconds (0.04654 seconds per try).
+20 * 100 calls in 8.367     seconds (min=0.4       max=0.445     avg=0.41835   seconds per 100 calls)
 
 Implementation: #11  I/O by paired 2 DWORDs
-100 calls in 5.029 seconds (0.05029 seconds per try).
+20 * 100 calls in 9.084     seconds (min=0.435     max=0.48      avg=0.4542    seconds per 100 calls)
 
 Implementation: #11a I/O by blindly paired 2 DWORDs
-100 calls in 4.646 seconds (0.04646 seconds per try).
+20 * 100 calls in 8.498     seconds (min=0.407     max=0.453     avg=0.4249    seconds per 100 calls)
 
 Implementation: #11b I/O by blindly paired 4 DWORDs
-100 calls in 4.64 seconds (0.0464 seconds per try).
+20 * 100 calls in 8.389     seconds (min=0.399     max=0.445     avg=0.41945   seconds per 100 calls)
 
 Implementation: #12  reading aligned by 4 bytes
-100 calls in 7.567 seconds (0.07567 seconds per try).
+20 * 100 calls in 13.952    seconds (min=0.671     max=0.735     avg=0.6976    seconds per 100 calls)
 
 Implementation: #13  I/O by blindly paired 2 DWORDs using MMX
-100 calls in 5.228 seconds (0.05228 seconds per try).
+20 * 100 calls in 9.521     seconds (min=0.455     max=0.525     avg=0.47605   seconds per 100 calls)
+
+Implementation: #13a I/O by blindly paired 2 DWORDs using MMX (only copying with MMX)
+20 * 100 calls in 8.85      seconds (min=0.424     max=0.467     avg=0.4425    seconds per 100 calls)
+
