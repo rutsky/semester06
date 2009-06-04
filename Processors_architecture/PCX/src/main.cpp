@@ -25,7 +25,7 @@
 
 // TODO: Divivde `main()' on subroutines.
 
-/* The main program function */
+// The main program function.
 int main( int argc, char *argv[] )
 {
   char const *inputFileName = "../data/baboon4.pcx";
