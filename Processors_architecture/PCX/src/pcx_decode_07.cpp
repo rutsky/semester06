@@ -1,4 +1,4 @@
-/* pcx_decode_7.cpp
+/* pcx_decode_07.cpp
  * PCX fast decoding routine.
  * Implementation #7.
  * Vladimir Rutsky <altsysrq@gmail.com>
@@ -7,11 +7,15 @@
 
 #include "pcx.h"
 
+//
+// #7. Inlined outputting.
+//
+
 namespace pcx
 {
-  void decode_7( unsigned char const *input, size_t size,
-                 size_t width, size_t height,
-                 unsigned char *image )
+  void decode_07( unsigned char const *input, size_t size,
+                  size_t width, size_t height,
+                  unsigned char *image )
   {
     unsigned char const *imageEnd = image + height * 3 * width;
     unsigned char const *inputEnd = input + size;

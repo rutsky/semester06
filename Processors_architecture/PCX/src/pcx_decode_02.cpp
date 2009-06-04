@@ -1,4 +1,4 @@
-/* pcx_decode_2.cpp
+/* pcx_decode_02.cpp
  * PCX fast decoding routine.
  * Implementation #2.
  * Vladimir Rutsky <altsysrq@gmail.com>
@@ -7,11 +7,15 @@
 
 #include "pcx.h"
 
+//
+// #2. Inlined constants.
+//
+
 namespace pcx
 {
-  void decode_2( unsigned char const *input, size_t size,
-                 size_t width, size_t height,
-                 unsigned char *image )
+  void decode_02( unsigned char const *input, size_t size,
+                  size_t width, size_t height,
+                  unsigned char *image )
   {
     size_t plane = 0, x = 0, y = 0, d = 0;
     while (d < size && y < height)

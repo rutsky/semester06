@@ -1,4 +1,4 @@
-/* pcx_decode_3.cpp
+/* pcx_decode_03.cpp
  * PCX fast decoding routine.
  * Implementation #3.
  * Vladimir Rutsky <altsysrq@gmail.com>
@@ -7,11 +7,15 @@
 
 #include "pcx.h"
 
+//
+// #03. Using `int' instead of `size_t'.
+//
+
 namespace pcx
 {
-  void decode_3( unsigned char const *input, size_t size,
-                 size_t width, size_t height,
-                 unsigned char *image )
+  void decode_03( unsigned char const *input, size_t size,
+                  size_t width, size_t height,
+                  unsigned char *image )
   {
     int plane = 0, x = 0, y = 0, d = 0;
     while (d < size && y < height)

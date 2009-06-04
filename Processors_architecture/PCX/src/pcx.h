@@ -6,6 +6,8 @@
 
 namespace pcx
 {
+  // Using own `size_t' type because including standart headers 
+  // will obligate to use some optimizations when compiling with g++.
   typedef unsigned long size_t;
 
 #pragma pack(push, 1)
@@ -80,47 +82,47 @@ namespace pcx
                size_t width, size_t height,
                unsigned char *image );
   
-  void decode_1(
+  void decode_01(
       unsigned char const *input, size_t size,
       size_t width, size_t height,
       unsigned char *image );
   
-  void decode_2(
+  void decode_02(
       unsigned char const *input, size_t size,
       size_t width, size_t height,
       unsigned char *image );
 
-  void decode_3(
+  void decode_03(
       unsigned char const *input, size_t size,
       size_t width, size_t height,
       unsigned char *image );
 
-  void decode_4(
+  void decode_04(
       unsigned char const *input, size_t size,
       size_t width, size_t height,
       unsigned char *image );
 
-  void decode_5(
+  void decode_05(
       unsigned char const *input, size_t size,
       size_t width, size_t height,
       unsigned char *image );
 
-  void decode_6(
+  void decode_06(
       unsigned char const *input, size_t size,
       size_t width, size_t height,
       unsigned char *image );
 
-  void decode_7(
+  void decode_07(
       unsigned char const *input, size_t size,
       size_t width, size_t height,
       unsigned char *image );
 
-  void decode_8(
+  void decode_08(
       unsigned char const *input, size_t size,
       size_t width, size_t height,
       unsigned char *image );
 
-  void decode_9(
+  void decode_09(
       unsigned char const *input, size_t size,
       size_t width, size_t height,
       unsigned char *image );

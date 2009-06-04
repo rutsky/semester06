@@ -1,4 +1,4 @@
-/* pcx_decode_4.cpp
+/* pcx_decode_04.cpp
  * PCX fast decoding routine.
  * Implementation #4.
  * Vladimir Rutsky <altsysrq@gmail.com>
@@ -7,11 +7,15 @@
 
 #include "pcx.h"
 
+//
+// #4. Deduced output image addressing.
+//
+
 namespace pcx
 {
-  void decode_4( unsigned char const *input, size_t size,
-                 size_t width, size_t height,
-                 unsigned char *image )
+  void decode_04( unsigned char const *input, size_t size,
+                  size_t width, size_t height,
+                  unsigned char *image )
   {
     unsigned char const *imageEnd = image + height * 3 * width;
   

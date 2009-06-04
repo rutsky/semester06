@@ -1,4 +1,4 @@
-/* pcx_decode_5.cpp
+/* pcx_decode_05.cpp
  * PCX fast decoding routine.
  * Implementation #5.
  * Vladimir Rutsky <altsysrq@gmail.com>
@@ -7,11 +7,15 @@
 
 #include "pcx.h"
 
+//
+// #5. Deduced input data addressing.
+//
+
 namespace pcx
 {
-  void decode_5( unsigned char const *input, size_t size,
-                 size_t width, size_t height,
-                 unsigned char *image )
+  void decode_05( unsigned char const *input, size_t size,
+                  size_t width, size_t height,
+                  unsigned char *image )
   {
     unsigned char const *imageEnd = image + height * 3 * width;
     unsigned char const *inputEnd = input + size;

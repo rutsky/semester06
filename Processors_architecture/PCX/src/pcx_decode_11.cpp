@@ -7,6 +7,10 @@
 
 #include "pcx.h"
 
+//
+// #11. I/O by paired DWORDs.
+//
+
 namespace pcx
 {
   void decode_11( unsigned char const *input, size_t size,
@@ -20,21 +24,21 @@ namespace pcx
     {
       while (image < imageEnd - 8)
       {
-        unsigned int word1 = *((unsigned int const *)(input + 0));
-        unsigned int word2 = *((unsigned int const *)(input + 4));
+        unsigned int dword1 = *((unsigned int const *)(input + 0));
+        unsigned int dword2 = *((unsigned int const *)(input + 4));
       
-        if (!((word1 | word2) & 0xC0C0C0C0))
+        if (!((dword1 | dword2) & 0xC0C0C0C0))
         {
-          *((unsigned int *)(image + 0)) = word1;
-          *((unsigned int *)(image + 4)) = word2;
+          *((unsigned int *)(image + 0)) = dword1;
+          *((unsigned int *)(image + 4)) = dword2;
           input += 8;
           image += 8;
         }
         else
         {
-          if (!(word1 & 0xC0C0C0C0))
+          if (!(dword1 & 0xC0C0C0C0))
           {
-            *((unsigned int *)(image + 0)) = word1;
+            *((unsigned int *)(image + 0)) = dword1;
             input += 4;
             image += 4;
           }

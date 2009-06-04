@@ -1,4 +1,4 @@
-/* pcx_decode_1.cpp
+/* pcx_decode_01.cpp
  * PCX fast decoding routine.
  * Implementation #1.
  * Vladimir Rutsky <altsysrq@gmail.com>
@@ -7,11 +7,15 @@
 
 #include "pcx.h"
 
+//
+// #1. Removed use of std::cout and whole <iostream>.
+//
+
 namespace pcx
 {
-  void decode_1( unsigned char const *input, size_t size,
-                 size_t width, size_t height,
-                 unsigned char *image )
+  void decode_01( unsigned char const *input, size_t size,
+                  size_t width, size_t height,
+                  unsigned char *image )
   {
     size_t const nPlanes = 3;
     

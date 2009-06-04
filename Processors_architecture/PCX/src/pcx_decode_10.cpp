@@ -7,6 +7,10 @@
 
 #include "pcx.h"
 
+//
+// #10. I/O by DWORD.
+//
+
 namespace pcx
 {
   void decode_10( unsigned char const *input, size_t size,
@@ -20,11 +24,11 @@ namespace pcx
     {
       while (image < imageEnd - 4)
       {
-        unsigned int word1 = *((unsigned int const *)input);
+        unsigned int dword = *((unsigned int const *)input);
       
-        if (!(word1 & 0xC0C0C0C0))
+        if (!(dword & 0xC0C0C0C0))
         {
-          *((unsigned int *)image) = word1;
+          *((unsigned int *)image) = dword;
           image += 4;
           input += 4;
         }
