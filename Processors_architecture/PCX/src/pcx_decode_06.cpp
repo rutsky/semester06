@@ -29,17 +29,17 @@ namespace pcx
       {
         count = (byte & 0x3F); // 0x3F = 2#00111111
         if (input == inputEnd)
-          break;
+          return; // Impossible on correct images.
         
         byte = *input++;
       }
       
       do
       {
-        if (image == imageEnd)
-          break;
-        
         *image++ = byte;
+
+        if (image == imageEnd)
+          return;
         
         --count;
       } while (count > 0);
