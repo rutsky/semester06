@@ -18,7 +18,7 @@ namespace pcx
                   unsigned char *image )
   {
     int plane = 0, x = 0, y = 0, d = 0;
-    while (d < size && y < height)
+    while (d < static_cast<int>(size) && y < static_cast<int>(height))
     {
       unsigned char byte = input[d];
       ++d;
@@ -27,7 +27,7 @@ namespace pcx
       if ((byte & 0xC0) == 0xC0) // 0xC0 = 2#11000000
       {
         count = (byte & 0x3F); // 0x3F = 2#00111111
-        if (d >= size)
+        if (d >= static_cast<int>(size))
         {
           break;
         }
@@ -38,7 +38,7 @@ namespace pcx
       
       for (int i = 0; i < count; ++i)
       {
-        if (x >= width)
+        if (x >= static_cast<int>(width))
         {
           x = 0;
           ++plane;
@@ -50,7 +50,7 @@ namespace pcx
           ++y;
         }
         
-        if (y >= height)
+        if (y >= static_cast<int>(height))
           break;
         
         image[y * 3 * width + plane * width + x] = byte;

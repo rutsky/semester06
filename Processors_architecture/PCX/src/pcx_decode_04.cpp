@@ -20,7 +20,7 @@ namespace pcx
     unsigned char const *imageEnd = image + height * 3 * width;
   
     int d = 0;
-    while (d < size && image != imageEnd)
+    while (d < static_cast<int>(size) && image != imageEnd)
     {
       unsigned char byte = input[d];
       ++d;
@@ -29,7 +29,7 @@ namespace pcx
       if ((byte & 0xC0) == 0xC0) // 0xC0 = 2#11000000
       {
         count = (byte & 0x3F); // 0x3F = 2#00111111
-        if (d >= size)
+        if (d >= static_cast<int>(size))
         {
           break;
         }
