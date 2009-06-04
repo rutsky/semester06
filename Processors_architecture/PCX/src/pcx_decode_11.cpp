@@ -73,7 +73,8 @@ namespace pcx
               *(image + 3) = byte;
               image += 4;
             }
-            break;
+            
+            return;
           }
           else
           {
