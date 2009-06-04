@@ -1,3 +1,4 @@
 *.o
+*.s
 *~
 pcx_decode
