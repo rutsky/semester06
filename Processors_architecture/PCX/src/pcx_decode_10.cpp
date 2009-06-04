@@ -57,10 +57,11 @@ namespace pcx
             
             for (; count > 0; count -= 4)
             {
-              *image++ = byte;
-              *image++ = byte;
-              *image++ = byte;
-              *image++ = byte;
+              *(image + 0) = byte;
+              *(image + 1) = byte;
+              *(image + 2) = byte;
+              *(image + 3) = byte;
+              image += 4;
             }
             break;
           }
@@ -71,10 +72,11 @@ namespace pcx
             
             for (; count > 0; count -= 4)
             {
-              *image++ = byte;
-              *image++ = byte;
-              *image++ = byte;
-              *image++ = byte;
+              *(image + 0) = byte;
+              *(image + 1) = byte;
+              *(image + 2) = byte;
+              *(image + 3) = byte;
+              image += 4;
             }
               
             continue;
