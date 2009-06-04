@@ -24,7 +24,7 @@ namespace pcx
   
     do
     {
-      while (image < imageEnd - 4 && input < inputEnd - 4)
+      while (image < imageEnd - 4)
       {
         unsigned int const dword = *((unsigned int const *)input);
       
