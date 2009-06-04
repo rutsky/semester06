@@ -5,9 +5,9 @@
 
 PROGRAM_NAME = pcx_decode
 OBJECT_FILES = main.o pcx_decode.o \
-  pcx_decode_1.o  pcx_decode_2.o  pcx_decode_3.o  pcx_decode_4.o \
-  pcx_decode_5.o  pcx_decode_6.o  pcx_decode_7.o  pcx_decode_8.o \
-  pcx_decode_9.o  pcx_decode_10.o pcx_decode_11.o pcx_decode_12.o
+  pcx_decode_01.o pcx_decode_02.o pcx_decode_03.o pcx_decode_04.o \
+  pcx_decode_05.o pcx_decode_06.o pcx_decode_07.o pcx_decode_08.o \
+  pcx_decode_09.o pcx_decode_10.o pcx_decode_11.o pcx_decode_12.o
 CC = g++
 
 MAIN_LIB_COMPILER_OPTIONS = $(shell sdl-config --cflags)
@@ -41,13 +41,13 @@ main.o: main.cpp pcx.h mtimer.hpp
 
 pcx_decode.o: pcx_decode.cpp pcx.h
 
-pcx_decode_1.o : pcx_decode_1.cpp  pcx.h
-pcx_decode_2.o : pcx_decode_2.cpp  pcx.h
-pcx_decode_3.o : pcx_decode_3.cpp  pcx.h
-pcx_decode_4.o : pcx_decode_4.cpp  pcx.h
-pcx_decode_5.o : pcx_decode_5.cpp  pcx.h
-pcx_decode_6.o : pcx_decode_6.cpp  pcx.h
-pcx_decode_7.o : pcx_decode_7.cpp  pcx.h
-pcx_decode_8.o : pcx_decode_8.cpp  pcx.h
-pcx_decode_9.o : pcx_decode_9.cpp  pcx.h
+pcx_decode_01.o: pcx_decode_01.cpp pcx.h
+pcx_decode_02.o: pcx_decode_02.cpp pcx.h
+pcx_decode_03.o: pcx_decode_03.cpp pcx.h
+pcx_decode_04.o: pcx_decode_04.cpp pcx.h
+pcx_decode_05.o: pcx_decode_05.cpp pcx.h
+pcx_decode_06.o: pcx_decode_06.cpp pcx.h
+pcx_decode_07.o: pcx_decode_07.cpp pcx.h
+pcx_decode_08.o: pcx_decode_08.cpp pcx.h
+pcx_decode_09.o: pcx_decode_09.cpp pcx.h
 pcx_decode_10.o: pcx_decode_10.cpp pcx.h
