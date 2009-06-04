@@ -1,0 +1,41 @@
+Loaded `../data/baboon.pcx' file.
+290129 bytes length.
+PCX image header info:
+  Manufacturer:     10
+  Version:          5
+  Encoding:         1
+  Bits per pixel:   8
+  Window:           from (0,0) to (297,297)
+  Resolution (dpi): (298,298)
+  Planes:           3
+  Bytes per line:   298
+  Pallete type:     1
+  Screen size:      (0,0)
+Starting 10 runs by 100 calls...
+Average result based on 10 runs by 100 calls.
+Implementation: general
+100 calls in 3.909 seconds (0.03909 seconds per try).
+Implementation: # 1 w/o iostream
+100 calls in 3.46 seconds (0.0346 seconds per try).
+Implementation: # 2 constants inlined
+100 calls in 3.329 seconds (0.03329 seconds per try).
+Implementation: # 3 using `int' type
+100 calls in 3.072 seconds (0.03072 seconds per try).
+Implementation: # 4 deduced output image addressing
+100 calls in 2.008 seconds (0.02008 seconds per try).
+Implementation: # 5 deduced input data addressing
+100 calls in 2.166 seconds (0.02166 seconds per try).
+Implementation: # 6 reimplemented cycle
+100 calls in 2.165 seconds (0.02165 seconds per try).
+Implementation: # 7 inlined outputting
+100 calls in 1.598 seconds (0.01598 seconds per try).
+Implementation: # 8 inlined outputting in all cases
+100 calls in 1.475 seconds (0.01475 seconds per try).
+Implementation: # 9 pairing in output
+100 calls in 1.544 seconds (0.01544 seconds per try).
+Implementation: #10 I/O by DWORD
+100 calls in 2.395 seconds (0.02395 seconds per try).
+Implementation: #11 I/O by paired DWORDs
+100 calls in 2.638 seconds (0.02638 seconds per try).
+Implementation: #12 reading aligned by 4
+100 calls in 2.467 seconds (0.02467 seconds per try).
