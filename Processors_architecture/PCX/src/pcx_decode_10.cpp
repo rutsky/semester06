@@ -11,7 +11,7 @@
 // #10. I/O by DWORD.
 //
 
-#define DO_4_TIMES(expr) expr expr expr expr
+#define DO_3_TIMES(expr) expr expr expr
 
 namespace pcx
 {
@@ -32,11 +32,11 @@ namespace pcx
           break;
 
         *((unsigned int *)image) = dword;
-        image += 4;
         input += 4;
+        image += 4;
       }
     
-      DO_4_TIMES(
+      DO_3_TIMES(
       {
         unsigned char byte = *input++;
 
@@ -93,7 +93,7 @@ namespace pcx
         if (input == inputEnd || image == imageEnd)
           return;
       }
-      ); // End of 'DO_4_TIMES'
+      ); // End of 'DO_3_TIMES'.
     } while (true);
   }
 } // End of namespace 'pcx'.
