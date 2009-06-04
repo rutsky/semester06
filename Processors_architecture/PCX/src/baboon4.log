@@ -1,0 +1,65 @@
+Loaded `../data/baboon4.pcx' file.                                                                                                                        
+1160132 bytes length.                                                                                                                                     
+PCX image header info:                                                                                                                                    
+  Manufacturer:     10                                                                                                                                    
+  Version:          5                                                                                                                                     
+  Encoding:         1                                                                                                                                     
+  Bits per pixel:   8                                                                                                                                     
+  Window:           from (0,0) to (595,595)                                                                                                               
+  Resolution (dpi): (300,300)                                                                                                                             
+  Planes:           3                                                                                                                                     
+  Bytes per line:   596                                                                                                                                   
+  Pallete type:     1                                                                                                                                     
+  Screen size:      (0,0)
+Starting 10 runs by 100 calls...
+Average result based on 10 runs by 100 calls.
+Implementation: general
+100 calls in 12.356 seconds (0.12356 seconds per try).
+
+Implementation: # 1  w/o iostream
+100 calls in 11.345 seconds (0.11345 seconds per try).
+
+Implementation: # 2  constants inlined
+100 calls in 11.399 seconds (0.11399 seconds per try).
+
+Implementation: # 3  using `int' type
+100 calls in 10.181 seconds (0.10181 seconds per try).
+
+Implementation: # 4  deduced output image addressing
+100 calls in 6.477 seconds (0.06477 seconds per try).
+
+Implementation: # 5  deduced input data addressing
+100 calls in 7.419 seconds (0.07419 seconds per try).
+
+Implementation: # 6  reimplemented cycle
+100 calls in 6.45 seconds (0.0645 seconds per try).
+
+Implementation: # 7  inlined outputting
+100 calls in 4.918 seconds (0.04918 seconds per try).
+
+Implementation: # 8  inlined outputting in all cases
+100 calls in 4.696 seconds (0.04696 seconds per try).
+
+Implementation: # 9  pairing in output
+100 calls in 4.657 seconds (0.04657 seconds per try).
+
+Implementation: # 9a using memset() for output
+100 calls in 4.818 seconds (0.04818 seconds per try).
+
+Implementation: #10  I/O by DWORD
+100 calls in 4.654 seconds (0.04654 seconds per try).
+
+Implementation: #11  I/O by paired 2 DWORDs
+100 calls in 5.029 seconds (0.05029 seconds per try).
+
+Implementation: #11a I/O by blindly paired 2 DWORDs
+100 calls in 4.646 seconds (0.04646 seconds per try).
+
+Implementation: #11b I/O by blindly paired 4 DWORDs
+100 calls in 4.64 seconds (0.0464 seconds per try).
+
+Implementation: #12  reading aligned by 4 bytes
+100 calls in 7.567 seconds (0.07567 seconds per try).
+
+Implementation: #13  I/O by blindly paired 2 DWORDs using MMX
+100 calls in 5.228 seconds (0.05228 seconds per try).
