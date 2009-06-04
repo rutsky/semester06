@@ -52,7 +52,7 @@ namespace pcx
       {
         int count = (byte & 0x3F); // 0x3F = 2#00111111
         if (input == inputEnd)
-          break;
+          return; // Impossible on correct images.
         
         byte = *input++;
         
