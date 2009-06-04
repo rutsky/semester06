@@ -1,6 +1,6 @@
 /* pcx_decode_11.cpp
  * PCX fast decoding routine.
- * Implementation #11.
+ * Implementation #10.
  * Vladimir Rutsky <altsysrq@gmail.com>
  * 02.06.2009
  */
@@ -11,6 +11,8 @@
 // #11. I/O by paired DWORDs.
 //
 
+#define DO_3_TIMES(expr) expr expr expr
+
 namespace pcx
 {
   void decode_11( unsigned char const *input, size_t size,
@@ -20,82 +22,90 @@ namespace pcx
     unsigned char const *imageEnd = image + height * 3 * width;
     unsigned char const *inputEnd = input + size;
   
-    while (input != inputEnd && image != imageEnd)
+    do
     {
-      while (image < imageEnd - 8)
+      while (image < imageEnd - 8) // We know, that input size must be enough for full image decoding.
       {
-        unsigned int dword1 = *((unsigned int const *)(input + 0));
-        unsigned int dword2 = *((unsigned int const *)(input + 4));
+        unsigned int const dword1 = *((unsigned int const *)(input + 0));
       
-        if (!((dword1 | dword2) & 0xC0C0C0C0))
+        if (dword1 & 0xC0C0C0C0)
+          break;
+
+        unsigned int const dword2 = *((unsigned int const *)(input + 4));
+        
+        if (dword2 & 0xC0C0C0C0)
         {
           *((unsigned int *)(image + 0)) = dword1;
-          *((unsigned int *)(image + 4)) = dword2;
-          input += 8;
-          image += 8;
-        }
-        else
-        {
-          if (!(dword1 & 0xC0C0C0C0))
-          {
-            *((unsigned int *)(image + 0)) = dword1;
-            input += 4;
-            image += 4;
-          }
+          input += 4;
+          image += 4;
           break;
         }
+
+        *((unsigned int *)(image + 0)) = dword1;
+        *((unsigned int *)(image + 4)) = dword2;
+        
+        input += 8;
+        image += 8;
       }
     
-      unsigned char byte = *input++;
-      
-      if ((byte & 0xC0) == 0xC0) // 0xC0 = 2#11000000
+      DO_3_TIMES(
       {
-        int count = (byte & 0x3F); // 0x3F = 2#00111111
-        if (input == inputEnd)
-          return; // Impossible on correct images.
-        
-        byte = *input++;
-        
-        if (count != 1)
+        unsigned char byte = *input++;
+
+        if ((byte & 0xC0) != 0xC0) // 0xC0 = 2#11000000
+          *image++ = byte;
+        else
         {
-          if (image + count > imageEnd)
-          {
-            count = imageEnd - image;
-            
-            for (; count & 0x3; --count)
-              *image++ = byte;
-            
-            for (; count > 0; count -= 4)
-            {
-              *(image + 0) = byte;
-              *(image + 1) = byte;
-              *(image + 2) = byte;
-              *(image + 3) = byte;
-              image += 4;
-            }
-            
-            return;
-          }
+          int count = (byte & 0x3F); // 0x3F = 2#00111111
+        
+          if (input == inputEnd)
+            return; // Impossible on correct images.
+        
+          byte = *input++;
+        
+          if (count == 1)
+            *image++ = byte;
           else
           {
-            for (; count & 0x3; --count)
-              *image++ = byte;
-            
-            for (; count > 0; count -= 4)
+            if (image + count > imageEnd)
             {
-              *(image + 0) = byte;
-              *(image + 1) = byte;
-              *(image + 2) = byte;
-              *(image + 3) = byte;
-              image += 4;
+              count = imageEnd - image;
+            
+              for (; count & 0x3; --count)
+                *image++ = byte;
+            
+              for (; count > 0; count -= 4)
+              {
+                *(image + 0) = byte;
+                *(image + 1) = byte;
+                *(image + 2) = byte;
+                *(image + 3) = byte;
+                image += 4;
+              }
+            
+              return;
             }
-              
-            continue;
+            else
+            {
+              for (; count & 0x3; --count)
+                *image++ = byte;
+            
+              for (; count > 0; count -= 4)
+              {
+                *(image + 0) = byte;
+                *(image + 1) = byte;
+                *(image + 2) = byte;
+                *(image + 3) = byte;
+                image += 4;
+              }
+            }
           }
         }
+        
+        if (input == inputEnd || image == imageEnd)
+          return;
       }
-
-      *image++ = byte;
-    }
+      ); // End of 'DO_3_TIMES'.
+    } while (true);
   }
 } // End of namespace 'pcx'.
