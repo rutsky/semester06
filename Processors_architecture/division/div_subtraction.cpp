@@ -40,23 +40,23 @@ namespace subtraction
       if (x < y)
         return 0;
       
-      dword_t quotient;
-      asm volatile ("xor     eax, eax\n" // `eax' is `quotient'
+      dword_t volatile result, quotient;
+      asm volatile ("xor     %[quotient], %[quotient]\n"
                   "loop:"
                   "\tcmp     %[x], %[y]\n"
                   "\tjl      endloop\n"
                   
                   "\tsub     %[x], %[y]\n"
-                  "\tinc     eax\n"
-                  "\ttest    eax, eax\n"
+                  "\tinc     %[quotient]\n"
+                  "\ttest    %[quotient], %[quotient]\n"
                   "\tjz      endloop\n"
                   "jmp       loop\n"
                     
                   "endloop:\n"
-                  "\tmov     %[quotient], eax"
-                    : [quotient]"=r"(quotient) : [x]"r"(x), [y]"r"(y) ); 
+                  "\tmov     %[result], %[quotient]"
+                    : [result]"=r"(result) : [x]"r"(x), [y]"r"(y), [quotient]"r"(quotient)); 
       
-      return quotient;
+      return result;
     }
   }
 } // End of namespace 'subtraction'.

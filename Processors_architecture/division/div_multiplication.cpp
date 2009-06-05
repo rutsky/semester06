@@ -74,11 +74,14 @@ namespace multiplication
       }
       
       y = details::K[y];
-      asm volatile ("mov     eax, %[y]":           : [y]"r"(y));
-      asm volatile ("mul     %[x]"     :           : [x]"r"(x));
-      asm volatile ("shr     eax, 16"  :           : );
-      asm volatile ("mov     %[x], eax": [x]"=r"(x): );
-      return x;
+      
+      dword_t volatile result, tmp;
+      asm volatile ("mov     %[tmp], %[y]\n" 
+                  "\timul    %[tmp], %[x]\n"
+                  "\tshr     %[tmp], 16\n"
+                  "\tmov     %[result], %[tmp]\n"
+                  :[result]"=r"(result) : [tmp]"r"(tmp), [x]"r"(x), [y]"r"(y));
+      return result;
     }
   }
 } // End of namespace 'multiplication'.
