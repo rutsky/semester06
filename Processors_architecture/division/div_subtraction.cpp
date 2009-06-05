@@ -17,6 +17,9 @@ namespace subtraction
   {
     dword_t div( dword_t x, dword_t y )
     {
+      if (x < y)
+        return 0;
+      
       dword_t quotient = 0;
       while (x >= y)
       {
@@ -34,7 +37,26 @@ namespace subtraction
   {
     dword_t div( dword_t x, dword_t y )
     {
-      return x;
+      if (x < y)
+        return 0;
+      
+      dword_t quotient;
+      asm volatile ("xor     eax, eax\n" // `eax' is `quotient'
+                  "loop:"
+                  "\tcmp     %[x], %[y]\n"
+                  "\tjl      endloop\n"
+                  
+                  "\tsub     %[x], %[y]\n"
+                  "\tinc     eax\n"
+                  "\ttest    eax, eax\n"
+                  "\tjz      endloop\n"
+                  "jmp       loop\n"
+                    
+                  "endloop:\n"
+                  "\tmov     %[quotient], eax"
+                    : [quotient]"=r"(quotient) : [x]"r"(x), [y]"r"(y) ); 
+      
+      return quotient;
     }
   }
 } // End of namespace 'subtraction'.
