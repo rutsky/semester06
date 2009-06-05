@@ -36,17 +36,21 @@ int main()
       &division::newton_raphson::impl_asm::div,
       &division::subtraction::impl_cpp::div,
       &division::subtraction::impl_asm::div,
+      &division::long_division::impl_cpp::div,
+      &division::long_division::impl_asm::div,
     };
   
   char const * divAlgsNames[] =
     {
-      "Native X/Y:        ",
-      "Multiplication C++:",
-      "Multiplication ASM:",
-      "Newton-Raphson C++:",
-      "Newton-Raphson ASM:",
-      "Subtraction C++:   ",
-      "Subtraction ASM:   ",
+      "Native X/Y:         ",
+      "Multiplication C++: ",
+      "Multiplication ASM: ",
+      "Newton-Raphson C++: ",
+      "Newton-Raphson ASM: ",
+      "Subtraction C++:    ",
+      "Subtraction ASM:    ",
+      "Long division C++:  ",
+      "Long division ASM:  ",
     };
   
   // Tests must be unsigned, 16-bit and no division by zero.
@@ -54,7 +58,7 @@ int main()
     { 
       {1, 1}, {1, 5}, {1, (1 << 3)},
       {18243, 58},
-      {2, 1}, {2, 2}, {2, 5}, {2, (1 << 30)},
+      {2, 1}, {2, 2}, {2, 5}, {2, (1 << 14)},
       {(1 << 15), 2}, {(1 << 15), 37},
       {(1 << 14) + 1236, 32526},
       {25, 17}, {(1 << 18), (1 << 13)}, {(1 << 13), (1 << 18)},
