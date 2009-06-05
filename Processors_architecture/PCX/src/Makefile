@@ -1,7 +1,7 @@
 # Makefile.
 # Simple makefile for building C++/Assembler based project.
 # Bob Rutsky <rutsky_v@rambler.ru>
-# 05.03.2005
+# 03.06.2009
 
 PROGRAM_NAME = pcx_decode
 OPTIMIZATION_MODULES = \
