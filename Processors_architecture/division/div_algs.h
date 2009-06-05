@@ -42,4 +42,16 @@ namespace division
       dword_t div( dword_t x, dword_t y );
     }
   }
+  
+  namespace subtraction
+  {
+    namespace impl_cpp
+    {
+      dword_t div( dword_t x, dword_t y );
+    }
+    namespace impl_asm
+    {
+      dword_t div( dword_t x, dword_t y );
+    }
+  }
 } // End of namespace 'division'.

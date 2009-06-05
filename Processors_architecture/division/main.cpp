@@ -34,6 +34,8 @@ int main()
       &division::multiplication::impl_asm::div,
       &division::newton_raphson::impl_cpp::div,
       &division::newton_raphson::impl_asm::div,
+      &division::subtraction::impl_cpp::div,
+      &division::subtraction::impl_asm::div,
     };
   
   char const * divAlgsNames[] =
@@ -43,12 +45,14 @@ int main()
       "Multiplication ASM:",
       "Newton-Raphson C++:",
       "Newton-Raphson ASM:",
+      "Subtraction C++:   ",
+      "Subtraction ASM:   ",
     };
   
   // Tests must be unsigned, 16-bit and no division by zero.
   dword_t tests[][2] = 
     { 
-      {1, 1}, {1, 5}, {1, (1 << 30)},
+      {1, 1}, {1, 5}, {1, (1 << 3)},
       {18243, 58},
       {2, 1}, {2, 2}, {2, 5}, {2, (1 << 30)},
       {(1 << 15), 2}, {(1 << 15), 37},
