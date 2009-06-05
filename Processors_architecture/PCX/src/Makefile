@@ -1,6 +1,6 @@
 # Makefile.
 # Simple makefile for building C++/Assembler based project.
-# Vladimir Rutsky <rutsky_v@rambler.ru>
+# Vladimir Rutsky <altsysrq@gmail.com>
 # 03.06.2009
 
 PROGRAM_NAME = pcx_decode
