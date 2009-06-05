@@ -29,9 +29,12 @@ namespace newton_raphson
     {
       if (x < y)
         return 0;
+      if (x == y)
+        return 1;
+      if (y == 1)
+        return x;
       
-      //dword_t yCur, yNext = y;
-      dword_t yCur, yNext = 600;
+      dword_t yCur, yNext = y;
       do
       {
         yCur = yNext;
@@ -46,7 +49,33 @@ namespace newton_raphson
   {
     dword_t div( dword_t x, dword_t y )
     {
-      return x;
+      if (x < y)
+        return 0;
+      if (x == y)
+        return 1;
+      if (y == 1)
+        return x;
+      
+      dword_t result;
+      asm volatile (
+                  "mov     ecx, %[y]\n"   // `ecx' is `yNext'
+                  "loop:\n"
+                  "\tmov     eax, ecx\n"    // `eax' is `yCur'
+                  
+                  "\tmul     eax\n"
+                  "\tmul     %[y]\n"
+                  "\tshr     eax, 16\n"     // now `eax' == ((yCur * yCur * y) >> 16)
+                  
+                  "\tlea     edx, [ecx + ecx]\n"
+                  "\tsub     edx, eax\n"    // now `edx' == yNext
+                  
+                  "\tcmp     edx, ecx\n"
+                  "\tmov     ecx, edx\n"
+                  "\tjne     loop\n"
+                  "\tmov     %[result], ecx\n"
+                  : [result]"=r"(result) : [x]"r"(x), [y]"r"(y));
+      
+      return (x * result) >> 16;
     }
   }
 } // End of namespace 'newton_raphson'.
