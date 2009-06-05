@@ -1,6 +1,6 @@
 # Makefile.
 # Simple makefile for building C++/Assembler based project.
-# Bob Rutsky <rutsky_v@rambler.ru>
+# Vladimir Rutsky <rutsky_v@rambler.ru>
 # 05.06.2009
 
 PROGRAM_NAME = division_test
