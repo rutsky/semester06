@@ -4,8 +4,6 @@
  * 05.06.2009
  */
 
-// Original source is unknown.
-
 #include "div_algs.h"
 
 namespace division
@@ -29,7 +27,7 @@ namespace multiplication
   
   namespace details
   {
-    static dword_t const yEffectiveBits = 24;
+    static dword_t const yEffectiveBits = 16;
     static dword_t const tableSize = (1 << yEffectiveBits);
     
     static bool    KFilled = false;

@@ -4,7 +4,7 @@
 # 05.06.2009
 
 PROGRAM_NAME = division_test
-OPTIMIZATION_MODULES = div_multiplication
+OPTIMIZATION_MODULES = div_multiplication div_newton_raphson
 OBJECT_FILES = main.o $(foreach M,$(OPTIMIZATION_MODULES),$(M).o)
 CC = g++
 

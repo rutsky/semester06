@@ -32,6 +32,8 @@ int main()
       &division::native::div,
       &division::multiplication::impl_cpp::div,
       &division::multiplication::impl_asm::div,
+      &division::newton_raphson::impl_cpp::div,
+      &division::newton_raphson::impl_asm::div,
     };
   
   char const * divAlgsNames[] =
@@ -39,17 +41,22 @@ int main()
       "Native X/Y:        ",
       "Multiplication C++:",
       "Multiplication ASM:",
+      "Newton-Raphson C++:",
+      "Newton-Raphson ASM:",
     };
   
+  // Tests must be unsigned, 16-bit and no division by zero.
   dword_t tests[][2] = 
     { 
       {1, 1}, {1, 5}, {1, (1 << 30)},
+      {18243, 58},
       {2, 1}, {2, 2}, {2, 5}, {2, (1 << 30)},
-      {(1 << 15), 2}, {(1 << 15), 37}, {(1 << 18) + 5246, 5726},
-      {(1 << 18) + 1236, 32526},
+      {(1 << 15), 2}, {(1 << 15), 37},
+      {(1 << 14) + 1236, 32526},
       {25, 17}, {(1 << 18), (1 << 13)}, {(1 << 13), (1 << 18)},
-      {(1 << 18) + 37195, (1 << 20) + 836598},
+      {(1 << 12) + 3195, (1 << 10) + 8598},
     };
+  // TODO: {(1 << 14) + 5246, 5726}
   
   for (size_t alg = 0; alg < array_size(divAlgs); ++alg)
   {
@@ -64,6 +71,7 @@ int main()
       dword_t const y = tests[t][1];
       
       std::cout << x << "/" << y << "=" << div(x, y) << "  ";
+      std::cout.flush();
     }
     std::cout << std::endl;
   }

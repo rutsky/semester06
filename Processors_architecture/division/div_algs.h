@@ -30,4 +30,16 @@ namespace division
       dword_t div( dword_t x, dword_t y );
     }
   }
+  
+  namespace newton_raphson
+  {
+    namespace impl_cpp
+    {
+      dword_t div( dword_t x, dword_t y );
+    }
+    namespace impl_asm
+    {
+      dword_t div( dword_t x, dword_t y );
+    }
+  }
 } // End of namespace 'division'.
