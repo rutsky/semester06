@@ -49,39 +49,38 @@ namespace long_division
       if (x < y)
         return 0;
 
-      dword_t z;
-      asm volatile ("mov     eax, %[y]\n" // `eax' is `yy'
+      dword_t volatile z, yy, result;
+      asm volatile ("mov     %[yy], %[y]\n"
                   "loop0:\n"
-                  "\tshl     eax, 1\n"
-                  "\tcmp     %[x], eax\n"
+                  "\tshl     %[yy], 1\n"
+                  "\tcmp     %[x], %[yy]\n"
                   "\tjge     loop0\n"
-                  "\tshr     eax, 1\n"
-                  // Calculated `yy' (`eax').
+                  "\tshr     %[yy], 1\n"
+                  // Calculated `yy'
                   
-                  "\txor     ecx, ecx\n"  // `ecx' is `z'
+                  "\txor     %[z], %[z]\n"
                   
                   "loop1:\n"
-                  "\tcmp     eax, %[y]\n"
+                  "\tcmp     %[yy], %[y]\n"
                   "\tjl      endloop\n"
                   
-                  "\tshl     ecx, 1\n"
-                  "\tcmp     %[x], eax\n"
+                  "\tshl     %[z], 1\n"
+                  "\tcmp     %[x], %[yy]\n"
                   "\tjl      pass\n"
                   //{
-                    "\tsub     %[x], eax\n"
-                    "\tinc     ecx\n"
+                    "\tsub     %[x], %[yy]\n"
+                    "\tinc     %[z]\n"
                   //}
                   "pass:\n"
-                  "\tshr     eax\n"
+                  "\tshr     %[yy]\n"
                   
                   "\tjmp     loop1\n"
                   
                   "endloop:\n"
-                  
-                  "\tmov     %[z], ecx\n"
-                : [z]"=r"(z) : [y]"r"(y), [x]"r"(x));
+                  "\tmov     %[result], %[z]\n"
+                : [result]"=r"(result) : [y]"r"(y), [x]"r"(x), [yy]"r"(yy), [z]"r"(z));
       
-      return z;
+      return result;
     }
   }
 } // End of namespace 'long_division'.
