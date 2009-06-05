@@ -56,24 +56,24 @@ namespace newton_raphson
       if (y == 1)
         return x;
       
-      dword_t result;
+      dword_t volatile result, yCur, yNext, tmp;
       asm volatile (
-                  "mov     ecx, %[y]\n"   // `ecx' is `yNext'
+                  "mov     %[yNext], %[y]\n"
                   "loop:\n"
-                  "\tmov     eax, ecx\n"    // `eax' is `yCur'
+                  "\tmov     %[yCur], %[yNext]\n"
                   
-                  "\tmul     eax\n"
-                  "\tmul     %[y]\n"
-                  "\tshr     eax, 16\n"     // now `eax' == ((yCur * yCur * y) >> 16)
+                  "\timul    %[yCur], %[yCur]\n"
+                  "\timul    %[yCur], %[y]\n"
+                  "\tshr     %[yCur], 16\n"     // now `yCur' == ((yCur * yCur * y) >> 16)
                   
-                  "\tlea     edx, [ecx + ecx]\n"
-                  "\tsub     edx, eax\n"    // now `edx' == yNext
+                  "\tlea     %[tmp], [%[yNext] + %[yNext]]\n"
+                  "\tsub     %[tmp], %[yCur]\n"    // now `tmp' == yNext
                   
-                  "\tcmp     edx, ecx\n"
-                  "\tmov     ecx, edx\n"
+                  "\tcmp     %[tmp], %[yNext]\n"
+                  "\tmov     %[yNext], %[tmp]\n"
                   "\tjne     loop\n"
-                  "\tmov     %[result], ecx\n"
-                  : [result]"=r"(result) : [x]"r"(x), [y]"r"(y));
+                  "\tmov     %[result], %[yNext]\n"
+                  : [result]"=r"(result) : [x]"r"(x), [y]"r"(y), [yNext]"r"(yNext), [yCur]"r"(yCur), [tmp]"r"(tmp));
       
       return (x * result) >> 16;
     }
