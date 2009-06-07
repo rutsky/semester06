@@ -2,7 +2,7 @@
  * PCX fast decoding routine.
  * Implementation #14.
  * Vladimir Rutsky <altsysrq@gmail.com>
- * 02.06.2009
+ * 07.06.2009
  */
 
 #include "pcx.h"

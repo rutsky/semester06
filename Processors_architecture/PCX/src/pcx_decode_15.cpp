@@ -1,8 +1,8 @@
 /* pcx_decode_15.cpp
  * PCX fast decoding routine.
  * Implementation #15.
- * Anton Timofeev <at1.030@gmail.com>
- * 02.06.2009
+ * Vladimir Rutsky <altsysrq@gmail.com>
+ * 07.06.2009
  */
 
 #include "pcx.h"
