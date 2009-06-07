@@ -23,8 +23,8 @@ MAIN_COMPILER_OPTIONS = -c $(MAIN_OPTIMIZATION_OPTIONS) $(MAIN_LIB_COMPILER_OPTI
 #OPTIMIZATION_OPTIONS = -Wall -O2 -masm=intel -mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-ssse3 -mno-sse4.1 -mno-sse4.2 -mno-sse4 -mno-sse4a -mno-sse5 -mno-3dnow
 OPTIMIZATION_OPTIONS = -Wall -O2 -masm=intel
 LIB_COMPILER_OPTIONS = 
-COMPILER_OPTIONS = -c $(OPTIMIZATION_OPTIONS) $(LIB_COMPILER_OPTIONS)
-ASSEMBLER_OPTIONS = -S $(OPTIMIZATION_OPTIONS) $(LIB_COMPILER_OPTIONS)
+COMPILER_OPTIONS = -S $(OPTIMIZATION_OPTIONS) $(LIB_COMPILER_OPTIONS)
+ASSEMBLER_OPTIONS = -c
 
 #LINUX-DEPENDENT
 LIB_LINK_OPTIONS = $(shell sdl-config --libs)
@@ -38,8 +38,8 @@ $(PROGRAM_NAME): $(OBJECT_FILES)
 	$(CC) $(LINK_OPTIONS) $(OBJECT_FILES)
 
 %.o: %.cpp pcx.h
-	$(CC) $(ASSEMBLER_OPTIONS) $(basename $@).cpp
-	$(CC) $(COMPILER_OPTIONS) $(basename $@).cpp
+	$(CC) $(COMPILER_OPTIONS) $(basename $@).cpp -o $(basename $@).s
+	$(CC) $(ASSEMBLER_OPTIONS) $(basename $@).s -o $(basename $@).o
 
 clean:
 	rm -f *.o
