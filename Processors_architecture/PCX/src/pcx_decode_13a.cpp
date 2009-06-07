@@ -32,18 +32,14 @@ namespace pcx
         unsigned int       dword1 = *((unsigned int const *)(input + 0));
         unsigned int const dword2 = *((unsigned int const *)(input + 4));
         
-        // Writing 8 bytes from mm0 to image.
-        asm("movq     QWORD PTR [%[outaddr]], mm0": : [outaddr] "r"(image));
-      
-        *((unsigned int *)(image + 0)) = dword1;
-        
         dword1 |= dword2;
 
         if (dword1 & 0xC0C0C0C0)
           break;
 
-        *((unsigned int *)(image + 4)) = dword2;
-        
+        // Writing 8 bytes from mm0 to image.
+        asm("movq     QWORD PTR [%[outaddr]], mm0": : [outaddr] "r"(image));
+
         input += 8;
         image += 8;
       }
