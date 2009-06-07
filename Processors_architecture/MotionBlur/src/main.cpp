@@ -32,6 +32,26 @@
   }
 #endif // not WIN32
 
+#ifdef WIN32
+  // VS6 workaround
+  #undef min
+  #undef max
+  namespace std
+  {
+    template< typename T >
+    T min( T a, T b )
+    {
+      return (a > b) ? b : a;
+    }
+
+    template< typename T >
+    T max( T a, T b )
+    {
+      return (a < b) ? b : a;
+    }
+  }
+#endif
+
 namespace constants
 {
   char   const *defaultBackgroundImagePath = "../data/Kimi_Raikkonen_won_2007_Brazil_GP_scaled.jpg";
@@ -167,11 +187,22 @@ int mainLoop( SDL_Surface *screen,
     
     // Doing work.
     {
+      /*
       {
         SDL_Rect srcRect = {0};
         srcRect.w = screen->w;
         srcRect.h = screen->h;
         int const result = SDL_BlitSurface(backgroundSurface, &srcRect, screen, NULL);
+        assert(result == 0);
+      }
+      */
+      
+      {
+        SDL_Rect srcRect = {0};
+        srcRect.w = screen->w;
+        srcRect.h = screen->h;
+        int const result = SDL_BlitSurface(movingSurfaces[frameCounter % nMovingSurfaces], &srcRect, screen, NULL);
+        //int const result = SDL_BlitSurface(movingSurfaces[0], &srcRect, screen, NULL);
         assert(result == 0);
       }
       
@@ -261,7 +292,7 @@ bool prepareData( SDL_Surface *screen,
     srcRect.h = std::min(screen->h, movingLoaded->h);
     
     movingLoaded->flags &= ~SDL_SRCALPHA;
-    int const result = SDL_BlitSurface(backgroundLoaded, &srcRect, background, NULL);
+    int const result = SDL_BlitSurface(backgroundLoaded, &srcRect, moving, NULL);
     assert(result == 0);
   }
   
