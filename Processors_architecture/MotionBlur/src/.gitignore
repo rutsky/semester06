@@ -1,0 +1,6 @@
+*.o
+*.s
+*.lst
+*~
+.tempfile
+motion_blur
