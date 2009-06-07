@@ -12,19 +12,20 @@ OPTIMIZATION_MODULES = \
   pcx_decode_13a
 OBJECT_FILES = main.o pcx_decode.o $(foreach M,$(OPTIMIZATION_MODULES),$(M).o)
 CC = g++
+AS = as
 
 # TODO: On Windows platform SDL stuff not working. #LINUX-DEPENDENT
 MAIN_LIB_COMPILER_OPTIONS = $(shell sdl-config --cflags) 
 #MAIN_LIB_COMPILER_OPTIONS =
 
 MAIN_OPTIMIZATION_OPTIONS = -Wall -O3 
-MAIN_COMPILER_OPTIONS = -c $(MAIN_OPTIMIZATION_OPTIONS) $(MAIN_LIB_COMPILER_OPTIONS)
+MAIN_COMPILER_OPTIONS = $(MAIN_OPTIMIZATION_OPTIONS) $(MAIN_LIB_COMPILER_OPTIONS)
 
 #OPTIMIZATION_OPTIONS = -Wall -O2 -masm=intel -mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-ssse3 -mno-sse4.1 -mno-sse4.2 -mno-sse4 -mno-sse4a -mno-sse5 -mno-3dnow
-OPTIMIZATION_OPTIONS = -Wall -O2 -masm=intel
+OPTIMIZATION_OPTIONS = -Wall -O2
 LIB_COMPILER_OPTIONS = 
-COMPILER_OPTIONS = -S $(OPTIMIZATION_OPTIONS) $(LIB_COMPILER_OPTIONS)
-ASSEMBLER_OPTIONS = -c
+COMPILER_OPTIONS = -fverbose-asm -masm=intel $(OPTIMIZATION_OPTIONS) $(LIB_COMPILER_OPTIONS)
+ASSEMBLER_OPTIONS = 
 
 #LINUX-DEPENDENT
 LIB_LINK_OPTIONS = $(shell sdl-config --libs)
@@ -38,17 +39,19 @@ $(PROGRAM_NAME): $(OBJECT_FILES)
 	$(CC) $(LINK_OPTIONS) $(OBJECT_FILES)
 
 %.o: %.cpp pcx.h
-	$(CC) $(COMPILER_OPTIONS) $(basename $@).cpp -o $(basename $@).s
-	$(CC) $(ASSEMBLER_OPTIONS) $(basename $@).s -o $(basename $@).o
+	$(CC) -S -g $(COMPILER_OPTIONS) $(basename $@).cpp -o $(basename $@).s
+	$(CC) -c  $(ASSEMBLER_OPTIONS) $(basename $@).s -o $(basename $@).o
+	$(AS) -alhndm $(basename $@).s -o /dev/null > $(basename $@).lst
 
 clean:
-	rm -f *.o
+	rm -f $(OBJECT_FILES)
 	rm -f $(foreach M,$(OPTIMIZATION_MODULES),$(M).s)
-	rm -f *~ 
+	rm -f $(foreach M,$(OPTIMIZATION_MODULES),$(M).lst)
+	rm -f *~
 	rm -f $(PROGRAM_NAME)
 
 main.o: main.cpp pcx.h mtimer.hpp
-	$(CC) $(MAIN_COMPILER_OPTIONS) $<
+	$(CC) -c $(MAIN_COMPILER_OPTIONS) $<
 
 pcx_decode.o: pcx_decode.cpp pcx.h
-	$(CC) $(MAIN_COMPILER_OPTIONS) $<
+	$(CC) -c $(MAIN_COMPILER_OPTIONS) $<
