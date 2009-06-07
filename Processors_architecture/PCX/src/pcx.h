@@ -6,6 +6,9 @@
 
 #include <cstddef>
 
+#ifndef PCX_H
+#define PCX_H
+
 namespace pcx
 {
   typedef unsigned char  byte_type;
@@ -177,3 +180,5 @@ namespace pcx
       size_t width, size_t height,
       unsigned char *image );
 } // End of namespace 'pcx'.
+
+#endif // PCX_H
