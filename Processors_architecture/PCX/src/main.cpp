@@ -33,8 +33,10 @@ int main( int argc, char *argv[] )
 {
   using pcx::byte_type;
 
-  char const *inputFileName = "../data/baboon4.pcx";
-  char const *outputFileName = "../data/baboon4.ppm";
+  //char const *inputFileName = "../data/baboon4.pcx";
+  //char const *outputFileName = "../data/baboon4.ppm";
+  char const *inputFileName = "../data/square_2x2.pcx";
+  char const *outputFileName = "../data/square_2x2.ppm";
   size_t nTries = 10; // TODO: Set to 1000.
   size_t nTotalTries = 3;
   
@@ -146,12 +148,6 @@ int main( int argc, char *argv[] )
     width  = header.xMax - header.xMin + 1;
     height = header.yMax - header.yMin + 1;
     
-    if (dataSize / (height * header.nPlanes) < header.bytesPerLine)
-    {
-      std::cerr << "Error: incorrect bytes per line value!" << std::endl;
-      return 5;
-    }
-    
     nPlanes = header.nPlanes;
     
     // Allocating result image.
@@ -189,6 +185,7 @@ int main( int argc, char *argv[] )
           &pcx::decode_12,
           &pcx::decode_13,
           &pcx::decode_13a,
+          &pcx::decode_14,
         };
       
       char const *decodeFuncsNames    [] = 
@@ -211,6 +208,7 @@ int main( int argc, char *argv[] )
           "#12  reading aligned by 4 bytes",
           "#13  I/O by blindly paired 2 DWORDs using MMX",
           "#13a I/O by blindly paired 2 DWORDs using MMX (only copying with MMX)",
+          "14   I/O by blindly paired 2 DWORDs using MMX + output using SSE.",
         };
       assert(array_size(decodeFuncs) == array_size(decodeFuncsNames));
 
