@@ -11,65 +11,65 @@ PCX image header info:
   Bytes per line:   298
   Pallete type:     1
   Screen size:      (0,0)
-Starting 10 runs by 10 calls...
-Average result based on 10 runs by 10 calls.
+Starting 10 runs by 100 calls...
+Average result based on 10 runs by 100 calls.
 Implementation: general
-10 * 10 calls in 0.332     seconds (min=0.025     max=0.061     avg=0.0332    seconds per 10 calls)
+10 * 100 calls in 2.717     seconds (min=0.267     max=0.277     avg=0.2717    seconds per 100 calls)
 
 Implementation: # 1  w/o iostream
-10 * 10 calls in 0.31      seconds (min=0.023     max=0.055     avg=0.031     seconds per 10 calls)
+10 * 100 calls in 2.541     seconds (min=0.243     max=0.301     avg=0.2541    seconds per 100 calls)
 
 Implementation: # 2  constants inlined
-10 * 10 calls in 0.314     seconds (min=0.023     max=0.063     avg=0.0314    seconds per 10 calls)
+10 * 100 calls in 2.487     seconds (min=0.242     max=0.255     avg=0.2487    seconds per 100 calls)
 
 Implementation: # 3  using `int' type
-10 * 10 calls in 0.284     seconds (min=0.02      max=0.063     avg=0.0284    seconds per 10 calls)
+10 * 100 calls in 2.201     seconds (min=0.216     max=0.225     avg=0.2201    seconds per 100 calls)
 
 Implementation: # 4  deduced output image addressing
-10 * 10 calls in 0.176     seconds (min=0.013     max=0.033     avg=0.0176    seconds per 10 calls)
+10 * 100 calls in 1.402     seconds (min=0.138     max=0.146     avg=0.1402    seconds per 100 calls)
 
 Implementation: # 5  deduced input data addressing
-10 * 10 calls in 0.207     seconds (min=0.015     max=0.035     avg=0.0207    seconds per 10 calls)
+10 * 100 calls in 1.624     seconds (min=0.158     max=0.167     avg=0.1624    seconds per 100 calls)
 
 Implementation: # 6  reimplemented cycle
-10 * 10 calls in 0.167     seconds (min=0.013     max=0.031     avg=0.0167    seconds per 10 calls)
+10 * 100 calls in 1.404     seconds (min=0.136     max=0.147     avg=0.1404    seconds per 100 calls)
 
 Implementation: # 7  inlined outputting
-10 * 10 calls in 0.12      seconds (min=0.01      max=0.024     avg=0.012     seconds per 10 calls)
+10 * 100 calls in 1.077     seconds (min=0.104     max=0.116     avg=0.1077    seconds per 100 calls)
 
 Implementation: # 8  inlined outputting in all cases
-10 * 10 calls in 0.109     seconds (min=0.009     max=0.021     avg=0.0109    seconds per 10 calls)
+10 * 100 calls in 1.016     seconds (min=0.098     max=0.108     avg=0.1016    seconds per 100 calls)
 
 Implementation: # 9  pairing in output
-10 * 10 calls in 0.109     seconds (min=0.009     max=0.023     avg=0.0109    seconds per 10 calls)
+10 * 100 calls in 0.983     seconds (min=0.097     max=0.1       avg=0.0983    seconds per 100 calls)
 
 Implementation: # 9a using memset() for output
-10 * 10 calls in 0.115     seconds (min=0.01      max=0.021     avg=0.0115    seconds per 10 calls)
+10 * 100 calls in 1.045     seconds (min=0.101     max=0.11      avg=0.1045    seconds per 100 calls)
 
 Implementation: #10  I/O by DWORD
-10 * 10 calls in 0.108     seconds (min=0.009     max=0.021     avg=0.0108    seconds per 10 calls)
+10 * 100 calls in 1.005     seconds (min=0.098     max=0.105     avg=0.1005    seconds per 100 calls)
 
 Implementation: #11  I/O by paired 2 DWORDs
-10 * 10 calls in 0.125     seconds (min=0.01      max=0.031     avg=0.0125    seconds per 10 calls)
+10 * 100 calls in 1.088     seconds (min=0.107     max=0.116     avg=0.1088    seconds per 100 calls)
 
 Implementation: #11a I/O by blindly paired 2 DWORDs
-10 * 10 calls in 0.11      seconds (min=0.009     max=0.022     avg=0.011     seconds per 10 calls)
+10 * 100 calls in 1.001     seconds (min=0.096     max=0.106     avg=0.1001    seconds per 100 calls)
 
 Implementation: #11b I/O by blindly paired 4 DWORDs
-10 * 10 calls in 0.111     seconds (min=0.009     max=0.021     avg=0.0111    seconds per 10 calls)
+10 * 100 calls in 0.993     seconds (min=0.096     max=0.104     avg=0.0993    seconds per 100 calls)
 
 Implementation: #12  reading aligned by 4 bytes
-10 * 10 calls in 0.189     seconds (min=0.016     max=0.036     avg=0.0189    seconds per 10 calls)
+10 * 100 calls in 1.7       seconds (min=0.165     max=0.175     avg=0.17      seconds per 100 calls)
 
 Implementation: #13  I/O by blindly paired 2 DWORDs using MMX
-10 * 10 calls in 0.125     seconds (min=0.01      max=0.024     avg=0.0125    seconds per 10 calls)
+10 * 100 calls in 1.11      seconds (min=0.109     max=0.118     avg=0.111     seconds per 100 calls)
 
 Implementation: #13a I/O by blindly paired 2 DWORDs using MMX (only copying with MMX)
-10 * 10 calls in 0.108     seconds (min=0.009     max=0.023     avg=0.0108    seconds per 10 calls)
+10 * 100 calls in 0.991     seconds (min=0.097     max=0.103     avg=0.0991    seconds per 100 calls)
 
 Implementation: 14   I/O by blindly paired 2 DWORDs using MMX + output using SSE
-10 * 10 calls in 0.119     seconds (min=0.01      max=0.023     avg=0.0119    seconds per 10 calls)
+10 * 100 calls in 1.096     seconds (min=0.108     max=0.116     avg=0.1096    seconds per 100 calls)
 
 Implementation: 15   Only using SSE for output
-10 * 10 calls in 0.116     seconds (min=0.01      max=0.023     avg=0.0116    seconds per 10 calls)
+10 * 100 calls in 1.051     seconds (min=0.102     max=0.111     avg=0.1051    seconds per 100 calls)
 
