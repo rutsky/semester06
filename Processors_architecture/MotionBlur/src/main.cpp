@@ -82,6 +82,7 @@ namespace cmdline
       istr >> val;
       result = val;
     }
+    assert(result > 0);
     return result;
   }
   
@@ -189,26 +190,95 @@ int mainLoop( SDL_Surface *screen,
   return 0;
 }
 
-bool prepareData( char const *backgroundImagePath, char const *movingImagePath,
+bool prepareData( SDL_Surface *screen,
+                  char const *backgroundImagePath, char const *movingImagePath,
                   size_t nMovingFrames, int movingFramesStep,
-                  SDL_Surface **backgroundSurface, SDL_Surface ***movingSurfaces, size_t *nMovingSurfaces )
+                  SDL_Surface **backgroundSurface, 
+                  std::vector<SDL_Surface *> &movingSurfaces )
 {
   // Loading data images.
-  SDL_Surface *background = IMG_Load(backgroundImagePath);
-  if (!background)
+  SDL_Surface *backgroundLoaded = IMG_Load(backgroundImagePath);
+  if (!backgroundLoaded)
   {
-    std::cout << "Failed to load `" << backgroundImagePath << "' with IMG_Load: " << IMG_GetError() << std::endl;
+    std::cerr << "Failed to load `" << backgroundImagePath << "' with IMG_Load: " << IMG_GetError() << std::endl;
     return false;
   }
   
-  SDL_Surface *moving = IMG_Load(movingImagePath);
-  if (!background)
+  SDL_Surface *movingLoaded = IMG_Load(movingImagePath);
+  if (!movingLoaded)
   {
-    std::cout << "Failed to load `" << movingImagePath << "' with IMG_Load: " << IMG_GetError() << std::endl;
+    std::cerr << "Failed to load `" << movingImagePath << "' with IMG_Load: " << IMG_GetError() << std::endl;
     return false;
   }
+  
+  // Converting to screen format.
+  backgroundLoaded = SDL_ConvertSurface(backgroundLoaded, screen->format, SDL_SWSURFACE);
+  if (backgroundLoaded == NULL)
+  {
+    std::cerr << "Error: failed to convert background image pixel format to screen pixel format." << std::endl;
+    return false;
+  }
+  movingLoaded = SDL_ConvertSurface(movingLoaded, screen->format, SDL_SWSURFACE);
+  if (movingLoaded == NULL)
+  {
+    std::cerr << "Error: failed to convert moving image pixel format to screen pixel format." << std::endl;
+    return false;
+  }
+
+  // Resizing data images to screen size.
+  SDL_Surface *background = 
+      SDL_CreateRGBSurface(SDL_SWSURFACE, screen->w, screen->h, screen->format->BitsPerPixel,
+                           screen->format->Rmask, screen->format->Gmask, screen->format->Bmask, screen->format->Amask);
+  assert(background);
+  {
+    SDL_Rect srcRect = {0};
+    srcRect.w = std::min(screen->w, backgroundLoaded->w);
+    srcRect.h = std::min(screen->h, backgroundLoaded->h);
+    
+    backgroundLoaded->flags &= ~SDL_SRCALPHA;
+    SDL_BlitSurface(backgroundLoaded, &srcRect, background, NULL);
+    background->flags |= SDL_SRCALPHA;
+  }
+  
+  SDL_Surface *moving = 
+      SDL_CreateRGBSurface(SDL_SWSURFACE, screen->w, screen->h, screen->format->BitsPerPixel,
+                           screen->format->Rmask, screen->format->Gmask, screen->format->Bmask, screen->format->Amask);
+  assert(moving);
+  {
+    SDL_Rect srcRect = {0};
+    srcRect.w = std::min(screen->w, movingLoaded->w);
+    srcRect.h = std::min(screen->h, movingLoaded->h);
+    
+    movingLoaded->flags &= ~SDL_SRCALPHA;
+    SDL_BlitSurface(backgroundLoaded, &srcRect, background, NULL);
+  }
+  
+  assert(background->w == screen->w && background->h == screen->h);
+  assert(moving->w     == screen->w && moving->h     == screen->h);
   
   // Creating blur steps images.
+  moving->flags &= ~SDL_SRCALPHA;
+  movingSurfaces.resize(nMovingFrames, (SDL_Surface *)NULL);
+  for (size_t i = 0; i < nMovingFrames; ++i)
+  {
+    movingSurfaces[i] = 
+        SDL_CreateRGBSurface(SDL_SWSURFACE, screen->w, screen->h, screen->format->BitsPerPixel, 
+                             screen->format->Rmask, screen->format->Gmask, screen->format->Bmask, screen->format->Amask);
+
+    int hOffset = movingFramesStep * (nMovingFrames - 1 - i);
+    
+    SDL_Rect srcRect = {0};
+    srcRect.w = screen->w;
+    srcRect.h = screen->h;
+    
+    SDL_Rect dstRect = {0};
+    dstRect.x = hOffset;
+
+    SDL_BlitSurface(moving, &srcRect, movingSurfaces[i], &dstRect);
+    movingSurfaces[i]->flags |= SDL_SRCALPHA;
+  }
+  
+  *backgroundSurface = background;
 
   return true;
 }
@@ -216,10 +286,10 @@ bool prepareData( char const *backgroundImagePath, char const *movingImagePath,
 // The main program function.
 int main( int argc, char *argv[] )
 {
-  char const *backgroundImagePath = cmdline::getBackgroundImagePath(argc, argv);
-  char const *movingImagePath     = cmdline::getMovingImagePath(argc, argv);
-  size_t nMovingFrames            = cmdline::getNMovingFrames(argc, argv);
-  int movingFramesStep            = cmdline::getMovingFramesStep(argc, argv);
+  char   const *backgroundImagePath = cmdline::getBackgroundImagePath(argc, argv);
+  char   const *movingImagePath     = cmdline::getMovingImagePath(argc, argv);
+  size_t const nMovingFrames        = cmdline::getNMovingFrames(argc, argv);
+  int    const movingFramesStep     = cmdline::getMovingFramesStep(argc, argv);
   
   // Initializing SDL.
   if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -243,13 +313,14 @@ int main( int argc, char *argv[] )
     {
       assert(screen->format->BytesPerPixel == 4);
       
-      SDL_Surface *backgroundSurface, **movingSurfaces;
-      size_t nMovingSurfaces;
-      if (prepareData(backgroundImagePath, movingImagePath, nMovingFrames, movingFramesStep,
-                      &backgroundSurface, &movingSurfaces, &nMovingSurfaces))
+      SDL_Surface *backgroundSurface;
+      std::vector<SDL_Surface *> movingSurfaces;
+      
+      if (prepareData(screen, backgroundImagePath, movingImagePath, nMovingFrames, movingFramesStep,
+                      &backgroundSurface, movingSurfaces))
       {
         // Running main loop.
-        mainLoop(screen, backgroundSurface, movingSurfaces, nMovingSurfaces);
+        mainLoop(screen, backgroundSurface, &(movingSurfaces[0]), nMovingFrames);
       }
       else
       {
