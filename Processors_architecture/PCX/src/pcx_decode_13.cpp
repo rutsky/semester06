@@ -22,10 +22,8 @@ namespace pcx
     unsigned char const *imageEnd = image + height * 3 * width;
     unsigned char const *inputEnd = input + size;
     
-    static const dword_type mask[16] = 
+    static const dword_type mask[8] = 
       { 
-        0xC0, 0xC0, 0xC0, 0xC0,
-        0xC0, 0xC0, 0xC0, 0xC0,
         0xC0, 0xC0, 0xC0, 0xC0,
         0xC0, 0xC0, 0xC0, 0xC0,
       };
