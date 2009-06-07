@@ -1,0 +1,6 @@
+view3d
+view3d.exe.so
+Out/
+*.ncb
+*.opt
+*.plg
