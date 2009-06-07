@@ -2,4 +2,5 @@
 *.s
 *.lst
 *~
+.tempfile
 pcx_decode

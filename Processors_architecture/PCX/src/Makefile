@@ -14,6 +14,8 @@ OBJECT_FILES = main.o pcx_decode.o $(foreach M,$(OPTIMIZATION_MODULES),$(M).o)
 CC = g++
 AS = as
 
+TEMPFILE = .tempfile
+
 # TODO: On Windows platform SDL stuff not working. #LINUX-DEPENDENT
 MAIN_LIB_COMPILER_OPTIONS = $(shell sdl-config --cflags) 
 #MAIN_LIB_COMPILER_OPTIONS =
@@ -41,7 +43,9 @@ $(PROGRAM_NAME): $(OBJECT_FILES)
 %.o: %.cpp pcx.h
 	$(CC) -S -g $(COMPILER_OPTIONS) $(basename $@).cpp -o $(basename $@).s
 	$(CC) -c  $(ASSEMBLER_OPTIONS) $(basename $@).s -o $(basename $@).o
+	@#LINUX-DEPENDENT
 	$(AS) -alhndm $(basename $@).s -o /dev/null > $(basename $@).lst
+	@#$(AS) -alhndm $(basename $@).s -o $(TEMPFILE) > $(basename $@).lst
 
 clean:
 	rm -f $(OBJECT_FILES)
@@ -49,6 +53,7 @@ clean:
 	rm -f $(foreach M,$(OPTIMIZATION_MODULES),$(M).lst)
 	rm -f *~
 	rm -f $(PROGRAM_NAME)
+	rm -f $(TEMPFILE)
 
 main.o: main.cpp pcx.h mtimer.hpp
 	$(CC) -c $(MAIN_COMPILER_OPTIONS) $<
