@@ -18,7 +18,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-#include "effect_motion_blur.h"
+#include "motion_blur.h"
 
 // Useful `array_size' function.
 #ifdef WIN32
@@ -65,6 +65,14 @@ namespace constants
   
   Uint32 const fpsUpdateInterval = 1000; // in ticks (1/1000 of second).
   
+  typedef void (*motion_blur_apply_func_ptr)( motion_blur::byte_type *, size_t, size_t, size_t, 
+                                              motion_blur::byte_type const *, size_t, motion_blur::byte_type const *const *);
+  
+  motion_blur_apply_func_ptr const effectImpls[] =
+    {
+      &motion_blur::apply,
+      &motion_blur::apply,
+    };
   char const *effectImplsNames[] = 
     {
       "Base version",
@@ -137,6 +145,10 @@ int mainLoop( SDL_Surface *screen,
               SDL_Surface *backgroundSurface,
               SDL_Surface *movingSurfaces[], size_t nMovingSurfaces )
 {
+  std::vector<motion_blur::byte_type *> blurMovingLayers;
+  for (size_t i = 0; i < nMovingSurfaces; ++i)
+    blurMovingLayers.push_back(reinterpret_cast<motion_blur::byte_type *>(movingSurfaces[i]->pixels));
+  
   size_t frameCounter(0);
   Uint32 frameCounterLastUpdateTicks = SDL_GetTicks();
 
@@ -187,6 +199,21 @@ int mainLoop( SDL_Surface *screen,
     
     // Doing work.
     {
+      constants::motion_blur_apply_func_ptr const func = constants::effectImpls[curEffectImpl];
+      
+      // Locking screen.
+      if (SDL_MUSTLOCK(screen))
+        if (SDL_LockSurface(screen) < 0) 
+        {
+          std::cerr << "Error: SDL_LockSurface failed: " << SDL_GetError() << std::endl;
+          return 1;
+        }
+      
+      // Rendering.
+      func(reinterpret_cast<motion_blur::byte_type *>(screen->pixels), screen->w, screen->h, screen->pitch,
+           reinterpret_cast<motion_blur::byte_type const *>(backgroundSurface->pixels),
+           nMovingSurfaces, &(blurMovingLayers[0]));
+      
       /*
       {
         SDL_Rect srcRect = {0};
@@ -196,7 +223,7 @@ int mainLoop( SDL_Surface *screen,
         assert(result == 0);
       }
       */
-      
+      /*
       {
         SDL_Rect srcRect = {0};
         srcRect.w = screen->w;
@@ -205,7 +232,13 @@ int mainLoop( SDL_Surface *screen,
         //int const result = SDL_BlitSurface(movingSurfaces[0], &srcRect, screen, NULL);
         assert(result == 0);
       }
+      */
       
+      // Unlocking screen.
+      if (SDL_MUSTLOCK(screen))
+        SDL_UnlockSurface(screen);
+
+      // Flushing.
       SDL_UpdateRect(screen, 0, 0, 0, 0);
       
       //SDL_Delay(10);
@@ -237,6 +270,8 @@ bool prepareData( SDL_Surface *screen,
                   SDL_Surface **backgroundSurface, 
                   std::vector<SDL_Surface *> &movingSurfaces )
 {
+  assert(array_size(constants::effectImpls) == array_size(constants::effectImplsNames));
+  
   // Loading data images.
   SDL_Surface *backgroundLoaded = IMG_Load(backgroundImagePath);
   if (!backgroundLoaded)
@@ -356,6 +391,11 @@ int main( int argc, char *argv[] )
     else
     {
       assert(screen->format->BytesPerPixel == 4);
+      
+      
+      std::cout << "Successfully createted window surface.\n"
+          <<   "Rmask:" << std::hex << screen->format->Rmask << ", Gmask:" << std::hex << screen->format->Gmask
+          << ", Bmask:" << std::hex << screen->format->Bmask << ", Amask:" << std::hex << screen->format->Amask << std::endl;
       
       SDL_Surface *backgroundSurface;
       std::vector<SDL_Surface *> movingSurfaces;

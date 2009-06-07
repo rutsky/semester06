@@ -4,7 +4,8 @@
 # 03.06.2009
 
 PROGRAM_NAME = motion_blur
-OPTIMIZATION_MODULES = 
+OPTIMIZATION_MODULES = \
+  motion_blur
 OBJECT_FILES = main.o $(foreach M,$(OPTIMIZATION_MODULES),$(M).o)
 CC = g++
 AS = as
@@ -35,7 +36,7 @@ all: $(PROGRAM_NAME)
 $(PROGRAM_NAME): $(OBJECT_FILES)
 	$(CC) $(LINK_OPTIONS) $(OBJECT_FILES)
 
-%.o: %.cpp effect_motion_blur.h
+%.o: %.cpp motion_blur.h
 	$(CC) -S -g $(COMPILER_OPTIONS) $(basename $@).cpp -o $(basename $@).s
 	$(CC) -c  $(ASSEMBLER_OPTIONS) $(basename $@).s -o $(basename $@).o
 	@#LINUX-DEPENDENT
@@ -50,5 +51,5 @@ clean:
 	rm -f $(PROGRAM_NAME)
 	rm -f $(TEMPFILE)
 
-main.o: main.cpp effect_motion_blur.h
+main.o: main.cpp motion_blur.h
 	$(CC) -c $(MAIN_COMPILER_OPTIONS) $<
