@@ -25,6 +25,9 @@
 
 // TODO: Divivde `main()' on subroutines.
 
+template< typename T, size_t N >
+size_t array_size( T (&)[N] ) { return N; }
+
 // The main program function.
 int main( int argc, char *argv[] )
 {
@@ -187,9 +190,8 @@ int main( int argc, char *argv[] )
           &pcx::decode_13,
           &pcx::decode_13a,
         };
-      size_t const nImplementations = sizeof(decodeFuncs) / sizeof(decodeFuncs[0]);
       
-      char const *decodeFuncsNames    [nImplementations] = 
+      char const *decodeFuncsNames    [] = 
         {
           "general",
           "# 1  w/o iostream",
@@ -210,6 +212,9 @@ int main( int argc, char *argv[] )
           "#13  I/O by blindly paired 2 DWORDs using MMX",
           "#13a I/O by blindly paired 2 DWORDs using MMX (only copying with MMX)",
         };
+      assert(array_size(decodeFuncs) == array_size(decodeFuncsNames));
+
+      size_t const nImplementations = array_size(decodeFuncs);
 
       double results[nImplementations][nTotalTries + 2]; // `... + 2' because we skipping first and last runs.
       
