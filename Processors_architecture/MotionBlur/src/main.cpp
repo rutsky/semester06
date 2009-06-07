@@ -16,6 +16,7 @@
 #include <vector>
 
 #include <SDL.h>
+#include <SDL_image.h>
 
 #include "effect_motion_blur.h"
 
@@ -104,13 +105,16 @@ void updateWindowTitle( int effectCurImpl, double fps )
   std::ostringstream ostr;
   
   assert(effectCurImpl < static_cast<int>(array_size(constants::effectImplsNames)));
-  ostr << constants::effectImplsNames[effectCurImpl] << " " << std::fixed << std::setw(9) << std::setprecision(4) <<  fps;
+  ostr << constants::effectImplsNames[effectCurImpl] << " " 
+      << std::fixed << std::setw(9) << std::setprecision(4) << fps << " FPS";
   
   SDL_WM_SetCaption(ostr.str().c_str(), NULL);
 }
 
 // Main program loop.
-int mainLoop( SDL_Surface *screen )
+int mainLoop( SDL_Surface *screen,
+              SDL_Surface *backgroundSurface,
+              SDL_Surface *movingSurfaces[], size_t nMovingSurfaces )
 {
   size_t frameCounter(0);
   Uint32 frameCounterLastUpdateTicks = SDL_GetTicks();
@@ -184,7 +188,31 @@ int mainLoop( SDL_Surface *screen )
   
   return 0;
 }
-    
+
+bool prepareData( char const *backgroundImagePath, char const *movingImagePath,
+                  size_t nMovingFrames, int movingFramesStep,
+                  SDL_Surface **backgroundSurface, SDL_Surface ***movingSurfaces, size_t *nMovingSurfaces )
+{
+  // Loading data images.
+  SDL_Surface *background = IMG_Load(backgroundImagePath);
+  if (!background)
+  {
+    std::cout << "Failed to load `" << backgroundImagePath << "' with IMG_Load: " << IMG_GetError() << std::endl;
+    return false;
+  }
+  
+  SDL_Surface *moving = IMG_Load(movingImagePath);
+  if (!background)
+  {
+    std::cout << "Failed to load `" << movingImagePath << "' with IMG_Load: " << IMG_GetError() << std::endl;
+    return false;
+  }
+  
+  // Creating blur steps images.
+
+  return true;
+}
+
 // The main program function.
 int main( int argc, char *argv[] )
 {
@@ -210,13 +238,24 @@ int main( int argc, char *argv[] )
       std::cerr << "Unable to set " 
           << constants::windowWidth << "x" << constants::windowHeight << "x" << constants::windowBPP 
           << " video mode window: %s\n" << SDL_GetError() << std::endl;
-      SDL_Quit();
-      return 2;
     }
-    assert(screen->format->BytesPerPixel == 4);
-    
-    // Running main loop.
-    mainLoop(screen);
+    else
+    {
+      assert(screen->format->BytesPerPixel == 4);
+      
+      SDL_Surface *backgroundSurface, **movingSurfaces;
+      size_t nMovingSurfaces;
+      if (prepareData(backgroundImagePath, movingImagePath, nMovingFrames, movingFramesStep,
+                      &backgroundSurface, &movingSurfaces, &nMovingSurfaces))
+      {
+        // Running main loop.
+        mainLoop(screen, backgroundSurface, movingSurfaces, nMovingSurfaces);
+      }
+      else
+      {
+        // Exiting. // TODO: Do it with error.
+      }
+    }
   }
 
   // Deinitializing SDL.

@@ -25,7 +25,7 @@ COMPILER_OPTIONS = -fverbose-asm -masm=intel $(OPTIMIZATION_OPTIONS) $(LIB_COMPI
 ASSEMBLER_OPTIONS = 
 
 #LINUX-DEPENDENT
-LIB_LINK_OPTIONS = $(shell sdl-config --libs)
+LIB_LINK_OPTIONS = $(shell sdl-config --libs) -lSDL_image
 #LIB_LINK_OPTIONS =
 
 LINK_OPTIONS = -o $(PROGRAM_NAME) $(LIB_LINK_OPTIONS)
