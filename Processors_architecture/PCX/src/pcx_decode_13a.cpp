@@ -60,7 +60,7 @@ namespace pcx
           int count = (byte & 0x3F); // 0x3F = 2#00111111
         
           if (input == inputEnd)
-            return; // Impossible on correct images.
+            goto exit; // Impossible on correct images.
         
           byte = *input++;
         
@@ -84,7 +84,7 @@ namespace pcx
                 image += 4;
               }
             
-              return;
+              goto exit;
             }
             else
             {
@@ -104,9 +104,13 @@ namespace pcx
         }
         
         if (input == inputEnd || image == imageEnd)
-          return;
+          goto exit;
       }
       ); // End of 'DO_4_TIMES'.
     } while (true);
+    
+  exit:
+    // Freeing FPU registers.
+    asm("emms": : );
   }
 } // End of namespace 'pcx'.
