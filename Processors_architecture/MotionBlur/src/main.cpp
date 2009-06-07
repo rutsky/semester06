@@ -292,7 +292,7 @@ bool prepareData( SDL_Surface *screen,
     srcRect.h = std::min(screen->h, movingLoaded->h);
     
     movingLoaded->flags &= ~SDL_SRCALPHA;
-    int const result = SDL_BlitSurface(backgroundLoaded, &srcRect, moving, NULL);
+    int const result = SDL_BlitSurface(movingLoaded, &srcRect, moving, NULL);
     assert(result == 0);
   }
   
