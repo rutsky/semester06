@@ -41,7 +41,6 @@ namespace pcx
             count = imageEnd - image;
             
             memset(image, static_cast<int>(byte), count);
-            image += count;
             
             break;
           }
