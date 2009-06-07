@@ -28,10 +28,12 @@
 // The main program function.
 int main( int argc, char *argv[] )
 {
+  using pcx::byte_type;
+
   char const *inputFileName = "../data/baboon4.pcx";
   char const *outputFileName = "../data/baboon4.ppm";
-  size_t nTries = 100; // TODO: Set to 1000.
-  size_t nTotalTries = 20;
+  size_t nTries = 10; // TODO: Set to 1000.
+  size_t nTotalTries = 3;
   
   if (argc >= 2)
     inputFileName = argv[1];
@@ -54,7 +56,7 @@ int main( int argc, char *argv[] )
     nTotalTries = x;
   }
   
-  std::vector<unsigned char> inputData;
+  std::vector<byte_type> inputData;
   {
     // Opening input PCX file.
     std::ifstream ifs;
@@ -130,7 +132,7 @@ int main( int argc, char *argv[] )
   }
   
   // Decoding image.
-  std::vector<unsigned char> image;
+  std::vector<byte_type> image;
   size_t width, height, nPlanes;
   {
     if (header.xMin > header.xMax || header.yMin > header.yMax)
@@ -153,8 +155,16 @@ int main( int argc, char *argv[] )
     image.resize(height * width * nPlanes);
     
     // Decoding.
+    pcx::decode(&(inputData[headerSize]), dataSize, width, height, &(image[0]));
+
+    // Optimized decoding timing.
+    size_t const nAdditionalInput = 1024, nAdditionalOutput = 1024;
+    std::vector<byte_type> testInput(inputData.size() + nAdditionalInput, byte_type(0));
+    std::copy(inputData.begin(), inputData.end(), testInput.begin());
+    std::vector<byte_type> testImage(height * width * nPlanes + nAdditionalOutput, byte_type(0));
+    
     {
-      typedef void (*decode_func_ptr_type)( unsigned char const *, size_t, size_t, size_t, unsigned char *);
+      typedef void (*decode_func_ptr_type)( byte_type const *, size_t, size_t, size_t, byte_type *);
       
       decode_func_ptr_type decodeFuncs[] = 
         { 
@@ -220,7 +230,7 @@ int main( int argc, char *argv[] )
         #endif
           for (size_t i = 0; i < nTries; ++i)
           {
-            decodeFunc(&(inputData[headerSize]), dataSize, width, height, &(image[0]));
+            decodeFunc(&(testInput[headerSize]), dataSize, width, height, &(testImage[0]));
           }
         #ifdef WIN32
           double const tryTime = timer.GetTime() - startTime;
@@ -229,6 +239,12 @@ int main( int argc, char *argv[] )
           double const tryTime = (double)(endTics - startTics) / 1000.0;
         #endif
           results[funcIdx][totalTry] = tryTime;
+          
+          // Verifying generated image.
+          if (!std::equal(image.begin(), image.end(), testImage.begin()))
+          {
+            std::cout << "Error! Implementation `" << decodeFuncsNames[funcIdx] << "' incorectly decoded image." << std::endl;
+          }
         }
       }
       
