@@ -23,7 +23,7 @@
 
 #include "pcx.h"
 
-// TODO: Divivde `main()' on subroutines.
+// TODO: Divide `main()' on subroutines.
 
 template< typename T, size_t N >
 size_t array_size( T (&)[N] ) { return N; }
