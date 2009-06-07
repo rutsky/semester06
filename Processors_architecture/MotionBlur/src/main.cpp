@@ -90,6 +90,36 @@ namespace cmdline
   }
 #endif // not WIN32
 
+// Main program loop.
+int mainLoop( SDL_Surface *screen )
+{
+  bool exit = false;
+  while (!exit)
+  {
+    SDL_Event event;
+
+    // Polling all events.
+    while (SDL_PollEvent(&event))
+    {
+      switch (event.type)
+      {
+        case SDL_KEYDOWN:
+          std::cout << "The " << SDL_GetKeyName(event.key.keysym.sym) << " key was pressed!" << std::endl;
+          break;
+            
+        case SDL_QUIT:
+          // Exiting.
+          exit = true;
+          break;
+      }
+    }
+    
+    // Doing work.
+  }
+  
+  return 0;
+}
+    
 // The main program function.
 int main( int argc, char *argv[] )
 {
@@ -118,8 +148,10 @@ int main( int argc, char *argv[] )
       SDL_Quit();
       return 2;
     }
+    assert(screen->format->BytesPerPixel == 4);
     
-    
+    // Running main loop.
+    mainLoop(screen);
   }
 
   // Deinitializing SDL.
