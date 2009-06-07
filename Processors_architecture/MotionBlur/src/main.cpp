@@ -67,11 +67,16 @@ namespace cmdline
 } // End of namespace `cmdline'.
 
 // Usefull function.
-template< typename T, size_t N >
-size_t array_size( T (&)[N] ) 
-{ 
-  return N; 
-}
+#ifdef WIN32
+  #define array_size(x) \
+    (sizeof(x) / sizeof((x)[0]))
+#else // WIN32
+  template< typename T, size_t N >
+  size_t array_size( T (&)[N] ) 
+  { 
+    return N; 
+  }
+#endif // not WIN32
 
 // The main program function.
 int main( int argc, char *argv[] )

@@ -4,3 +4,9 @@
 *~
 .tempfile
 motion_blur
+# VS6 stuff.
+MotionBlur.ncb
+MotionBlur.opt
+MotionBlur.plg
+Debug/*
+Release/*
