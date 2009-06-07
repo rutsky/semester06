@@ -1,7 +1,7 @@
 /* pcx_decode_15.cpp
  * PCX fast decoding routine.
  * Implementation #15.
- * Vladimir Rutsky <altsysrq@gmail.com>
+ * Anton Timofeev <at1.030@gmail.com>
  * 02.06.2009
  */
 
@@ -40,8 +40,26 @@ namespace pcx
           {
             count = imageEnd - image;
             
-            for (; count & (8 - 1); --count)
-              *image++ = byte;
+            switch (count & (8 - 1))
+            {
+              case 7:
+                *(image + 6) = byte;
+              case 6:
+                *(image + 5) = byte;
+              case 5:
+                *(image + 4) = byte;
+              case 4:
+                *(image + 3) = byte;
+              case 3:
+                *(image + 2) = byte;
+              case 2:
+                *(image + 1) = byte;
+              case 1:
+                *(image + 0) = byte;
+            }
+            
+            image += count & (8 - 1);
+            count &= ~(8 - 1);
               
             if (count != 0)
             {
@@ -77,8 +95,26 @@ namespace pcx
           }
           else
           {
-            for (; count & (8 - 1); --count)
-              *image++ = byte;
+            switch (count & (8 - 1))
+            {
+              case 7:
+                *(image + 6) = byte;
+              case 6:
+                *(image + 5) = byte;
+              case 5:
+                *(image + 4) = byte;
+              case 4:
+                *(image + 3) = byte;
+              case 3:
+                *(image + 2) = byte;
+              case 2:
+                *(image + 1) = byte;
+              case 1:
+                *(image + 0) = byte;
+            }
+            
+            image += count & (8 - 1);
+            count &= ~(8 - 1);
               
             if (count != 0)
             {
