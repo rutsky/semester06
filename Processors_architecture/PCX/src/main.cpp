@@ -186,6 +186,7 @@ int main( int argc, char *argv[] )
           &pcx::decode_13,
           &pcx::decode_13a,
           &pcx::decode_14,
+          &pcx::decode_15,
         };
       
       char const *decodeFuncsNames    [] = 
@@ -208,7 +209,8 @@ int main( int argc, char *argv[] )
           "#12  reading aligned by 4 bytes",
           "#13  I/O by blindly paired 2 DWORDs using MMX",
           "#13a I/O by blindly paired 2 DWORDs using MMX (only copying with MMX)",
-          "14   I/O by blindly paired 2 DWORDs using MMX + output using SSE.",
+          "14   I/O by blindly paired 2 DWORDs using MMX + output using SSE",
+          "15   Only using SSE for output",
         };
       assert(array_size(decodeFuncs) == array_size(decodeFuncsNames));
 

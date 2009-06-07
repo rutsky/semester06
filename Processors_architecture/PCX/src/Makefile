@@ -9,7 +9,7 @@ OPTIMIZATION_MODULES = \
   pcx_decode_05  pcx_decode_06  pcx_decode_07  pcx_decode_08 \
   pcx_decode_09  pcx_decode_09a pcx_decode_10  pcx_decode_11 \
   pcx_decode_11a pcx_decode_11b pcx_decode_12  pcx_decode_13 \
-  pcx_decode_13a pcx_decode_14
+  pcx_decode_13a pcx_decode_14  pcx_decode_15
 OBJECT_FILES = main.o pcx_decode.o $(foreach M,$(OPTIMIZATION_MODULES),$(M).o)
 CC = g++
 AS = as
