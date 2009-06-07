@@ -167,7 +167,17 @@ int mainLoop( SDL_Surface *screen,
     
     // Doing work.
     {
-      SDL_Delay(10);
+      {
+        SDL_Rect srcRect = {0};
+        srcRect.w = screen->w;
+        srcRect.h = screen->h;
+        int const result = SDL_BlitSurface(backgroundSurface, &srcRect, screen, NULL);
+        assert(result == 0);
+      }
+      
+      SDL_UpdateRect(screen, 0, 0, 0, 0);
+      
+      //SDL_Delay(10);
     }
     
     // Timing.
@@ -236,7 +246,8 @@ bool prepareData( SDL_Surface *screen,
     srcRect.h = std::min(screen->h, backgroundLoaded->h);
     
     backgroundLoaded->flags &= ~SDL_SRCALPHA;
-    SDL_BlitSurface(backgroundLoaded, &srcRect, background, NULL);
+    int const result = SDL_BlitSurface(backgroundLoaded, &srcRect, background, NULL);
+    assert(result == 0);
     background->flags |= SDL_SRCALPHA;
   }
   
@@ -250,7 +261,8 @@ bool prepareData( SDL_Surface *screen,
     srcRect.h = std::min(screen->h, movingLoaded->h);
     
     movingLoaded->flags &= ~SDL_SRCALPHA;
-    SDL_BlitSurface(backgroundLoaded, &srcRect, background, NULL);
+    int const result = SDL_BlitSurface(backgroundLoaded, &srcRect, background, NULL);
+    assert(result == 0);
   }
   
   assert(background->w == screen->w && background->h == screen->h);
@@ -274,7 +286,8 @@ bool prepareData( SDL_Surface *screen,
     SDL_Rect dstRect = {0};
     dstRect.x = hOffset;
 
-    SDL_BlitSurface(moving, &srcRect, movingSurfaces[i], &dstRect);
+    int const result = SDL_BlitSurface(moving, &srcRect, movingSurfaces[i], &dstRect);
+    assert(result == 0);
     movingSurfaces[i]->flags |= SDL_SRCALPHA;
   }
   
