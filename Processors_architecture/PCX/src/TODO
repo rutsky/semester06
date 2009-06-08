@@ -1,0 +1,5 @@
+ * Fix incorrect optimization about:
+  > if (dword & 0xC0C0C0C0)
+  and 
+  > dword |= dword1
+ * In 7th optimization case of `count == 1' not handled as in 8th optimization.
