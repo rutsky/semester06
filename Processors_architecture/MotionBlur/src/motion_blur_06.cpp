@@ -28,11 +28,11 @@ namespace motion_blur
 
     // Storing zeroes at mm6.
     static char const zeroes[8] = {0};
-    asm("movd    mm6, QWORD PTR [%[addr]]": : [addr]"r"(zeroes));
+    asm("movq    mm6, QWORD PTR [%[addr]]": : [addr]"r"(zeroes));
     
     // Storing mask.
     static char const mask[8] = {0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00};
-    asm("movd    mm7, QWORD PTR [%[addr]]": : [addr]"r"(mask));
+    asm("movq    mm7, QWORD PTR [%[addr]]": : [addr]"r"(mask));
   
     for (int y = 0; y < h; ++y)
     {
