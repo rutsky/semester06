@@ -1,22 +1,23 @@
-/* motion_blur.cpp
+/* motion_blur_01.cpp
  * Motion blur effect.
- * Base implementation.
+ * Implementation 1.
  * Vladimir Rutsky <altsysrq@gmail.com>
  * 08.06.2009
  */
 
 #include "motion_blur.h"
 
+/*****
+ * 1. Used `int' type instead `float'.
+ ****/
+
 namespace motion_blur
 {
-  void apply( 
+  void apply_01( 
           byte_type *image, int w, int h, int scanlineLen,
           byte_type const *background,
           int nMovingLayers, byte_type const *const *movingLayers )
   {
-    // Assume that pixel format is A[RGB], 
-    // i.e. (pixel & 0xff000000) is always alpha, order of color components not matters.
-  
     for (int y = 0; y < h; ++y)
     {
       for (int x = 0; x < w; ++x)
@@ -40,7 +41,7 @@ namespace motion_blur
           // Loading background pixel.
           pixel_type const &backgroundPixel = *reinterpret_cast<pixel_type const *>(background + idx);
           
-          float
+          int
             totalR = backgroundPixel.r,
             totalG = backgroundPixel.g,
             totalB = backgroundPixel.b;

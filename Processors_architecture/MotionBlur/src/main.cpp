@@ -65,18 +65,18 @@ namespace constants
   
   Uint32 const fpsUpdateInterval = 1000; // in ticks (1/1000 of second).
   
-  typedef void (*motion_blur_apply_func_ptr)( motion_blur::byte_type *, size_t, size_t, size_t, 
-                                              motion_blur::byte_type const *, size_t, motion_blur::byte_type const *const *);
+  typedef void (*motion_blur_apply_func_ptr)( motion_blur::byte_type *, int, int, int, 
+                                              motion_blur::byte_type const *, int, motion_blur::byte_type const *const *);
   
   motion_blur_apply_func_ptr const effectImpls[] =
     {
       &motion_blur::apply,
-      &motion_blur::apply,
+      &motion_blur::apply_01,
     };
   char const *effectImplsNames[] = 
     {
       "Base version",
-      "Paired copying",
+      "1. Used `int' type instead of `float'",
     };
   size_t const nEffectImpls = array_size(effectImplsNames);
 } // End of namespace `constants'.

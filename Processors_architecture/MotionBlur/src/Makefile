@@ -4,8 +4,8 @@
 # 03.06.2009
 
 PROGRAM_NAME = motion_blur
-OPTIMIZATION_MODULES = \
-  motion_blur
+OPTIMIZATION_MODULES = motion_blur \
+  motion_blur_01 
 OBJECT_FILES = main.o $(foreach M,$(OPTIMIZATION_MODULES),$(M).o)
 CC = g++
 AS = as

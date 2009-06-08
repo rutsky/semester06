@@ -23,9 +23,14 @@ namespace motion_blur
   };
   
   void apply(
-          byte_type *image, size_t w, size_t h, size_t scanlineLen,
+          byte_type *image, int w, int h, int scanlineLen,
           byte_type const *background,
-          size_t nMovingLayers, byte_type const *const *movingLayers );
+          int nMovingLayers, byte_type const *const *movingLayers );
+
+  void apply_01(
+          byte_type *image, int w, int h, int scanlineLen,
+          byte_type const *background,
+          int nMovingLayers, byte_type const *const *movingLayers );
 } // End of namespace `motion_blur'.
 
 #endif // MOTION_BLUR_H
