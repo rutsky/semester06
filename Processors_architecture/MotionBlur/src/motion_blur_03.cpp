@@ -1,6 +1,6 @@
-/* motion_blur_01.cpp
+/* motion_blur_03.cpp
  * Motion blur effect.
- * Implementation 1.
+ * Implementation 3.
  * Vladimir Rutsky <altsysrq@gmail.com>
  * 08.06.2009
  */
@@ -8,12 +8,12 @@
 #include "motion_blur.h"
 
 /*****
- * 1. Used `int' type instead `float'.
+ * 3. Optimized cycle.
  ****/
 
 namespace motion_blur
 {
-  void apply_01( 
+  void apply_03( 
           byte_type *image, int w, int h, int scanlineLen,
           byte_type const *background,
           int nMovingLayers, byte_type const *const *movingLayers )
@@ -28,11 +28,7 @@ namespace motion_blur
         
         pixel_type const &lastLayerMovingPixel = *reinterpret_cast<pixel_type const *>(movingLayers[nMovingLayers - 1] + idx);
         if (lastLayerMovingPixel.a != 0)
-        {
-          imagePixel.r = lastLayerMovingPixel.r;
-          imagePixel.g = lastLayerMovingPixel.g;
-          imagePixel.b = lastLayerMovingPixel.b;
-        }
+          imagePixel = lastLayerMovingPixel;
         else
         {
           pixel_type const &backgroundPixel = *reinterpret_cast<pixel_type const *>(background + idx);
@@ -42,9 +38,10 @@ namespace motion_blur
             totalG = backgroundPixel.g,
             totalB = backgroundPixel.b;
           
-          for (int i = 0; i < nMovingLayers - 1; ++i)
+          int i = nMovingLayers - 1;
+          do
           {
-            pixel_type const &movingPixel = *reinterpret_cast<pixel_type const *>(movingLayers[i] + idx);
+            pixel_type const &movingPixel = *reinterpret_cast<pixel_type const *>(movingLayers[i - 1] + idx);
             
             if (movingPixel.a != 0)
             {
@@ -58,7 +55,8 @@ namespace motion_blur
               totalG += backgroundPixel.g;
               totalB += backgroundPixel.b;
             }
-          }
+            --i;
+          } while (i != 0);
           
           imagePixel.r = static_cast<byte_type>(totalR / nMovingLayers);
           imagePixel.g = static_cast<byte_type>(totalG / nMovingLayers);

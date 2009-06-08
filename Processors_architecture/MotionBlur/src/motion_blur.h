@@ -22,12 +22,37 @@ namespace motion_blur
     byte_type r, g, b, a;
   };
   
+  void apply_dummy(
+          byte_type *image, int w, int h, int scanlineLen,
+          byte_type const *background,
+          int nMovingLayers, byte_type const *const *movingLayers );
+  
   void apply(
           byte_type *image, int w, int h, int scanlineLen,
           byte_type const *background,
           int nMovingLayers, byte_type const *const *movingLayers );
 
   void apply_01(
+          byte_type *image, int w, int h, int scanlineLen,
+          byte_type const *background,
+          int nMovingLayers, byte_type const *const *movingLayers );
+  
+  void apply_02(
+          byte_type *image, int w, int h, int scanlineLen,
+          byte_type const *background,
+          int nMovingLayers, byte_type const *const *movingLayers );
+  
+  void apply_03(
+          byte_type *image, int w, int h, int scanlineLen,
+          byte_type const *background,
+          int nMovingLayers, byte_type const *const *movingLayers );
+  
+  void apply_04(
+          byte_type *image, int w, int h, int scanlineLen,
+          byte_type const *background,
+          int nMovingLayers, byte_type const *const *movingLayers );
+  
+  void apply_06(
           byte_type *image, int w, int h, int scanlineLen,
           byte_type const *background,
           int nMovingLayers, byte_type const *const *movingLayers );

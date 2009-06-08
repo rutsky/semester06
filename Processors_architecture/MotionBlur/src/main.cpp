@@ -70,13 +70,23 @@ namespace constants
   
   motion_blur_apply_func_ptr const effectImpls[] =
     {
+      &motion_blur::apply_dummy,
       &motion_blur::apply,
       &motion_blur::apply_01,
+      &motion_blur::apply_02,
+      &motion_blur::apply_03,
+      &motion_blur::apply_04,
+      &motion_blur::apply_06,
     };
   char const *effectImplsNames[] = 
     {
+      "Dummy background output.",
       "Base version",
       "1. Used `int' type instead of `float'",
+      "2. Outputting by 4 bytes some pixels.",
+      "3. Optimized cycle.",
+      "4. Precalculated inverse value.",
+      "6. Using MMX and SSE.",
     };
   size_t const nEffectImpls = array_size(effectImplsNames);
 } // End of namespace `constants'.
@@ -168,7 +178,7 @@ int mainLoop( SDL_Surface *screen,
         switch (event.type)
         {
           case SDL_KEYDOWN:
-            if (event.key.keysym.sym == SDLK_LEFT)
+            if (event.key.keysym.sym == SDLK_RIGHT)
             {
               curEffectImpl = (curEffectImpl + 1) % constants::nEffectImpls;
 
@@ -177,7 +187,7 @@ int mainLoop( SDL_Surface *screen,
               frameCounter = 0;
               updateWindowTitle(curEffectImpl, curEffectFPS);
             }
-            else if (event.key.keysym.sym == SDLK_RIGHT)
+            else if (event.key.keysym.sym == SDLK_LEFT)
             {
               curEffectImpl = (curEffectImpl + constants::nEffectImpls - 1) % constants::nEffectImpls;
 
