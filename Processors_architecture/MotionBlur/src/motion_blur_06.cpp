@@ -19,7 +19,7 @@ namespace motion_blur
           int nMovingLayers, byte_type const *const *movingLayers )
   {
     // Calculating `1/nMovingLayers'.
-    dword_type invNMovingLayers = (1 << 16) / nMovingLayers;
+    dword_type invNMovingLayers = (1 << 8) / nMovingLayers;
     
     // Storing `1/nMovingLayers' into mm5.
     asm("movd    mm5, %[var]": : [var]"r"(invNMovingLayers));
@@ -71,13 +71,15 @@ namespace motion_blur
             --i;
           } while (i != 0);
           
-          // mm4 = mm4 * (1/nMovingLayers)
+          // mm4 = mm4 * ((1 << 8)/nMovingLayers)
           asm("pmullw   mm4, mm5": : );
+          // mm4 = mm4 >> 8
+          asm("psrlw    mm4, 8": : );
           // Packing result with saturation.
           asm("packuswb mm4, mm7": : );
           
           // Saving result pixels.
-          asm("movd     mm4, DWORD PTR [%[addr]]": : [addr]"r"(image + idx));
+          asm("movd     DWORD PTR [%[addr]], mm4": : [addr]"r"(image + idx));
         }
       }
     }
