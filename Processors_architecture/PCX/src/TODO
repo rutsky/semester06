@@ -3,3 +3,5 @@
   and 
   > dword |= dword1
  * In 7th optimization case of `count == 1' not handled as in 8th optimization.
+ * Case when decoding repeating bytes are outside of image is very rare and should not be 
+ (mat not be handled, just `return').
