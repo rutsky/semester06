@@ -7,6 +7,8 @@
 
 #include "motion_blur.h"
 
+#include <cmath>
+
 namespace motion_blur
 {
   void apply( 
@@ -40,7 +42,7 @@ namespace motion_blur
           // Loading background pixel.
           pixel_type const &backgroundPixel = *reinterpret_cast<pixel_type const *>(background + idx);
           
-          float 
+          double
             totalR = backgroundPixel.r,
             totalG = backgroundPixel.g,
             totalB = backgroundPixel.b;
@@ -50,16 +52,48 @@ namespace motion_blur
           {
             pixel_type const &movingPixel = *reinterpret_cast<pixel_type const *>(movingLayers[i] + idx);
             
+            double const coef = 0.5;
+            
             if (movingPixel.a != 0)
             {
-              float const
+              double const
                 r = movingPixel.r,
                 g = movingPixel.g,
                 b = movingPixel.b;
             
+              //double const p = pow(2., -(nMovingLayers - 1. - i));
+              //double const p = 0.5;
+              
+              /*
               totalR = (totalR + r) / 2.;
               totalG = (totalG + g) / 2.;
               totalB = (totalB + b) / 2.;
+              */
+              /*
+              totalR = 3./4. * totalR + 1./4. * r;
+              totalG = 3./4. * totalG + 1./4. * g;
+              totalB = 3./4. * totalB + 1./4. * b;
+              */
+              /*
+              totalR = (1. * totalR + p * r) / (1 + p);
+              totalG = (1. * totalG + p * g) / (1 + p);
+              totalB = (1. * totalB + p * b) / (1 + p);
+              */
+              /*
+              totalR = (1. - p) * totalR + p * r;
+              totalG = (1. - p) * totalG + p * g;
+              totalB = (1. - p) * totalB + p * b;
+              */
+              
+              totalR = coef * totalR + (1. - coef) * movingPixel.r;
+              totalG = coef * totalG + (1. - coef) * movingPixel.g;
+              totalB = coef * totalB + (1. - coef) * movingPixel.b;
+            }
+            else
+            {
+              totalR = coef * totalR + (1. - coef) * backgroundPixel.r;
+              totalG = coef * totalG + (1. - coef) * backgroundPixel.g;
+              totalB = coef * totalB + (1. - coef) * backgroundPixel.b;
             }
           }
           
