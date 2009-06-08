@@ -25,6 +25,14 @@ namespace motion_blur
     asm("movd    mm5, %[var]": : [var]"r"(invNMovingLayers));
     // Cloning `1/nMovingLayers' into 4 mm5 words.
     asm("pshufw  mm5, mm5, 0": : );
+
+    // Storing zeroes at mm6.
+    static char const zeroes[8] = {0};
+    asm("movd    mm6, QWORD PTR [%[addr]]": : [addr]"r"(zeroes));
+    
+    // Storing mask.
+    static char const mask[8] = {0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00};
+    asm("movd    mm7, QWORD PTR [%[addr]]": : [addr]"r"(mask));
   
     for (int y = 0; y < h; ++y)
     {
@@ -38,9 +46,9 @@ namespace motion_blur
         else
         {
           // mm0 = 0
-          asm("pxor      mm0, mm0": : );
+          asm("movd      mm0, DWORD PTR [%[addr]]": : [addr]"r"(background + idx));
           // Loading background pixel into mm0 (packed as words).
-          asm("punpcklbw mm0, DWORD PTR [%[addr]]": : [addr]"r"(background + idx));
+          asm("punpcklbw mm0, mm6": : );
           
           // mm4 will accumulate color sum.
           asm("movq      mm4, mm0": : );
@@ -54,10 +62,8 @@ namespace motion_blur
             {
               // Loading moving layer pixel into mm1.
               asm("movd      mm1, %[var]": : [var]"r"(movingLayerDword));
-              // mm2 = 0
-              asm("pxor      mm2, mm2": : );
               // Unpacking bytes to words.
-              asm("punpcklbw mm1, mm2": : );
+              asm("punpcklbw mm1, mm6": : );
               
               // mm4 += mm1
               asm("paddsw    mm4, mm1": : );
@@ -75,6 +81,8 @@ namespace motion_blur
           asm("pmullw   mm4, mm5": : );
           // mm4 = mm4 >> 8
           asm("psrlw    mm4, 8": : );
+          // mm4 = mm4 & 0xff
+          asm("pand     mm4, mm7": : );
           // Packing result with saturation.
           asm("packuswb mm4, mm7": : );
           
