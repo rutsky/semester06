@@ -23,33 +23,51 @@ namespace motion_blur
       {
         size_t const idx = y * scanlineLen + x * 4;
         
-        pixel_type const &backgroundPixel = *reinterpret_cast<pixel_type const *>(background + idx);
-        float 
-          totalR = backgroundPixel.r,
-          totalG = backgroundPixel.g,
-          totalB = backgroundPixel.b;
-        
-        for (size_t i = 0; i < nMovingLayers; ++i)
-        {
-          pixel_type const &movingPixel = *reinterpret_cast<pixel_type const *>(movingLayers[i] + idx);
-          
-          if (movingPixel.a != 0)
-          {
-            float const
-              r = backgroundPixel.r,
-              g = backgroundPixel.g,
-              b = backgroundPixel.b;
-          
-            totalR = (totalR + r) / 2.;
-            totalG = (totalG + g) / 2.;
-            totalB = (totalB + b) / 2.;
-          }
-        }
-        
+        // Preparing output pixel.
         pixel_type &imagePixel = *reinterpret_cast<pixel_type *>(image + idx);
-        imagePixel.r = static_cast<byte_type>(totalR);
-        imagePixel.g = static_cast<byte_type>(totalG);
-        imagePixel.b = static_cast<byte_type>(totalB);
+        
+        pixel_type const &lastLayerMovingPixel = *reinterpret_cast<pixel_type const *>(movingLayers[nMovingLayers - 1] + idx);
+        if (lastLayerMovingPixel.a != 0)
+        {
+          // Current pixel contains 100% of last moving layer pixel.
+          
+          imagePixel.r = lastLayerMovingPixel.r;
+          imagePixel.g = lastLayerMovingPixel.g;
+          imagePixel.b = lastLayerMovingPixel.b;
+        }
+        else
+        {
+          // Loading background pixel.
+          pixel_type const &backgroundPixel = *reinterpret_cast<pixel_type const *>(background + idx);
+          
+          float 
+            totalR = backgroundPixel.r,
+            totalG = backgroundPixel.g,
+            totalB = backgroundPixel.b;
+          
+          // Applying all layers.
+          for (size_t i = 0; i < nMovingLayers - 1; ++i)
+          {
+            pixel_type const &movingPixel = *reinterpret_cast<pixel_type const *>(movingLayers[i] + idx);
+            
+            if (movingPixel.a != 0)
+            {
+              float const
+                r = movingPixel.r,
+                g = movingPixel.g,
+                b = movingPixel.b;
+            
+              totalR = (totalR + r) / 2.;
+              totalG = (totalG + g) / 2.;
+              totalB = (totalB + b) / 2.;
+            }
+          }
+          
+          // Writing final color.
+          imagePixel.r = static_cast<byte_type>(totalR);
+          imagePixel.g = static_cast<byte_type>(totalG);
+          imagePixel.b = static_cast<byte_type>(totalB);
+        }
       }
     }
   }

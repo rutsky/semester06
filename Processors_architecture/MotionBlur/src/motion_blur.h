@@ -19,7 +19,7 @@ namespace motion_blur
   
   struct pixel_type
   {
-    byte_type a, r, g, b;
+    byte_type r, g, b, a;
   };
   
   void apply(

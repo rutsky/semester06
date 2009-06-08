@@ -57,7 +57,7 @@ namespace constants
   char   const *defaultBackgroundImagePath = "../data/Kimi_Raikkonen_won_2007_Brazil_GP_scaled.jpg";
   char   const *defaultMovingImagePath     = "../data/Kimi_Raikkonen_won_2007_Brazil_GP_scaled_car.png";
   size_t const  defaultNMovingFrames       = 10;
-  int    const  defaultMovingFramesStep    = -2;
+  int    const  defaultMovingFramesStep    = -3;
   
   int const windowWidth  = 1000;
   int const windowHeight = 500;
@@ -110,7 +110,7 @@ namespace cmdline
       istr >> val;
       result = val;
     }
-    assert(result > 0);
+    assert(result >= 2);
     return result;
   }
   
@@ -228,8 +228,8 @@ int mainLoop( SDL_Surface *screen,
         SDL_Rect srcRect = {0};
         srcRect.w = screen->w;
         srcRect.h = screen->h;
-        int const result = SDL_BlitSurface(movingSurfaces[frameCounter % nMovingSurfaces], &srcRect, screen, NULL);
-        //int const result = SDL_BlitSurface(movingSurfaces[0], &srcRect, screen, NULL);
+        //int const result = SDL_BlitSurface(movingSurfaces[frameCounter % nMovingSurfaces], &srcRect, screen, NULL);
+        int const result = SDL_BlitSurface(movingSurfaces[0], &srcRect, screen, NULL);
         assert(result == 0);
       }
       */
@@ -270,6 +270,9 @@ bool prepareData( SDL_Surface *screen,
                   SDL_Surface **backgroundSurface, 
                   std::vector<SDL_Surface *> &movingSurfaces )
 {
+  // FIXME: Big hacks here!
+  // Assuming special RGBA format of input images.
+  
   assert(array_size(constants::effectImpls) == array_size(constants::effectImplsNames));
   
   // Loading data images.
@@ -287,15 +290,29 @@ bool prepareData( SDL_Surface *screen,
     return false;
   }
   
+  std::cout << "Screen:\n"
+    <<   "Rmask:" << std::hex << screen->format->Rmask << ", Gmask:" << std::hex << screen->format->Gmask
+    << ", Bmask:" << std::hex << screen->format->Bmask << ", Amask:" << std::hex << screen->format->Amask << std::endl;
+
+  std::cout << "Moving layer:\n"
+    <<   "Rmask:" << std::hex << movingLoaded->format->Rmask << ", Gmask:" << std::hex << movingLoaded->format->Gmask
+    << ", Bmask:" << std::hex << movingLoaded->format->Bmask << ", Amask:" << std::hex << movingLoaded->format->Amask << std::endl;
+  
+  SDL_PixelFormat alphaPixelFormat;
+  memcpy(reinterpret_cast<void *>(&alphaPixelFormat), reinterpret_cast<void *>(screen->format), sizeof(alphaPixelFormat));
+  alphaPixelFormat.Aloss  = movingLoaded->format->Aloss;
+  alphaPixelFormat.Ashift = movingLoaded->format->Ashift;
+  alphaPixelFormat.Amask  = movingLoaded->format->Amask;
+  
   // Converting to screen format.
-  backgroundLoaded = SDL_ConvertSurface(backgroundLoaded, screen->format, SDL_SWSURFACE);
-  if (backgroundLoaded == NULL)
+  SDL_Surface *backgroundConverted = SDL_ConvertSurface(backgroundLoaded, screen->format, SDL_SWSURFACE | SDL_SRCALPHA);
+  if (backgroundConverted == NULL)
   {
     std::cerr << "Error: failed to convert background image pixel format to screen pixel format." << std::endl;
     return false;
   }
-  movingLoaded = SDL_ConvertSurface(movingLoaded, screen->format, SDL_SWSURFACE);
-  if (movingLoaded == NULL)
+  SDL_Surface *movingConverted = SDL_ConvertSurface(movingLoaded, &alphaPixelFormat, SDL_SWSURFACE | SDL_SRCALPHA);
+  if (movingConverted == NULL)
   {
     std::cerr << "Error: failed to convert moving image pixel format to screen pixel format." << std::endl;
     return false;
@@ -303,31 +320,31 @@ bool prepareData( SDL_Surface *screen,
 
   // Resizing data images to screen size.
   SDL_Surface *background = 
-      SDL_CreateRGBSurface(SDL_SWSURFACE, screen->w, screen->h, screen->format->BitsPerPixel,
+      SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, screen->w, screen->h, screen->format->BitsPerPixel,
                            screen->format->Rmask, screen->format->Gmask, screen->format->Bmask, screen->format->Amask);
   assert(background);
   {
     SDL_Rect srcRect = {0};
-    srcRect.w = std::min(screen->w, backgroundLoaded->w);
-    srcRect.h = std::min(screen->h, backgroundLoaded->h);
+    srcRect.w = std::min(screen->w, backgroundConverted->w);
+    srcRect.h = std::min(screen->h, backgroundConverted->h);
     
-    backgroundLoaded->flags &= ~SDL_SRCALPHA;
-    int const result = SDL_BlitSurface(backgroundLoaded, &srcRect, background, NULL);
+    backgroundConverted->flags &= ~SDL_SRCALPHA;
+    int const result = SDL_BlitSurface(backgroundConverted, &srcRect, background, NULL);
     assert(result == 0);
     background->flags |= SDL_SRCALPHA;
   }
   
   SDL_Surface *moving = 
-      SDL_CreateRGBSurface(SDL_SWSURFACE, screen->w, screen->h, screen->format->BitsPerPixel,
-                           screen->format->Rmask, screen->format->Gmask, screen->format->Bmask, screen->format->Amask);
+      SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, screen->w, screen->h, alphaPixelFormat.BitsPerPixel,
+                           alphaPixelFormat.Rmask, alphaPixelFormat.Gmask, alphaPixelFormat.Bmask, alphaPixelFormat.Amask);
   assert(moving);
   {
     SDL_Rect srcRect = {0};
-    srcRect.w = std::min(screen->w, movingLoaded->w);
-    srcRect.h = std::min(screen->h, movingLoaded->h);
+    srcRect.w = std::min(screen->w, movingConverted->w);
+    srcRect.h = std::min(screen->h, movingConverted->h);
     
-    movingLoaded->flags &= ~SDL_SRCALPHA;
-    int const result = SDL_BlitSurface(movingLoaded, &srcRect, moving, NULL);
+    movingConverted->flags &= ~SDL_SRCALPHA;
+    int const result = SDL_BlitSurface(movingConverted, &srcRect, moving, NULL);
     assert(result == 0);
   }
   
@@ -340,8 +357,8 @@ bool prepareData( SDL_Surface *screen,
   for (size_t i = 0; i < nMovingFrames; ++i)
   {
     movingSurfaces[i] = 
-        SDL_CreateRGBSurface(SDL_SWSURFACE, screen->w, screen->h, screen->format->BitsPerPixel, 
-                             screen->format->Rmask, screen->format->Gmask, screen->format->Bmask, screen->format->Amask);
+        SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, screen->w, screen->h, alphaPixelFormat.BitsPerPixel, 
+                             alphaPixelFormat.Rmask, alphaPixelFormat.Gmask, alphaPixelFormat.Bmask, alphaPixelFormat.Amask);
 
     int hOffset = movingFramesStep * (nMovingFrames - 1 - i);
     
@@ -381,7 +398,7 @@ int main( int argc, char *argv[] )
     // Creating SDL window.
     SDL_Surface *screen;
 
-    screen = SDL_SetVideoMode(constants::windowWidth, constants::windowHeight, constants::windowBPP, SDL_SWSURFACE);
+    screen = SDL_SetVideoMode(constants::windowWidth, constants::windowHeight, constants::windowBPP, SDL_SWSURFACE | SDL_SRCALPHA);
     if (screen == NULL)
     {
       std::cerr << "Unable to set " 
@@ -391,11 +408,6 @@ int main( int argc, char *argv[] )
     else
     {
       assert(screen->format->BytesPerPixel == 4);
-      
-      
-      std::cout << "Successfully createted window surface.\n"
-          <<   "Rmask:" << std::hex << screen->format->Rmask << ", Gmask:" << std::hex << screen->format->Gmask
-          << ", Bmask:" << std::hex << screen->format->Bmask << ", Amask:" << std::hex << screen->format->Amask << std::endl;
       
       SDL_Surface *backgroundSurface;
       std::vector<SDL_Surface *> movingSurfaces;
