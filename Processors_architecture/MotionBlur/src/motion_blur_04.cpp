@@ -18,7 +18,7 @@ namespace motion_blur
           byte_type const *background,
           int nMovingLayers, byte_type const *const *movingLayers )
   {
-    dword_type const invNMovingLayers = (1 << 16) / nMovingLayers;
+    dword_type const invNMovingLayers = (1 << 8) / nMovingLayers;
   
     for (int y = 0; y < h; ++y)
     {
@@ -60,9 +60,9 @@ namespace motion_blur
             --i;
           } while (i != 0);
           
-          imagePixel.r = static_cast<byte_type>((totalR * invNMovingLayers) >> 16);
-          imagePixel.g = static_cast<byte_type>((totalG * invNMovingLayers) >> 16);
-          imagePixel.b = static_cast<byte_type>((totalB * invNMovingLayers) >> 16);
+          imagePixel.r = static_cast<byte_type>((totalR * invNMovingLayers) >> 8);
+          imagePixel.g = static_cast<byte_type>((totalG * invNMovingLayers) >> 8);
+          imagePixel.b = static_cast<byte_type>((totalB * invNMovingLayers) >> 8);
         }
       }
     }
