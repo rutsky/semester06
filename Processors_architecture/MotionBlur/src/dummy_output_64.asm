@@ -49,7 +49,7 @@ _motion_blur_apply_dummy_64:
         push    rax                  ; saving registers, just to be sure
         push    rbx
         
-        ; Reorganazing input variables.
+        ; Reorganizing input variables.
         mov     h, arg_h
         mov     scanlineLen, arg_scanlineLen
         
