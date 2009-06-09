@@ -92,7 +92,39 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=.\dummy_output.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\main.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\motion_blur.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\motion_blur.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\motion_blur_01.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\motion_blur_02.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\motion_blur_03.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\motion_blur_04.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\motion_blur_06.cpp
 # End Source File
 # End Group
 # Begin Group "Resource Files"
@@ -102,6 +134,62 @@ SOURCE=.\main.cpp
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# End Group
+# Begin Group "Assembler Files"
+
+# PROP Default_Filter "asm"
+# Begin Source File
+
+SOURCE=.\dummy_output_64.asm
+
+!IF  "$(CFG)" == "MotionBlur - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputDir=.
+IntDir=.\Release
+InputPath=.\dummy_output_64.asm
+InputName=dummy_output_64
+
+"$(IntDir)$\(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	C:\nasm\nasm.exe -f win32 -Xvc -o "$(IntDir)$\(InputName).obj" $(InputDir)\$(InputName).asm
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "MotionBlur - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+# PROP Ignore_Default_Tool 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\motion_blur_05a64.asm
+
+!IF  "$(CFG)" == "MotionBlur - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputDir=.
+IntDir=.\Release
+InputPath=.\motion_blur_05a64.asm
+InputName=motion_blur_05a64
+
+"$(IntDir)$\(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	C:\nasm\nasm.exe -f win32 -Xvc -o "$(IntDir)$\(InputName).obj" $(InputDir)\$(InputName).asm
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "MotionBlur - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+# PROP Ignore_Default_Tool 1
+
+!ENDIF 
+
+# End Source File
 # End Group
 # End Target
 # End Project
