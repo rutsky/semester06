@@ -67,7 +67,7 @@ clean:
 	rm -f $(OBJECT_FILES)
 	rm -f $(foreach M,$(OPTIMIZATION_MODULES),$(M).s)
 	rm -f $(foreach M,$(OPTIMIZATION_MODULES),$(M).lst)
-	rm -f $(foreach M,$(ASSEMBLER_MODULES),$(M).o.s)
+	rm -f $(foreach M,$(ASSEMBLER_MODULES_64_linux),$(M).o.s)
 	rm -f *~
 	rm -f $(PROGRAM_NAME)
 	rm -f $(TEMPFILE)
