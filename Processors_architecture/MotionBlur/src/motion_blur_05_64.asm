@@ -102,17 +102,17 @@ _motion_blur_apply_05_64:
         
         ; Checking is pixel value has alpha (in ARGB model it means that pixel value > 0xffffff).
         cmp     ecx, 0x00ffffff
-        jbe     .last_layer_not_transparent
+        jbe     .last_layer_transparent
         
-  ;last_layer_is_transparent:
+  ;last_layer_not_transparent:
         ; Writing last layer pixel on image.
         mov     rax, image
         add     rax, rdx
         mov     DWORD [rax], ecx
         
-        jmp     .last_layer_not_transparent_if_end
+        jmp     .last_layer_transparent_if_end
         
-  .last_layer_not_transparent:
+  .last_layer_transparent:
         ; Loading background pixel (in ecx).
         mov     rax, background
         add     rax, rdx
@@ -203,7 +203,7 @@ _motion_blur_apply_05_64:
         imul    eax, ebx
         shr     eax, 8
         mov     BYTE [rcx + 2], al
-  .last_layer_not_transparent_if_end:
+  .last_layer_transparent_if_end:
   
         mov     eax, x
         inc     eax
