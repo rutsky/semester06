@@ -31,22 +31,24 @@ global _motion_blur_apply_05_64
 %define nMovingLayers   r9d
 %define movingLayers    QWORD [rbp + 8 * 2]
 
-; Local variables.
-%define invNMovingLayers     DWORD [rbp - 8 *  1]
-%define y                    DWORD [rbp - 8 *  2]
-%define x                    DWORD [rbp - 8 *  3]
-%define idx                  DWORD [rbp - 8 *  4]
-%define lastLayerMovingPixel DWORD [rbp - 8 *  5]
-%define backgroundPixel      DWORD [rbp - 8 *  6]
-%define totalR               DWORD [rbp - 8 *  7]
-%define totalG               DWORD [rbp - 8 *  8]
-%define totalB               DWORD [rbp - 8 *  9]
-%define r                    DWORD [rbp - 8 * 10]
-%define g                    DWORD [rbp - 8 * 11]
-%define b                    DWORD [rbp - 8 * 12]
+%define h                    DWORD [rbp - 8 *  1]
+%define scanlineLen          DWORD [rbp - 8 *  2]
 
-%define h                    DWORD [rbp - 8 * 13]
-%define scanlineLen          DWORD [rbp - 8 * 14]
+; Local variables.
+%define invNMovingLayers     DWORD [rbp - 8 *  3]
+%define y                    DWORD [rbp - 8 *  4]
+%define x                    DWORD [rbp - 8 *  5]
+%define idx                  DWORD [rbp - 8 *  6]
+%define lastLayerMovingPixel DWORD [rbp - 8 *  7]
+%define backgroundPixelR     DWORD [rbp - 8 *  8]
+%define backgroundPixelG     DWORD [rbp - 8 *  9]
+%define backgroundPixelB     DWORD [rbp - 8 * 10]
+%define totalR               DWORD [rbp - 8 * 11]
+%define totalG               DWORD [rbp - 8 * 12]
+%define totalB               DWORD [rbp - 8 * 13]
+%define r                    DWORD [rbp - 8 * 14]
+%define g                    DWORD [rbp - 8 * 15]
+%define b                    DWORD [rbp - 8 * 16]
 
 _motion_blur_apply_05_64:
         push    rbp                  ; saving previous rbp
@@ -66,6 +68,7 @@ _motion_blur_apply_05_64:
         cdq ; magic with edx, in other case idiv will spawn FPU exception.
         idiv    nMovingLayers
         mov     invNMovingLayers, eax
+        ;mov     invNMovingLayers, 26; debug
         
         mov     y, 0
         ; Loop by y.
@@ -121,10 +124,96 @@ _motion_blur_apply_05_64:
         add     rax, rdx
         mov     ecx, DWORD [rax]
         
-        ; Writing background pixel on image.
-        mov     rax, image
+        ; Parsing background pixel R, G, B components and initializing colors accumulators.
+        mov     eax, ecx
+        movzx   ebx, al
+        mov     backgroundPixelR, ebx
+        mov     totalR, ebx
+        shr     eax, 8
+        movzx   ebx, al
+        mov     backgroundPixelG, ebx
+        mov     totalG, ebx
+        shr     eax, 8
+        movzx   ebx, al
+        mov     backgroundPixelB, ebx
+        mov     totalB, ebx
+        
+        ; Iterating through layers.
+        mov     ecx, nMovingLayers
+        dec     ecx
+        ;mov ecx, 40 ; debug
+  .next_layer:
+        ; Loading layer pixel (in ebx).
+        mov     eax, ecx
+        dec     eax
+        shl     eax, 3     ; 3 == log(2, sizeof(byte_type *))
+        add     rax, movingLayers
+        mov     rax, [rax] ; retrieved layer start address
         add     rax, rdx
-        mov     DWORD [rax], ecx
+        mov     ebx, DWORD [rax]
+        
+        ; Checking is pixel value has alpha.
+        cmp     ebx, 0x00ffffff
+        jbe     .layer_dont_have_alpha
+        ;jmp     .layer_dont_have_alpha
+        
+        movzx   eax, bl
+        add     eax, totalR
+        mov     totalR, eax
+        shr     ebx, 8
+
+        movzx   eax, bl
+        add     eax, totalG
+        mov     totalG, eax
+        shr     ebx, 8
+        
+        movzx   eax, bl
+        add     eax, totalB
+        mov     totalB, eax
+        
+        jmp     .layer_dont_have_alpha_if_end
+        
+  .layer_dont_have_alpha:
+        ; Adding to colors accumulators background pixel value.
+        mov     eax, backgroundPixelR
+        add     eax, totalR
+        mov     totalR, eax
+
+        mov     eax, backgroundPixelG
+        add     eax, totalG
+        mov     totalG, eax
+        
+        mov     eax, backgroundPixelB
+        add     eax, totalB
+        mov     totalB, eax
+  .layer_dont_have_alpha_if_end:
+        
+        dec     ecx
+        jnz     .next_layer
+        
+        ; Writing pixel average value on image.
+        mov     rcx, image
+        add     rcx, rdx
+        
+        mov     ebx, invNMovingLayers
+        
+        mov     eax, totalR
+        imul    eax, ebx
+        shr     eax, 8
+        ;shr     eax, 5
+        mov     BYTE [rcx + 0], al
+
+        mov     eax, totalG
+        imul    eax, ebx
+        shr     eax, 8
+        ;shr     eax, 5
+        mov     BYTE [rcx + 1], al
+
+        mov     eax, totalB
+        imul    eax, ebx
+        shr     eax, 8
+        ;shr     eax, 5
+        mov     BYTE [rcx + 2], al
   .last_layer_not_transparent_if_end:
   
         mov     eax, x
