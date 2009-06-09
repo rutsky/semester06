@@ -5,7 +5,7 @@
 ; 09.06.2009
 
 ;
-; 64-bit Linux version.
+; 32-bit version.
 ;
 
 [bits 32]

@@ -97,6 +97,11 @@ namespace constants
       &motion_blur::motion_blur_apply_05_32,
 #endif
       &motion_blur::apply_06,
+#ifndef WIN32
+      &motion_blur::_motion_blur_apply_07_64,
+#else
+      &motion_blur::motion_blur_apply_07_64,
+#endif
     };
   char const *effectImplsNames[] = 
     {
@@ -108,9 +113,10 @@ namespace constants
       "2.  Outputting by 4 bytes some pixels.",
       "3.  Optimized cycle.",
       "4.  Precalculated inverse value.",
-      "5a. Rewrited on ASM. Linux 64 bit.",
-      "5b. Rewrited on ASM. 32 bit.",
+      "5a. Rewrited version 4 on assembler. 64 bit Unix.",
+      "5b. Rewrited version 4 on assembler. 32 bit.",
       "6.  Using MMX and SSE.",
+      "7a. Rewrited version 6 on assembler (with MMX and SSE). 64 bit Unix",
     };
   size_t const nEffectImpls = array_size(effectImplsNames);
 } // End of namespace `constants'.
