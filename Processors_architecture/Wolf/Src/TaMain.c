@@ -301,7 +301,7 @@ int PASCAL  WinMain(
                     "Error" , 
                     MB_OK 
                   );
-        return (-1);
+        //return (-1); // commented by bob
       }
     }
 
