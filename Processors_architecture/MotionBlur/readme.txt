@@ -1,3 +1,6 @@
+Для сборки проекта в MS Visial Studio 6 необходимы библиотеки SDL, SDL_image и 
+ассемблер nasm, их можно поставить следующим образом:
+
 1. Распаковать SDL-devel-1.2.13-VC6.zip [1] в C:\SDL
 2. Распаковать SDL_image-devel-1.2.7-VC9.zip [2] в C:\SDL_image
 3. Распаковать nasm-2.05-win32.zip [3] в C:\nasm
