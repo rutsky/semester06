@@ -52,7 +52,7 @@
 
 _motion_blur_apply_07_32:
         push    ebp                  ; saving previous ebp
-        mov     ebp, rsp             ; moving into current ebp esp: base for arguments and variables
+        mov     ebp, esp             ; moving into current ebp esp: base for arguments and variables
         
         sub     esp, 4 * nLocalVars  ; allocating memory on stack for local variables
         
