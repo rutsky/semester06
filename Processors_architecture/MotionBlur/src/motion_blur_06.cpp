@@ -46,9 +46,8 @@ namespace motion_blur
           *reinterpret_cast<dword_type *>(image + idx) = lastMovingLayerDword;
         else
         {
-          // mm0 = 0
-          asm("movd      mm0, DWORD PTR [%[addr]]": : [addr]"r"(background + idx));
           // Loading background pixel into mm0 (packed as words).
+          asm("movd      mm0, DWORD PTR [%[addr]]": : [addr]"r"(background + idx));
           asm("punpcklbw mm0, mm6": : );
           
           // mm4 will accumulate color sum.
