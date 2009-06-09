@@ -29,7 +29,7 @@ global _motion_blur_apply_05_64
 %define arg_scanlineLen ecx
 %define background      r8
 %define nMovingLayers   r9d
-%define movingLayers    DWORD [rbp + 8 * 2]
+%define movingLayers    QWORD [rbp + 8 * 2]
 
 ; Local variables.
 %define invNMovingLayers     DWORD [rbp - 8 *  1]
@@ -61,21 +61,29 @@ _motion_blur_apply_05_64:
         mov     h, arg_h
         mov     scanlineLen, arg_scanlineLen
         
+        ; Calculating `invNMovingLayers'.
+        mov     eax, (1 << 8)
+        cdq ; magic with edx, in other case idiv will spawn FPU exception.
+        idiv    nMovingLayers
+        mov     invNMovingLayers, eax
+        
         mov     y, 0
         ; Loop by y.
-  loop_by_y:
+  .loop_by_y:
         mov     eax, y
         mov     ebx, h
         cmp     eax, ebx
-        jge     end_loop_by_y
+        jge     .end_loop_by_y
         
         mov     x, 0
         ; Loop by x.
-  loop_by_x:
+  .loop_by_x:
         mov     eax, x
         mov     ebx, w
         cmp     eax, ebx
-        jge     end_loop_by_x
+        jge     .end_loop_by_x
+        
+        ; Now working with (x, y) pixel.
         
         ; Calculating index (in edx).
         mov     eax, y
@@ -84,6 +92,30 @@ _motion_blur_apply_05_64:
         shl     edx, 2
         add     edx, eax
         
+        ; Loading last layer pixel (in ecx).
+        mov     eax, nMovingLayers
+        dec     eax
+        shl     eax, 3     ; 3 == log(2, sizeof(byte_type *))
+        add     rax, movingLayers
+        mov     rax, [rax] ; retrieved last layer start address
+        add     rax, rdx
+        mov     ecx, DWORD [rax]
+        
+        ;mov ebx, ecx
+        
+        ; Checking is pixel value has alpha (in ARGB model it means that pixel value > 0xffffff).
+        cmp     ecx, 0x00ffffff
+        jbe     .last_layer_not_transparent
+        
+  ;last_layer_is_transparent:
+        ; Writing last layer pixel on image.
+        mov     rax, image
+        add     rax, rdx
+        mov     DWORD [rax], ecx
+        
+        jmp     .last_layer_not_transparent_if_end
+        
+  .last_layer_not_transparent:
         ; Loading background pixel (in ecx).
         mov     rax, background
         add     rax, rdx
@@ -93,20 +125,21 @@ _motion_blur_apply_05_64:
         mov     rax, image
         add     rax, rdx
         mov     DWORD [rax], ecx
+  .last_layer_not_transparent_if_end:
   
         mov     eax, x
         inc     eax
         mov     x, eax
-        jmp     loop_by_x
-  end_loop_by_x:
+        jmp     .loop_by_x
+  .end_loop_by_x:
         ; End of loop by x.
         
         mov     eax, y
         inc     eax
         mov     y, eax
-        jmp     loop_by_y
+        jmp     .loop_by_y
         
-  end_loop_by_y:
+  .end_loop_by_y:
         ; End of loop by y.
   
         pop     rbx                  ; restoring registers
