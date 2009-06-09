@@ -140,6 +140,40 @@ SOURCE=.\motion_blur_06.cpp
 # PROP Default_Filter "asm"
 # Begin Source File
 
+SOURCE=.\dummy_output_32.asm
+
+!IF  "$(CFG)" == "MotionBlur - Win32 Release"
+
+# Begin Custom Build
+InputDir=.
+IntDir=.\Release
+InputPath=.\dummy_output_32.asm
+InputName=dummy_output_32
+
+"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	C:\nasm\nasm.exe -f win32 -Xvc -o "$(IntDir)\$(InputName).obj" $(InputDir)\$(InputName).asm
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "MotionBlur - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputDir=.
+IntDir=.\Debug
+InputPath=.\dummy_output_32.asm
+InputName=dummy_output_32
+
+"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	C:\nasm\nasm.exe -f win32 -Xvc -o "$(IntDir)\$(InputName).obj" $(InputDir)\$(InputName).asm
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\dummy_output_64.asm
 
 !IF  "$(CFG)" == "MotionBlur - Win32 Release"
