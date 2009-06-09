@@ -15,30 +15,30 @@
 [global _motion_blur_apply_dummy_32]
 
 ; void _motion_blur_apply_dummy_32(
-;        byte_type *image,                    // [rbp + 4 * 2]
-;        int w,                               // [rbp + 4 * 3]
-;        int h,                               // [rbp + 4 * 4]
-;        int scanlineLen,                     // [rbp + 4 * 5]
-;        byte_type const *background,         // [rbp + 4 * 6]
-;        int nMovingLayers,                   // [rbp + 4 * 7]
-;        byte_type const *const *movingLayers // [rbp + 8 * 8]
+;        byte_type *image,                    // [ebp + 4 * 2]
+;        int w,                               // [ebp + 4 * 3]
+;        int h,                               // [ebp + 4 * 4]
+;        int scanlineLen,                     // [ebp + 4 * 5]
+;        byte_type const *background,         // [ebp + 4 * 6]
+;        int nMovingLayers,                   // [ebp + 4 * 7]
+;        byte_type const *const *movingLayers // [ebp + 4 * 8]
 ;      );
 
 %define nLocalVars    20
 
 ; Arguments.
-%define image           DWORD [ebp + 4 * 2]
-%define w               DWORD [ebp + 4 * 3]
-%define h               DWORD [ebp + 4 * 4]
-%define scanlineLen     DWORD [ebp + 4 * 5]
-%define background      DWORD [ebp + 4 * 6]
-%define nMovingLayers   DWORD [ebp + 4 * 7]
-%define movingLayers    DWORD [ebp + 4 * 8]
+%define image           DWORD [ebp + 4 *  1]
+%define w               DWORD [ebp + 4 *  2]
+%define h               DWORD [ebp + 4 *  3]
+%define scanlineLen     DWORD [ebp + 4 *  4]
+%define background      DWORD [ebp + 4 *  5]
+%define nMovingLayers   DWORD [ebp + 4 *  6]
+%define movingLayers    DWORD [ebp + 4 *  7]
 
 ; Local variables.
-%define y               DWORD [ebp - 4 * 1]
-%define x               DWORD [ebp - 4 * 2]
-%define idx             DWORD [ebp - 4 * 3]
+%define y               DWORD [ebp - 4 *  8]
+%define x               DWORD [ebp - 4 *  9]
+%define idx             DWORD [ebp - 4 * 10]
 
 _motion_blur_apply_dummy_32:
         push    ebp                  ; saving previous rbp
