@@ -10,7 +10,7 @@
 
 global _motion_blur_apply_dummy_64
 
-; void _motion_blur_apply_05_64(
+; void _motion_blur_apply_dummy_64(
 ;        byte_type *image,                    // rdi
 ;        int w,                               // rsi
 ;        int h,                               // rdx
