@@ -56,7 +56,7 @@ _motion_blur_apply_07_32:
         
         sub     esp, 4 * nLocalVars  ; allocating memory on stack for local variables
         
-        push    rax                  ; saving registers, just to be sure
+        push    eax                  ; saving registers, just to be sure
         push    ebx
         
         ; Calculating `1/nMovingLayers'.
