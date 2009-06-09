@@ -149,6 +149,7 @@ _motion_blur_apply_05_64:
         cmp     ebx, 0x00ffffff
         jbe     .layer_dont_have_alpha
         
+        ; Adding layer pixel value to accumulators.
         movzx   eax, bl
         add     eax, totalR
         mov     totalR, eax
