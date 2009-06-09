@@ -1,4 +1,4 @@
-; motion_blur_05_64.asm
+; motion_blur_05_32.asm
 ; Motion blur effect.
 ; Implementation 4 rewritten in assembler.
 ; Vladimir Rutsky <altsysrq@gmail.com>
@@ -8,57 +8,54 @@
 ; 64-bit Linux version.
 ;
 
-global _motion_blur_apply_05_64
+[bits 32]
+[section .bss align=16]
+[section .data align=16]
+[section .text align=16]
+[global _motion_blur_apply_05_32]
 
 ; void _motion_blur_apply_05_64(
-;        byte_type *image,                    // rdi
-;        int w,                               // rsi
-;        int h,                               // rdx
-;        int scanlineLen,                     // rcx
-;        byte_type const *background,         // r8
-;        int nMovingLayers,                   // r9
-;        byte_type const *const *movingLayers // QWORD [rbp + 8 * 2]
+;        byte_type *image,                    // DWORD [ebp + 4 * 2]
+;        int w,                               // DWORD [ebp + 4 * 3]
+;        int h,                               // DWORD [ebp + 4 * 4]
+;        int scanlineLen,                     // DWORD [ebp + 4 * 5]
+;        byte_type const *background,         // DWORD [ebp + 4 * 6]
+;        int nMovingLayers,                   // DWORD [ebp + 4 * 7]
+;        byte_type const *const *movingLayers // DWORD [ebp + 4 * 8]
 ;      );
 
 %define nLocalVars    20
 
 ; Arguments.
-%define image           rdi
-%define w               esi
-%define arg_h           edx
-%define arg_scanlineLen ecx
-%define background      r8
-%define nMovingLayers   r9d
-%define movingLayers    QWORD [rbp + 8 * 2]
-
-%define h                    DWORD [rbp - 8 *  1]
-%define scanlineLen          DWORD [rbp - 8 *  2]
+%define image           DWORD [ebp + 4 * 2]
+%define w               DWORD [ebp + 4 * 3]
+%define h               DWORD [ebp + 4 * 4]
+%define scanlineLen     DWORD [ebp + 4 * 5]
+%define background      DWORD [ebp + 4 * 6]
+%define nMovingLayers   DWORD [ebp + 4 * 7]
+%define movingLayers    DWORD [rbp + 4 * 8]
 
 ; Local variables.
-%define invNMovingLayers     DWORD [rbp - 8 *  3]
-%define y                    DWORD [rbp - 8 *  4]
-%define x                    DWORD [rbp - 8 *  5]
-%define idx                  DWORD [rbp - 8 *  6]
-%define lastLayerMovingPixel DWORD [rbp - 8 *  7]
-%define backgroundPixelR     DWORD [rbp - 8 *  8]
-%define backgroundPixelG     DWORD [rbp - 8 *  9]
-%define backgroundPixelB     DWORD [rbp - 8 * 10]
-%define totalR               DWORD [rbp - 8 * 11]
-%define totalG               DWORD [rbp - 8 * 12]
-%define totalB               DWORD [rbp - 8 * 13]
+%define invNMovingLayers     DWORD [rbp - 4 *  3]
+%define y                    DWORD [rbp - 4 *  4]
+%define x                    DWORD [rbp - 4 *  5]
+%define idx                  DWORD [rbp - 4 *  6]
+%define lastLayerMovingPixel DWORD [rbp - 4 *  7]
+%define backgroundPixelR     DWORD [rbp - 4 *  8]
+%define backgroundPixelG     DWORD [rbp - 4 *  9]
+%define backgroundPixelB     DWORD [rbp - 4 * 10]
+%define totalR               DWORD [rbp - 4 * 11]
+%define totalG               DWORD [rbp - 4 * 12]
+%define totalB               DWORD [rbp - 4 * 13]
 
 _motion_blur_apply_05_64:
-        push    rbp                  ; saving previous rbp
-        mov     rbp, rsp             ; moving into current rbp rsp: base for arguments and variables
+        push    ebp                  ; saving previous rbp
+        mov     ebp, esp             ; moving into current rbp rsp: base for arguments and variables
         
-        sub     rsp, 8 * nLocalVars  ; allocating memory on stack for local variables
+        sub     esp, 4 * nLocalVars  ; allocating memory on stack for local variables
         
-        push    rax                  ; saving registers, just to be sure
-        push    rbx
-        
-        ; Reorganizing input variables.
-        mov     h, arg_h
-        mov     scanlineLen, arg_scanlineLen
+        push    eax                  ; saving registers, just to be sure
+        push    ebx
         
         ; Calculating `invNMovingLayers'.
         mov     eax, (1 << 8)
@@ -95,10 +92,10 @@ _motion_blur_apply_05_64:
         mov     eax, nMovingLayers
         dec     eax
         shl     eax, 3     ; 3 == log(2, sizeof(byte_type *))
-        add     rax, movingLayers
-        mov     rax, [rax] ; retrieved last layer start address
-        add     rax, rdx
-        mov     ecx, DWORD [rax]
+        add     eax, movingLayers
+        mov     eax, [eax] ; retrieved last layer start address
+        add     eax, edx
+        mov     ecx, DWORD [eax]
         
         ; Checking is pixel value has alpha (in ARGB model it means that pixel value > 0xffffff).
         cmp     ecx, 0x00ffffff
@@ -106,17 +103,17 @@ _motion_blur_apply_05_64:
         
   ;last_layer_is_transparent:
         ; Writing last layer pixel on image.
-        mov     rax, image
-        add     rax, rdx
-        mov     DWORD [rax], ecx
+        mov     eax, image
+        add     eax, edx
+        mov     DWORD [eax], ecx
         
         jmp     .last_layer_not_transparent_if_end
         
   .last_layer_not_transparent:
         ; Loading background pixel (in ecx).
-        mov     rax, background
-        add     rax, rdx
-        mov     ecx, DWORD [rax]
+        mov     eax, background
+        add     eax, edx
+        mov     ecx, DWORD [eax]
         
         ; Parsing background pixel R, G, B components and initializing colors accumulators.
         mov     eax, ecx
@@ -139,11 +136,11 @@ _motion_blur_apply_05_64:
         ; Loading layer pixel (in ebx).
         mov     eax, ecx
         dec     eax
-        shl     eax, 3     ; 3 == log(2, sizeof(byte_type *))
-        add     rax, movingLayers
-        mov     rax, [rax] ; retrieved layer start address
-        add     rax, rdx
-        mov     ebx, DWORD [rax]
+        shl     eax, 2     ; 2 == log(2, sizeof(byte_type *))
+        add     eax, movingLayers
+        mov     eax, [eax] ; retrieved layer start address
+        add     eax, edx
+        mov     ebx, DWORD [eax]
         
         ; Checking is pixel value has alpha.
         cmp     ebx, 0x00ffffff
@@ -184,25 +181,25 @@ _motion_blur_apply_05_64:
         jnz     .next_layer
         
         ; Writing pixel average value on image.
-        mov     rcx, image
-        add     rcx, rdx
+        mov     ecx, image
+        add     ecx, edx
         
         mov     ebx, invNMovingLayers
         
         mov     eax, totalR
         imul    eax, ebx
         shr     eax, 8
-        mov     BYTE [rcx + 0], al
+        mov     BYTE [ecx + 0], al
 
         mov     eax, totalG
         imul    eax, ebx
         shr     eax, 8
-        mov     BYTE [rcx + 1], al
+        mov     BYTE [ecx + 1], al
 
         mov     eax, totalB
         imul    eax, ebx
         shr     eax, 8
-        mov     BYTE [rcx + 2], al
+        mov     BYTE [ecx + 2], al
   .last_layer_not_transparent_if_end:
   
         mov     eax, x
@@ -220,9 +217,9 @@ _motion_blur_apply_05_64:
   .end_loop_by_y:
         ; End of loop by y.
   
-        pop     rbx                  ; restoring registers
-        pop     rax
+        pop     ebx                  ; restoring registers
+        pop     eax
   
-        add     rsp, 8 * nLocalVars  ; restoring stack state
+        add     esp, 4 * nLocalVars  ; restoring stack state
         leave                        ; mov esp,ebp / pop ebp 
         ret
