@@ -1,6 +1,6 @@
 ; dummy_output_64.asm
 ; Motion blur effect.
-; Summt output rewritten in assembler.
+; Dummy output rewritten in assembler.
 ; Vladimir Rutsky <altsysrq@gmail.com>
 ; 09.06.2009
 
