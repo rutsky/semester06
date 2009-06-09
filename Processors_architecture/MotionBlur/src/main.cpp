@@ -312,6 +312,7 @@ bool prepareData( SDL_Surface *screen,
     return false;
   }
   
+#ifndef WIN32 // TODO
   std::cout << "Screen:\n"
     <<   "Rmask:" << std::hex << screen->format->Rmask << ", Gmask:" << std::hex << screen->format->Gmask
     << ", Bmask:" << std::hex << screen->format->Bmask << ", Amask:" << std::hex << screen->format->Amask << std::endl;
@@ -319,6 +320,7 @@ bool prepareData( SDL_Surface *screen,
   std::cout << "Moving layer:\n"
     <<   "Rmask:" << std::hex << movingLoaded->format->Rmask << ", Gmask:" << std::hex << movingLoaded->format->Gmask
     << ", Bmask:" << std::hex << movingLoaded->format->Bmask << ", Amask:" << std::hex << movingLoaded->format->Amask << std::endl;
+#endif // WIN32
   
   SDL_PixelFormat alphaPixelFormat;
   memcpy(reinterpret_cast<void *>(&alphaPixelFormat), reinterpret_cast<void *>(screen->format), sizeof(alphaPixelFormat));
