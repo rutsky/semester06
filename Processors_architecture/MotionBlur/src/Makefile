@@ -71,6 +71,12 @@ clean:
 	rm -f *~
 	rm -f $(PROGRAM_NAME)
 	rm -f $(TEMPFILE)
+	
+	rm -f MotionBlur.ncb
+	rm -f MotionBlur.opt
+	rm -f MotionBlur.plg
+	rm -rf Debug/
+	rm -rf Release/
 
 main.o: main.cpp motion_blur.h
 	$(CC) -c $(MAIN_COMPILER_OPTIONS) $<
