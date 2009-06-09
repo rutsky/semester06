@@ -60,19 +60,6 @@ namespace motion_blur
   extern "C"
   {
   #ifndef WIN32
-    void _motion_blur_apply_05_64(
-            byte_type *image, int w, int h, int scanlineLen,
-            byte_type const *background,
-            int nMovingLayers, byte_type const *const *movingLayers );
-  #else // WIN32
-    static
-    void motion_blur_apply_05_64(
-            byte_type *image, int w, int h, int scanlineLen,
-            byte_type const *background,
-            int nMovingLayers, byte_type const *const *movingLayers ) {};
-  #endif // WIN32
-
-  #ifndef WIN32
     void _motion_blur_apply_dummy_64(
             byte_type *image, int w, int h, int scanlineLen,
             byte_type const *background,
@@ -80,6 +67,32 @@ namespace motion_blur
   #else // WIN32
     static
     void motion_blur_apply_dummy_64(
+            byte_type *image, int w, int h, int scanlineLen,
+            byte_type const *background,
+            int nMovingLayers, byte_type const *const *movingLayers ) {};
+  #endif // WIN32
+
+  #ifndef WIN32
+    static
+    void _motion_blur_apply_dummy_32(
+            byte_type *image, int w, int h, int scanlineLen,
+            byte_type const *background,
+            int nMovingLayers, byte_type const *const *movingLayers ) {};
+  #else // WIN32
+    void motion_blur_apply_dummy_32(
+            byte_type *image, int w, int h, int scanlineLen,
+            byte_type const *background,
+            int nMovingLayers, byte_type const *const *movingLayers );
+  #endif // WIN32
+
+  #ifndef WIN32
+    void _motion_blur_apply_05_64(
+            byte_type *image, int w, int h, int scanlineLen,
+            byte_type const *background,
+            int nMovingLayers, byte_type const *const *movingLayers );
+  #else // WIN32
+    static
+    void motion_blur_apply_05_64(
             byte_type *image, int w, int h, int scanlineLen,
             byte_type const *background,
             int nMovingLayers, byte_type const *const *movingLayers ) {};
