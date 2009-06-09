@@ -71,6 +71,11 @@ namespace constants
   motion_blur_apply_func_ptr const effectImpls[] =
     {
       &motion_blur::apply_dummy,
+#ifndef WIN32
+      &motion_blur::_motion_blur_apply_dummy_64,
+#else
+      &motion_blur::motion_blur_apply_dummy_64,
+#endif
       &motion_blur::apply,
       &motion_blur::apply_01,
       &motion_blur::apply_02,
@@ -86,6 +91,7 @@ namespace constants
   char const *effectImplsNames[] = 
     {
       "Dummy background output.",
+      "Dummy background output. Linux 64 bit.",
       "Base version",
       "1. Used `int' type instead of `float'",
       "2. Outputting by 4 bytes some pixels.",

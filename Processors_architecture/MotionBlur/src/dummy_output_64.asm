@@ -1,6 +1,6 @@
-; motion_blur_05a64.asm
+; dummy_output_64.asm
 ; Motion blur effect.
-; Implementation 4 rewritten in assembler.
+; Summt output rewritten in assembler.
 ; Vladimir Rutsky <altsysrq@gmail.com>
 ; 09.06.2009
 
@@ -8,7 +8,7 @@
 ; 64-bit Linux version.
 ;
 
-global _motion_blur_apply_05_64
+global _motion_blur_apply_dummy_64
 
 ; void _motion_blur_apply_05_64(
 ;        byte_type *image,                    // rdi
@@ -32,23 +32,14 @@ global _motion_blur_apply_05_64
 %define movingLayers    DWORD [rbp + 8 * 2]
 
 ; Local variables.
-%define invNMovingLayers     DWORD [rbp - 8 *  1]
 %define y                    DWORD [rbp - 8 *  2]
 %define x                    DWORD [rbp - 8 *  3]
 %define idx                  DWORD [rbp - 8 *  4]
-%define lastLayerMovingPixel DWORD [rbp - 8 *  5]
-%define backgroundPixel      DWORD [rbp - 8 *  6]
-%define totalR               DWORD [rbp - 8 *  7]
-%define totalG               DWORD [rbp - 8 *  8]
-%define totalB               DWORD [rbp - 8 *  9]
-%define r                    DWORD [rbp - 8 * 10]
-%define g                    DWORD [rbp - 8 * 11]
-%define b                    DWORD [rbp - 8 * 12]
 
 %define h                    DWORD [rbp - 8 * 13]
 %define scanlineLen          DWORD [rbp - 8 * 14]
 
-_motion_blur_apply_05_64:
+_motion_blur_apply_dummy_64:
         push    rbp                  ; saving previous rbp
         mov     rbp, rsp             ; moving into current rbp rsp: base for arguments and variables
         
