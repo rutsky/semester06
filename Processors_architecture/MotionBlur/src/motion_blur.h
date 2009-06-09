@@ -56,6 +56,22 @@ namespace motion_blur
           byte_type *image, int w, int h, int scanlineLen,
           byte_type const *background,
           int nMovingLayers, byte_type const *const *movingLayers );
+
+  extern "C"
+  {
+  #ifndef WIN32
+    void _motion_blur_apply_05_64(
+            byte_type *image, int w, int h, int scanlineLen,
+            byte_type const *background,
+            int nMovingLayers, byte_type const *const *movingLayers );
+  #else // WIN32
+    static
+    void motion_blur_apply_05_64(
+            byte_type *image, int w, int h, int scanlineLen,
+            byte_type const *background,
+            int nMovingLayers, byte_type const *const *movingLayers ) {};
+  #endif // WIN32
+  }
 } // End of namespace `motion_blur'.
 
 #endif // MOTION_BLUR_H

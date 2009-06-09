@@ -76,6 +76,11 @@ namespace constants
       &motion_blur::apply_02,
       &motion_blur::apply_03,
       &motion_blur::apply_04,
+#ifndef WIN32
+      &motion_blur::_motion_blur_apply_05_64,
+#else
+      &motion_blur::motion_blur_apply_05_64,
+#endif
       &motion_blur::apply_06,
     };
   char const *effectImplsNames[] = 
@@ -86,6 +91,7 @@ namespace constants
       "2. Outputting by 4 bytes some pixels.",
       "3. Optimized cycle.",
       "4. Precalculated inverse value.",
+      "5. Rewrited on ASM. Linux 64 bit.",
       "6. Using MMX and SSE.",
     };
   size_t const nEffectImpls = array_size(effectImplsNames);

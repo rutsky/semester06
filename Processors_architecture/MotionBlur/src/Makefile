@@ -7,9 +7,12 @@ PROGRAM_NAME = motion_blur
 OPTIMIZATION_MODULES = motion_blur dummy_output \
   motion_blur_01  motion_blur_02  motion_blur_03  motion_blur_04  \
   motion_blur_06
-OBJECT_FILES = main.o $(foreach M,$(OPTIMIZATION_MODULES),$(M).o)
+ASSEMBLER_MODULES = \
+  motion_blur_05a64
+OBJECT_FILES = main.o $(foreach M,$(OPTIMIZATION_MODULES),$(M).o) $(foreach M,$(ASSEMBLER_MODULES),$(M).o)
 CC = g++
 AS = as
+NASM = nasm
 
 TEMPFILE = .tempfile
 
@@ -22,7 +25,9 @@ MAIN_COMPILER_OPTIONS = $(MAIN_OPTIMIZATION_OPTIONS) $(MAIN_LIB_COMPILER_OPTIONS
 
 #OPTIMIZATION_OPTIONS = -Wall -O2 -mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-ssse3 -mno-sse4.1 -mno-sse4.2 -mno-sse4 -mno-sse4a -mno-sse5 -mno-3dnow
 OPTIMIZATION_OPTIONS = -Wall -O2 -mmmx -msse
+#LINUX-DEPENDENT
 LIB_COMPILER_OPTIONS = $(shell sdl-config --cflags) 
+#LIB_COMPILER_OPTIONS = 
 COMPILER_OPTIONS = -fverbose-asm -masm=intel $(OPTIMIZATION_OPTIONS) $(LIB_COMPILER_OPTIONS)
 ASSEMBLER_OPTIONS = 
 
@@ -44,10 +49,17 @@ $(PROGRAM_NAME): $(OBJECT_FILES)
 	$(AS) -alhndm $(basename $@).s -o /dev/null > $(basename $@).lst
 	@#$(AS) -alhndm $(basename $@).s -o $(TEMPFILE) > $(basename $@).lst
 
+%.o: %.asm
+	@#LINUX-DEPENDENT
+	$(NASM) -f elf64 -Xgnu $(basename $@).asm -o $(basename $@).o
+	@#LINUX-DEPENDENT
+	objdump -d $(basename $@).o > $(basename $@).o.s
+
 clean:
 	rm -f $(OBJECT_FILES)
 	rm -f $(foreach M,$(OPTIMIZATION_MODULES),$(M).s)
 	rm -f $(foreach M,$(OPTIMIZATION_MODULES),$(M).lst)
+	rm -f $(foreach M,$(ASSEMBLER_MODULES),$(M).o.s)
 	rm -f *~
 	rm -f $(PROGRAM_NAME)
 	rm -f $(TEMPFILE)

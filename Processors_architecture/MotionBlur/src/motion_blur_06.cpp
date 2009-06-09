@@ -8,11 +8,12 @@
 #include "motion_blur.h"
 
 /*****
- * 6. Using MMX and SSE.
+ * 6. Using MMX and SSE. GCC specific version.
  ****/
 
 namespace motion_blur
 {
+#ifndef WIN32
   void apply_06( 
           byte_type *image, int w, int h, int scanlineLen,
           byte_type const *background,
@@ -95,4 +96,12 @@ namespace motion_blur
     // Restoring FPU registers.
     asm("emms");
   }
+#else // WIN32
+  void apply_06( 
+          byte_type *image, int w, int h, int scanlineLen,
+          byte_type const *background,
+          int nMovingLayers, byte_type const *const *movingLayers )
+  {
+  }
+#endif // !WIN32
 } // End of namespace 'motion_blur'.
