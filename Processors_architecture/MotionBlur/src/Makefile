@@ -3,6 +3,8 @@
 # Vladimir Rutsky <altsysrq@gmail.com>
 # 03.06.2009
 
+# TODO: Never tested on Windows.
+
 PROGRAM_NAME = motion_blur
 OPTIMIZATION_MODULES = motion_blur dummy_output \
   motion_blur_01  motion_blur_02  motion_blur_03  motion_blur_04  \
