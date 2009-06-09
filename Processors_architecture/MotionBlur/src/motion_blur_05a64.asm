@@ -68,7 +68,6 @@ _motion_blur_apply_05_64:
         cdq ; magic with edx, in other case idiv will spawn FPU exception.
         idiv    nMovingLayers
         mov     invNMovingLayers, eax
-        ;mov     invNMovingLayers, 26; debug
         
         mov     y, 0
         ; Loop by y.
@@ -103,8 +102,6 @@ _motion_blur_apply_05_64:
         mov     rax, [rax] ; retrieved last layer start address
         add     rax, rdx
         mov     ecx, DWORD [rax]
-        
-        ;mov ebx, ecx
         
         ; Checking is pixel value has alpha (in ARGB model it means that pixel value > 0xffffff).
         cmp     ecx, 0x00ffffff
@@ -141,7 +138,6 @@ _motion_blur_apply_05_64:
         ; Iterating through layers.
         mov     ecx, nMovingLayers
         dec     ecx
-        ;mov ecx, 40 ; debug
   .next_layer:
         ; Loading layer pixel (in ebx).
         mov     eax, ecx
@@ -155,7 +151,6 @@ _motion_blur_apply_05_64:
         ; Checking is pixel value has alpha.
         cmp     ebx, 0x00ffffff
         jbe     .layer_dont_have_alpha
-        ;jmp     .layer_dont_have_alpha
         
         movzx   eax, bl
         add     eax, totalR
@@ -200,19 +195,16 @@ _motion_blur_apply_05_64:
         mov     eax, totalR
         imul    eax, ebx
         shr     eax, 8
-        ;shr     eax, 5
         mov     BYTE [rcx + 0], al
 
         mov     eax, totalG
         imul    eax, ebx
         shr     eax, 8
-        ;shr     eax, 5
         mov     BYTE [rcx + 1], al
 
         mov     eax, totalB
         imul    eax, ebx
         shr     eax, 8
-        ;shr     eax, 5
         mov     BYTE [rcx + 2], al
   .last_layer_not_transparent_if_end:
   
