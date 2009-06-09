@@ -27,18 +27,18 @@
 %define nLocalVars    20
 
 ; Arguments.
-%define image           DWORD [ebp + 4 *  1]
-%define w               DWORD [ebp + 4 *  2]
-%define h               DWORD [ebp + 4 *  3]
-%define scanlineLen     DWORD [ebp + 4 *  4]
-%define background      DWORD [ebp + 4 *  5]
-%define nMovingLayers   DWORD [ebp + 4 *  6]
-%define movingLayers    DWORD [ebp + 4 *  7]
+%define image           DWORD [ebp + 4 * 2]
+%define w               DWORD [ebp + 4 * 3]
+%define h               DWORD [ebp + 4 * 4]
+%define scanlineLen     DWORD [ebp + 4 * 5]
+%define background      DWORD [ebp + 4 * 6]
+%define nMovingLayers   DWORD [ebp + 4 * 7]
+%define movingLayers    DWORD [ebp + 4 * 8]
 
 ; Local variables.
-%define y               DWORD [ebp - 4 *  8]
-%define x               DWORD [ebp - 4 *  9]
-%define idx             DWORD [ebp - 4 * 10]
+%define y               DWORD [ebp - 4 * 1]
+%define x               DWORD [ebp - 4 * 2]
+%define idx             DWORD [ebp - 4 * 3]
 
 _motion_blur_apply_dummy_32:
         push    ebp                  ; saving previous rbp
