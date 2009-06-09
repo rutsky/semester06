@@ -55,7 +55,7 @@ $(PROGRAM_NAME): $(OBJECT_FILES)
 
 %.o: %.asm
 	@#LINUX-DEPENDENT
-	$(NASM) -f elf64 -Xgnu $(basename $@).asm -o $(basename $@).o
+	$(NASM) -f elf64 -Xgnu -g $(basename $@).asm -o $(basename $@).o
 	@#LINUX-DEPENDENT
 	objdump -d $(basename $@).o > $(basename $@).o.s
 
