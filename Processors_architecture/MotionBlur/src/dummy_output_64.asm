@@ -31,13 +31,14 @@ global _motion_blur_apply_dummy_64
 %define nMovingLayers   r9d
 %define movingLayers    DWORD [rbp + 8 * 2]
 
-; Local variables.
-%define y                    DWORD [rbp - 8 *  2]
-%define x                    DWORD [rbp - 8 *  3]
-%define idx                  DWORD [rbp - 8 *  4]
+%define h               DWORD [rbp - 8 * 1]
+%define scanlineLen     DWORD [rbp - 8 * 2]
 
-%define h                    DWORD [rbp - 8 * 13]
-%define scanlineLen          DWORD [rbp - 8 * 14]
+; Local variables.
+%define y               DWORD [rbp - 8 * 3]
+%define x               DWORD [rbp - 8 * 4]
+%define idx             DWORD [rbp - 8 * 5]
+
 
 _motion_blur_apply_dummy_64:
         push    rbp                  ; saving previous rbp
