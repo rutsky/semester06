@@ -10,7 +10,7 @@ OPTIMIZATION_MODULES = motion_blur dummy_output \
   motion_blur_01  motion_blur_02  motion_blur_03  motion_blur_04  \
   motion_blur_06
 ASSEMBLER_MODULES = \
-  dummy_output_64 motion_blur_05a64
+  dummy_output_64 motion_blur_05_64
 #ASSEMBLER_MODULES = \
 #  dummy_output_32
 OBJECT_FILES = main.o $(foreach M,$(OPTIMIZATION_MODULES),$(M).o) $(foreach M,$(ASSEMBLER_MODULES),$(M).o)
