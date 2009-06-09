@@ -14,7 +14,7 @@
 [section .text align=16]
 [global _motion_blur_apply_05_32]
 
-; void _motion_blur_apply_05_64(
+; void _motion_blur_apply_05_32(
 ;        byte_type *image,                    // DWORD [ebp + 4 * 2]
 ;        int w,                               // DWORD [ebp + 4 * 3]
 ;        int h,                               // DWORD [ebp + 4 * 4]
@@ -33,22 +33,22 @@
 %define scanlineLen     DWORD [ebp + 4 * 5]
 %define background      DWORD [ebp + 4 * 6]
 %define nMovingLayers   DWORD [ebp + 4 * 7]
-%define movingLayers    DWORD [rbp + 4 * 8]
+%define movingLayers    DWORD [ebp + 4 * 8]
 
 ; Local variables.
-%define invNMovingLayers     DWORD [rbp - 4 *  3]
-%define y                    DWORD [rbp - 4 *  4]
-%define x                    DWORD [rbp - 4 *  5]
-%define idx                  DWORD [rbp - 4 *  6]
-%define lastLayerMovingPixel DWORD [rbp - 4 *  7]
-%define backgroundPixelR     DWORD [rbp - 4 *  8]
-%define backgroundPixelG     DWORD [rbp - 4 *  9]
-%define backgroundPixelB     DWORD [rbp - 4 * 10]
-%define totalR               DWORD [rbp - 4 * 11]
-%define totalG               DWORD [rbp - 4 * 12]
-%define totalB               DWORD [rbp - 4 * 13]
+%define invNMovingLayers     DWORD [ebp - 4 *  3]
+%define y                    DWORD [ebp - 4 *  4]
+%define x                    DWORD [ebp - 4 *  5]
+%define idx                  DWORD [ebp - 4 *  6]
+%define lastLayerMovingPixel DWORD [ebp - 4 *  7]
+%define backgroundPixelR     DWORD [ebp - 4 *  8]
+%define backgroundPixelG     DWORD [ebp - 4 *  9]
+%define backgroundPixelB     DWORD [ebp - 4 * 10]
+%define totalR               DWORD [ebp - 4 * 11]
+%define totalG               DWORD [ebp - 4 * 12]
+%define totalB               DWORD [ebp - 4 * 13]
 
-_motion_blur_apply_05_64:
+_motion_blur_apply_05_32:
         push    ebp                  ; saving previous rbp
         mov     ebp, esp             ; moving into current rbp rsp: base for arguments and variables
         
@@ -91,7 +91,7 @@ _motion_blur_apply_05_64:
         ; Loading last layer pixel (in ecx).
         mov     eax, nMovingLayers
         dec     eax
-        shl     eax, 3     ; 3 == log(2, sizeof(byte_type *))
+        shl     eax, 2     ; 2 == log(2, sizeof(byte_type *))
         add     eax, movingLayers
         mov     eax, [eax] ; retrieved last layer start address
         add     eax, edx

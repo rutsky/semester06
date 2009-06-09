@@ -200,29 +200,40 @@ InputName=dummy_output_64
 # End Source File
 # Begin Source File
 
-SOURCE=.\motion_blur_05a64.asm
+SOURCE=.\motion_blur_05_32.asm
 
 !IF  "$(CFG)" == "MotionBlur - Win32 Release"
 
-# PROP Ignore_Default_Tool 1
 # Begin Custom Build
 InputDir=.
 IntDir=.\Release
-InputPath=.\motion_blur_05a64.asm
-InputName=motion_blur_05a64
+InputPath=.\motion_blur_05_32.asm
+InputName=motion_blur_05_32
 
-"$(IntDir)$\(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	C:\nasm\nasm.exe -f win32 -Xvc -o "$(IntDir)$\(InputName).obj" $(InputDir)\$(InputName).asm
+"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	C:\nasm\nasm.exe -f win32 -Xvc -o "$(IntDir)\$(InputName).obj" $(InputDir)\$(InputName).asm
 
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "MotionBlur - Win32 Debug"
 
-# PROP Exclude_From_Build 1
-# PROP Ignore_Default_Tool 1
+# Begin Custom Build
+InputDir=.
+IntDir=.\Debug
+InputPath=.\motion_blur_05_32.asm
+InputName=motion_blur_05_32
+
+"$(IntDir)\$(InputName).obj" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	C:\nasm\nasm.exe -f win32 -Xvc -o "$(IntDir)\$(InputName).obj" $(InputDir)\$(InputName).asm
+
+# End Custom Build
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=.\motion_blur_05_64.asm
 # End Source File
 # End Group
 # End Target
