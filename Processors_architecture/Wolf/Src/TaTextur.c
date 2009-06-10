@@ -219,7 +219,7 @@ TaUInt8 *TaTextureGet(TaInt32 nTextureIndex)
 // RETURNS     None
 // NOTES       None
 //
-TaBool  TaTextureDrawVertLine(
+TaBool  TaTextureDrawVertLine_c(
                             TaUInt8 *cpScreen,
                             TaInt32 nScreenYUp,
                             TaInt32 nScreenYDown,
@@ -286,6 +286,275 @@ TaBool  TaTextureDrawVertLine(
     *npDest = nColor;
     npDest += taWINDOW_WIDTH;
     nTexAccurate += nTexStep;
+  }
+
+  return (taSUCCESS);
+}
+
+// NAME        
+// PURPOSE     
+// ARGUMENTS   None
+// RETURNS     None
+// NOTES       None
+//
+TaBool  TaTextureDrawVertLine(
+                            TaUInt8 *cpScreen,
+                            TaInt32 nScreenYUp,
+                            TaInt32 nScreenYDown,
+                            TaInt32 nTextureIndex,
+                            TaInt32 nTextureX,
+                            TaInt32 nScreenX
+                           )
+{
+  TaUInt16    *npTexture;
+  TaInt32     nTexStart, nTexEnd;
+  TaInt32     nTexStep;
+  TaInt32     nTexAccurate;
+  TaUInt16    *npSrc;
+  TaUInt16    *npDest;
+  TaInt32     nY;
+  TaInt32     nTexY;
+  TaUInt16    nColor;
+
+  // Cull fully invisible vert line
+  if (nScreenYUp >= taWINDOW_HEIGHT)
+  {
+    return (taSUCCESS);
+  }
+  if (nScreenYDown <= 0)
+  {
+    return (taSUCCESS);
+  }
+
+  nTexStart = 0;
+  nTexEnd   = taTEXTURE_SIDE - 1;
+
+  // Clip partially visible vert line
+  if (nScreenYUp < 0)
+  {
+    return (taSUCCESS);
+  }
+  if (nScreenYDown >= taWINDOW_HEIGHT)
+  {
+    return (taSUCCESS);
+  }
+
+  npTexture = (TaUInt16*)TaTextureGet(nTextureIndex);
+  if (!npTexture)
+  {
+    return (taFAIL);
+  }
+
+  nTexStep = 
+              ((nTexEnd - nTexStart) << 16) / 
+              (nScreenYDown - nScreenYUp + 1);
+
+  nTexAccurate = nTexStart << 16;
+
+
+  npDest = 
+            (TaUInt16*)cpScreen + nScreenX + 
+            nScreenYUp * taWINDOW_WIDTH;
+  npSrc = npTexture + nTextureX;
+  
+  /*
+  for (nY = nScreenYUp; nY <= nScreenYDown; nY++)
+  {
+    // Get int texture coord Y
+    nTexY = nTexAccurate >> 16;
+    nColor = npSrc[nTexY << taTEXTURE_SIDE_DEGREE];
+    *npDest = nColor;
+    npDest += taWINDOW_WIDTH;
+    nTexAccurate += nTexStep;
+  }
+  */
+
+  /*
+  // 52 FPS
+  __asm {
+          ; for (nY = nScreenYUp; nY <= nScreenYDown; nY++)
+          ; nY = nScreenYUp
+          mov     edx,dword ptr [nScreenYUp]
+          mov     dword ptr [nY],edx
+          jmp     loop_iter
+
+    loop_next_iter:
+          ; nY++
+          mov     eax,dword ptr [nY]
+          add     eax,1
+          mov     dword ptr [nY],eax
+
+    loop_iter:
+          ; check (nY <= nScreenYDown)
+          mov     ecx,dword ptr [nY]
+          cmp     ecx,dword ptr [nScreenYDown]
+          ;cmp     ecx,190
+          jg      end_loop
+
+          ; nTexY = nTexAccurate >> 16;
+          mov     edx,dword ptr [nTexAccurate]
+          sar     edx,10h
+          mov     dword ptr [nTexY],edx
+
+          ; nColor = npSrc[nTexY << taTEXTURE_SIDE_DEGREE];
+          mov     eax,dword ptr [nTexY]
+          shl     eax,7
+          mov     ecx,dword ptr [npSrc]
+          mov     dx,word ptr [ecx+eax*2]
+          ;mov     dx,word ptr [ecx]
+          mov     word ptr [nColor],dx
+
+          ; *npDest = nColor;
+          mov     eax,dword ptr [npDest]
+          mov     cx,word ptr [nColor]
+          mov     word ptr [eax],cx
+
+          ; npDest += taWINDOW_WIDTH;
+          mov     edx,dword ptr [npDest]
+          add     edx,500h
+          mov     dword ptr [npDest],edx
+
+          ; nTexAccurate += nTexStep;
+          mov     eax,dword ptr [nTexAccurate]
+          add     eax,dword ptr [nTexStep]
+          mov     dword ptr [nTexAccurate],eax
+          jmp     loop_next_iter
+    end_loop:
+  }
+  */
+
+  /*
+  // 53 FPS
+  __asm {
+          ; for (nY = nScreenYUp; nY <= nScreenYDown; nY++)
+          ; nY = nScreenYUp
+          mov     edx,dword ptr [nScreenYUp]
+          mov     dword ptr [nY],edx
+          jmp     loop_iter
+
+    loop_next_iter:
+          ; nY++
+          mov     eax,dword ptr [nY]
+          inc     eax
+          mov     dword ptr [nY],eax
+
+    loop_iter:
+          ; check (nY <= nScreenYDown)
+          mov     ecx,dword ptr [nY]
+          cmp     ecx,dword ptr [nScreenYDown]
+          jg      end_loop
+
+          ; nTexY = nTexAccurate >> 16;
+          mov     edx,dword ptr [nTexAccurate]
+          sar     edx,10h
+          mov     dword ptr [nTexY],edx
+
+          ; nColor = npSrc[nTexY << taTEXTURE_SIDE_DEGREE];
+          ; *npDest = nColor;
+          mov     eax,dword ptr [nTexY]
+          shl     eax,7
+          mov     ecx,dword ptr [npSrc]
+          mov     dx,word ptr [ecx+eax*2]
+          mov     eax,dword ptr [npDest]
+          mov     word ptr [eax],dx
+
+          ; npDest += taWINDOW_WIDTH;
+          mov     edx,dword ptr [npDest]
+          add     edx,500h
+          mov     dword ptr [npDest],edx
+
+          ; nTexAccurate += nTexStep;
+          mov     eax,dword ptr [nTexAccurate]
+          add     eax,dword ptr [nTexStep]
+          mov     dword ptr [nTexAccurate],eax
+          jmp     loop_next_iter
+    end_loop:
+  }
+  */
+
+  /*
+  // 54 FPS
+  __asm {
+          ; for (nY = nScreenYUp; nY <= nScreenYDown; nY++)
+          ; nY = nScreenYUp
+          mov     edx,dword ptr [nScreenYUp]
+          mov     dword ptr [nY],edx
+          jmp     loop_iter
+
+    loop_next_iter:
+          ; nY++
+          mov     eax,dword ptr [nY]
+          inc     eax
+          mov     dword ptr [nY],eax
+
+    loop_iter:
+          ; check (nY <= nScreenYDown)
+          mov     ecx,dword ptr [nY]
+          cmp     ecx,dword ptr [nScreenYDown]
+          jg      end_loop
+
+          ; nTexY = nTexAccurate >> 16;
+          mov     edx,dword ptr [nTexAccurate]
+          sar     edx,16
+
+          ; nColor = npSrc[nTexY << taTEXTURE_SIDE_DEGREE];
+          ; *npDest = nColor;
+          shl     edx,7
+          mov     ecx,dword ptr [npSrc]
+          mov     dx,word ptr [ecx+edx*2]
+          mov     eax,dword ptr [npDest]
+          mov     word ptr [eax],dx
+
+          ; npDest += taWINDOW_WIDTH;
+          add     eax,500h
+          mov     dword ptr [npDest],eax
+
+          ; nTexAccurate += nTexStep;
+          mov     eax,dword ptr [nTexAccurate]
+          add     eax,dword ptr [nTexStep]
+          mov     dword ptr [nTexAccurate],eax
+          jmp     loop_next_iter
+    end_loop:
+  }
+  */
+
+__asm {
+          ; for (nY = nScreenYUp; nY <= nScreenYDown; nY++)
+          ; nY = nScreenYUp (ecx is nY)
+          mov     ecx,dword ptr [nScreenYUp]
+          jmp     loop_iter
+
+    loop_next_iter:
+          ; nY++
+          inc     ecx
+
+    loop_iter:
+          ; check (nY <= nScreenYDown)
+          cmp     ecx,dword ptr [nScreenYDown]
+          jg      end_loop
+
+          ; nTexY = nTexAccurate >> 16;
+          mov     edx,dword ptr [nTexAccurate]
+          sar     edx,16
+
+          ; nColor = npSrc[nTexY << taTEXTURE_SIDE_DEGREE];
+          ; *npDest = nColor;
+          shl     edx,7
+          mov     eax,dword ptr [npSrc]
+          mov     dx,word ptr [eax+edx*2]
+          mov     eax,dword ptr [npDest]
+          mov     word ptr [eax],dx
+
+          ; npDest += taWINDOW_WIDTH;
+          add     eax,500h
+          mov     dword ptr [npDest],eax
+
+          ; nTexAccurate += nTexStep;
+          mov     eax,dword ptr [nTexAccurate]
+          add     eax,dword ptr [nTexStep]
+          mov     dword ptr [nTexAccurate],eax
+          jmp     loop_next_iter
+    end_loop:
   }
 
   return (taSUCCESS);
