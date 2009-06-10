@@ -245,6 +245,7 @@ int PASCAL  WinMain(
     WNDCLASS  wndClass;
     MSG       msg;
     TaBool    bRet;
+    int       doQuit;
 
 
     _mainFindArgs(lpszCommandLine);
@@ -293,6 +294,7 @@ int PASCAL  WinMain(
       hdc = GetDC(NULL);
       nCaps = GetDeviceCaps(hdc , BITSPIXEL);
       ReleaseDC(NULL, hdc);
+      /*
       if (nCaps != 16)
       {
         MessageBox( 
@@ -303,6 +305,7 @@ int PASCAL  WinMain(
                   );
         //return (-1); // commented by bob
       }
+      */
     }
 
 
@@ -339,17 +342,22 @@ int PASCAL  WinMain(
      * mechanism for a real application (a separate render worker
      * thread might be better). 
      */
-    while (TRUE)
+
+    doQuit = 0;
+    while (!doQuit)
     {
-        if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+        while (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
         {
             if (WM_QUIT == msg.message)
+            {
+                doQuit = 1;
                 break;
+            }
 
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-        else
+
         {
             if ( GetFocus() == hFrame )
             {
@@ -365,6 +373,7 @@ int PASCAL  WinMain(
                 break;
               }
             }
+            Sleep(1);
         }
     }
     return msg.wParam;
