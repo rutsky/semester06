@@ -1,0 +1,96 @@
+\documentclass[a4paper,10pt]{article}
+
+% Encoding support.
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+
+% Spaces after commas.
+\frenchspacing
+% Minimal carrying number of characters,
+\righthyphenmin=2
+
+\usepackage{amsmath, amsthm, amssymb}
+
+% From K.V.Voroncov Latex in samples, 2005.
+\textheight=24cm   % text height
+\textwidth=16cm    % text width.
+\oddsidemargin=0pt % left side indention
+\topmargin=-1.5cm  % top side indention.
+\parindent=24pt    % paragraph indent
+\parskip=0pt       % distance between paragraphs.
+\tolerance=2000
+%\flushbottom       % page height aligning
+%\hoffset=0cm
+\pagestyle{empty}  % withour numeration
+
+%\renewcommand{\baselinestretch}{0.5} % lowering lines interval
+
+\begin{document}
+
+\section*{Вопросы к экзамену по курсу архитектуры процессоров}
+
+\begin{enumerate}
+  %\setlength{\itemsep}{-1.5mm} % отступ в перечислении --- выглядит страшно
+
+  %TODO: Use \Roman.
+  \item Алгоритмы деления.
+        Алгоритм Ньютона-Рафсона, вывод формулы.
+  \item Алгоритмы деления.
+        Алгоритм с вычитанием, деление в столбик.
+  \item Сопроцессор VFPU для Allegrex.
+        Особенности регистрового файла, инструкции префикса.
+  \item Правила спаривания инструкций.
+        Архитектура Пентиум I.
+  \item Кэш данных.
+        Ассоциативность кэша.
+        Архитектура Пентиум I.
+  \item Механизм предсказания ветвлений.
+        Архитектура Пентиум I.
+  \item Оптимизация кеша данных.
+        Архитектура Пентиум I.
+  \item Стадии конвейера.
+        Архитектура Пентиум II.
+  \item Механизм предсказания ветвлений.
+        Архитектура Пентиум II.
+  \item Особенности выполнения в не исходном порядке.
+        Архитектура Пентиум II.
+  \item Оптимизации декодера.
+        Архитектура Пентиум II.
+  \item Регистры процессора Пентиум I.
+  \item Режимы адресации.
+        Архитектура Пентиум I.
+  \item Представление данных в процессоре с плавающей точкой.
+        Архитектура Пентиум I.
+  \item Регистровая организация процессора с плавающей точкой.
+        Архитектура Пентиум I.
+  \item Команды умножения и деления и подготовки делимого.
+        Архитектура Пентиум I.
+  \item Логические и сдвиговые команды.
+        Архитектура Пентиум I.
+  \item Команды обработки цепочек.
+        Архитектура Пентиум I.
+  \item Типы арифметики~--- с переполнением и насыщением.
+        Примеры.
+  \item Инструкции умножения, умножения и сложения.
+        Архитектура ММХ.
+  \item Инструкции упаковки, распаковки.
+        Архитектура ММХ.
+  \item Инструкции пересылки данных.
+        Архитектура SSE (Пентиум III).
+  \item Инструкция перемешивания.
+        Архитектура SSE (Пентиум III).
+  \item Инструкции управления кешем.
+        Архитектура SSE (Пентиум III).
+  \item Новые типы данных и примеры инструкций с ними.
+        Архитектура SSE2 (Пентиум IV).
+  \item Типы данных для процессора AMD K6-3Dnow! и примеры инструкций с ними.
+  \item Вычисление $\frac{1}{b}$.
+        Архитектура AMD K6-3Dnow!.
+  \item Архитектура ARM.
+        Типы арифметики, особенности инструкций.
+
+\end{enumerate}
+
+\end{document}
