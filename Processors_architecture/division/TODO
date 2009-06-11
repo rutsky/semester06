@@ -1,0 +1,2 @@
+ * Check Newton-Raphson that first `1/denominator' approximation is less then actual `1/denominator'.
+ * In long division search highers bits using `BSR' instruction.
