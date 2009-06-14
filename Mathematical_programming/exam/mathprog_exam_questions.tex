@@ -1,0 +1,77 @@
+\documentclass[a4paper,10pt]{article}
+
+% Encoding support.
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+
+% Spaces after commas.
+\frenchspacing
+% Minimal carrying number of characters,
+\righthyphenmin=2
+
+\usepackage{amsmath, amsthm, amssymb}
+
+% From K.V.Voroncov Latex in samples, 2005.
+\textheight=24cm   % text height
+\textwidth=16cm    % text width.
+\oddsidemargin=0pt % left side indention
+\topmargin=-1.5cm  % top side indention.
+\parindent=24pt    % paragraph indent
+\parskip=0pt       % distance between paragraphs.
+\tolerance=2000
+%\flushbottom       % page height aligning
+%\hoffset=0cm
+\pagestyle{empty}  % withour numeration
+
+%\renewcommand{\baselinestretch}{0.5} % lowering lines interval
+
+\begin{document}
+
+\section*{Вопросы по курсу "Математическое программирование"}
+
+\begin{enumerate}
+  %\setlength{\itemsep}{-1.5mm} % отступ в перечислении --- выглядит страшно
+
+  \item Симплекс-метод решения задачи линейного пpoграммирования.
+        Построение начального опорного вектора.
+  \item Метод деления отрезка пополам.
+  \item Метод золотого сечения.
+  \item Метод циклического покоординатного спуска.
+        Лемма о $f(x) - f(y) \geqslant f^\mathrm{T}(x)(x - y) - \Lambda \|x - y \|^2$ и теорема сходимости.
+  \item Грaдиентныe методы.
+        Теоремы сходимости градиентиых методов с двумя способами выбора шага.
+  \item Теорема o скорости сходимости градиентных методов.
+  \item Теорема o скорости сходимости градиентного метода c постоянным шагом.
+  \item Методы Ньютона.
+        Теоремы сходимости методов Ньютона c двумя способами выбора шага.
+  \item Теорема o скорости сходимости методов Ньютона.
+  \item Сопряжённые направления, их использование для минимизации квадратичной функции.
+  \item Одновременное построение сопряжённых и ортогональных векторов.
+  \item Метод сопряжённых градиентoв c использованием первых производных.
+  \item Метод сопряжённых градиентов без вычисления производных.
+  \item Метод проекции градиента.
+        Свойство матрицы проектирования.
+        Теорема об оптимальности точки.
+  \item Метод возможных направлений.
+        Схема метода и обоснование выбора шага.
+  \item Теорема o существовании $\eta_\delta < 0$.
+  \item Алгоритм метода возможных направлений и теорема сходимости.
+  \item Построение начального вектора в методе возможных направлений.
+  \item Градиентный метод в задаче c ограничениями.
+        Обоснование выбора шага и описание алгоритма.
+  \item Теоремы сходимости и скорости сходимости метода условного гpaдиента.
+  \item Метод Ньютона в задаче c ограничениями.
+        Обоснование выбора шага и описание алгоритма.
+  \item Теоремы сходимости и скорости сходимости метода Ньютона.
+  \item Метод отсекающей гиперплоскости.
+        Теорема схoдимости метода.
+  \item Метод штрафных функций.
+        Лемма об оценках и теорема сходимости.
+  \item Метод барьерных функций.
+        Лемма об оценках и теорема сходимости.
+
+\end{enumerate}
+
+\end{document}
