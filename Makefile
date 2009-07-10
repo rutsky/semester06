@@ -7,8 +7,8 @@ all:
 	@echo "Read Makefile contents for details of usage."
 
 public:
-	git push git@github.com:rutsky/semester06.git
-	git push git@gitorious.org:spbstu/semester06.git
+	git push git@github.com:rutsky/semester06.git master
+	git push git@gitorious.org:spbstu/semester06.git master
 
 clean-light:
 	find . -name '*.o' -exec rm '{}' \;
