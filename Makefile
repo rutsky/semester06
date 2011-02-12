@@ -7,8 +7,8 @@ all:
 	@echo "Read Makefile contents for details of usage."
 
 git-init:
-	git remote add github    git@github.com:rutsky/semester07.git
-	git remote add gitorious git@gitorious.org:spbstu/semester07.git
+	git remote add github    git@github.com:rutsky/semester06.git
+	git remote add gitorious git@gitorious.org:spbstu/semester06.git
 
 public:
 	git push git@github.com:rutsky/semester06.git    master
